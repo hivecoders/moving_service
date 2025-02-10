@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register as Customer{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white text-center">
+                <h4><i class="fas fa-user-plus"></i> Register as Customer</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <!-- Full Name -->
+                    <div class="mb-3">
+                        <label for="id_name" class="form-label">Full Name</label>
+                        <input type="text" name="name" class="form-control" id="id_name" value="{{ form.name.value }}">
+                        {% if form.name.errors %}
+                            <div class="text-danger">{{ form.name.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">Email</label>
+                        <input type="email" name="username" class="form-control" id="id_username" value="{{ form.username.value }}">
+                        <small class="text-muted">We'll never share your email with anyone else.</small>
+                        {% if form.username.errors %}
+                            <div class="text-danger">{{ form.username.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="mb-3">
+                        <label for="id_phone" class="form-label">Phone</label>
+                        <input type="text" name="phone" class="form-control" id="id_phone" value="{{ form.phone.value }}">
+                        <small class="text-muted">Include country code if applicable.</small>
+                        {% if form.phone.errors %}
+                            <div class="text-danger">{{ form.phone.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Payment Info -->
+                    <div class="mb-3">
+                        <label for="id_payment_info" class="form-label">Payment Information</label>
+                        <input type="text" name="payment_info" class="form-control" placeholder="Enter your bank details">
+                        <small class="text-muted">Bank account or payment details for transactions.</small>
+                    </div>
+
+                    <!-- Profile Photo -->
+                    <div class="mb-3">
+                        <label for="id_profile_photo" class="form-label">Profile Photo</label>
+                        <input type="file" name="profile_photo" class="form-control">
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-3">
+                        <label for="id_password1" class="form-label">Password</label>
+                        <input type="password" name="password1" class="form-control" id="id_password1" value="{{ form.password1.value }}">
+                        <small class="text-muted">Your password must be at least 8 characters long.</small>
+                        {% if form.password1.errors %}
+                            <div class="text-danger">{{ form.password1.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Password Confirmation -->
+                    <div class="mb-3">
+                        <label for="id_password2" class="form-label">Confirm Password</label>
+                        <input type="password" name="password2" class="form-control" id="id_password2" value="{{ form.password2.value }}">
+                        {% if form.password2.errors %}
+                            <div class="text-danger">{{ form.password2.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="fas fa-check-circle"></i> Submit
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

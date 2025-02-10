@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mover Registration{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Mover Registration</h1>
+    <form method="post" enctype="multipart/form-data" class="shadow p-4 bg-white rounded">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            {{ form.username }}
+        </div>
+
+        <div class="mb-3">
+            <label for="full_name" class="form-label">Full Name</label>
+            {{ form.name }}
+        </div>
+
+        <div class="mb-3">
+            <label for="phone" class="form-label">Phone</label>
+            {{ form.phone }}
+        </div>
+
+        <div class="mb-3">
+            <label for="vehicle_type" class="form-label">Vehicle Type</label>
+            {{ form.vehicle_type }}
+        </div>
+
+        <div class="mb-3">
+            <label for="mover_type" class="form-label">Mover Type</label>
+            {{ form.mover_type }}
+        </div>
+
+        <div class="mb-3">
+            <label for="profile_photo" class="form-label">Profile Photo</label>
+            <input type="file" name="profile_photo" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label for="identification_id" class="form-label">Identification ID</label>
+            <input type="text" name="identification_id" class="form-control" placeholder="Passport, Work/Study Permit, SIN">
+        </div>
+
+        <!-- Map Section -->
+        <div class="form-group">
+            <label for="location_map">Select Location</label>
+            <input type="text" id="location_map" class="form-control" placeholder="Search for location" readonly>
+            <div id="location_map_canvas" style="height: 400px;" class="my-3"></div>
+        </div>
+
+        <input type="hidden" id="mover_location" name="location">
+
+        <button type="submit" class="btn btn-primary w-100">Register</button>
+    </form>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var map = L.map('location_map_canvas').setView([51.505, -0.09], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        var marker;
+        function onLocationSelected(latlng) {
+            if (marker) map.removeLayer(marker);
+            marker = L.marker(latlng).addTo(map);
+            document.getElementById('location_map').value = latlng.lat + ', ' + latlng.lng;
+            document.getElementById('mover_location').value = latlng.lat + ',' + latlng.lng;
+        }
+
+        map.on('click', function(e) {
+            onLocationSelected(e.latlng);
+        });
+
+        L.Control.geocoder().addTo(map);
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mover Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white text-center">
+            <h2><i class="fas fa-box-open"></i> Available Orders</h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for order in orders %}
+                <div class="col-md-6 mb-4">
+                    <div class="card border-info shadow-sm h-100">
+                        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-truck"></i> Order #{{ order.id }}</h5>
+                            <span class="badge bg-warning text-dark">{{ order.move_date|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="card-body">
+                            <p><strong><i class="fas fa-map-marker-alt"></i> Origin:</strong> {{ order.origin }} <small>(Floor: {{ order.origin_floor }})</small></p>
+                            <p><strong><i class="fas fa-map-pin"></i> Destination:</strong> {{ order.destination }} <small>(Floor: {{ order.destination_floor }})</small></p>
+                            <p><strong><i class="fas fa-elevator"></i> Elevator Available:</strong> {{ order.has_elevator|yesno:"Yes,No" }}</p>
+                            <p><strong><i class="fas fa-cube"></i> Total Volume:</strong> {{ order.total_volume }} m³</p>
+                            <p><strong><i class="fas fa-weight-hanging"></i> Total Weight:</strong> {{ order.total_weight }} kg</p>
+
+                            <div class="photo-gallery d-flex flex-wrap gap-2 mt-3">
+                                {% for photo in order.photos.all %}
+                                    <img src="{{ photo.image.url }}" class="img-thumbnail" style="max-height: 120px; width: auto;" alt="Order Photo">
+                                {% empty %}
+                                    <p class="text-muted">No photos available.</p>
+                                {% endfor %}
+                            </div>
+
+                            <a href="{% url 'process_payment' order.id %}" class="btn btn-success mt-3 w-100">
+                                <i class="fas fa-check-circle"></i> Accept Order
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-center text-muted"><i class="fas fa-info-circle"></i> No orders available at the moment.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

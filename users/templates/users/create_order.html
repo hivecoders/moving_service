@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Order{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow-lg border-info">
+            <div class="card-header bg-info text-white text-center">
+                <h4><i class="fas fa-box-open"></i> Create New Order</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <!-- Order Details -->
+                    <h5 class="text-primary"><i class="fas fa-info-circle"></i> Order Details</h5>
+                    <hr>
+                    {{ order_form.as_p }}
+
+                    <!-- Hidden Inputs for Location Coordinates -->
+                    <input type="hidden" name="origin_location" id="id_origin_location">
+                    <input type="hidden" name="destination_location" id="id_destination_location">
+
+                    <!-- Map for Selecting Locations -->
+                    <h5 class="text-primary mt-4"><i class="fas fa-map-marked-alt"></i> Select Origin & Destination</h5>
+                    <div id="map" class="map-container mb-4"></div>
+
+                    <!-- Upload Photos -->
+                    <h5 class="text-primary"><i class="fas fa-camera"></i> Upload Photos of Items</h5>
+                    <small class="text-muted">You can upload multiple photos to help movers assess the size and type of items.</small>
+                    <hr>
+                    {{ photo_formset.management_form }}
+                    <div class="row">
+                        {% for form in photo_formset %}
+                            <div class="col-md-4 mb-3">
+                                {{ form.as_p }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-success w-100 mt-3">
+                        <i class="fas fa-truck-loading"></i> Submit Order
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Initialize the map
+    var map = L.map('map').setView([51.505, -0.09], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    var originMarker, destinationMarker;
+
+    map.on('click', function(e) {
+        if (!originMarker) {
+            originMarker = L.marker(e.latlng, { draggable: true })
+                .addTo(map)
+                .bindPopup('Origin Location').openPopup();
+            document.getElementById('id_origin_location').value = `${e.latlng.lat},${e.latlng.lng}`;
+        } else if (!destinationMarker) {
+            destinationMarker = L.marker(e.latlng, { draggable: true, icon: L.icon({
+                iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-red.png'
+            })}).addTo(map)
+              .bindPopup('Destination Location').openPopup();
+            document.getElementById('id_destination_location').value = `${e.latlng.lat},${e.latlng.lng}`;
+        }
+    });
+</script>
+{% endblock %}

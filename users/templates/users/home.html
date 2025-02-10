@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - Moving Companion{% endblock %}
+
+{% block content %}
+<div class="text-center mt-5">
+    <h1 class="display-4 fw-bold">Welcome to our Moving Service</h1>
+    <p class="lead">Moving Companion : Let us move for you</p>
+
+    <!-- Hero Image -->
+    <div class="mt-4">
+        <img src="{% static 'images/banner.jpg' %}" class="img-fluid shadow-lg rounded" alt="Moving Service Banner" style="max-width: 60%; height: auto;">
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex justify-content-center mt-4">
+        <a href="{% url 'login' %}" class="btn btn-primary btn-lg mx-2">
+            <i class="fas fa-sign-in-alt"></i> Login
+        </a>
+        <a href="{% url 'register_customer' %}" class="btn btn-success btn-lg mx-2">
+            <i class="fas fa-user-plus"></i> Register as Customer
+        </a>
+        <a href="{% url 'register_mover' %}" class="btn btn-info btn-lg mx-2">
+            <i class="fas fa-truck"></i> Register as Mover
+        </a>
+    </div>
+</div>
+{% endblock %}

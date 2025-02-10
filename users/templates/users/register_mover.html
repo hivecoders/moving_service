@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register as Mover{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white text-center">
+                <h4><i class="fas fa-truck"></i> Register as Mover</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <!-- Full Name -->
+                    <div class="mb-3">
+                        <label for="id_full_name" class="form-label">Full Name</label>
+                        {{ form.full_name }}
+                        {% if form.full_name.errors %}
+                            <div class="text-danger">{{ form.full_name.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="id_email" class="form-label">Email</label>
+                        {{ form.email }}
+                        <small class="form-text text-muted">We'll never share your email with anyone else.</small>
+                        {% if form.email.errors %}
+                            <div class="text-danger">{{ form.email.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="mb-3">
+                        <label for="id_phone" class="form-label">Phone</label>
+                        {{ form.phone }}
+                        <small class="form-text text-muted">Include country code if applicable.</small>
+                        {% if form.phone.errors %}
+                            <div class="text-danger">{{ form.phone.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Mover Type -->
+                    <div class="mb-3">
+                        <label for="id_mover_type" class="form-label">Mover Type</label>
+                        {{ form.mover_type }}
+                    </div>
+
+                    <!-- Profile Photo -->
+                    <div class="mb-3">
+                        <label for="id_profile_photo" class="form-label">Profile Photo</label>
+                        {{ form.profile_photo }}
+                    </div>
+
+                    <!-- Identification ID -->
+                    <div class="mb-3">
+                        <label for="id_identification_id" class="form-label">Identification ID (Passport, Work/Study Permit, SIN)</label>
+                        {{ form.identification_id }}
+                    </div>
+
+                    <!-- Vehicle Type -->
+                    <div class="mb-3">
+                        <label for="id_vehicle_type" class="form-label">Vehicle Type</label>
+                        {{ form.vehicle_type }}
+                    </div>
+
+                    <!-- Driving License -->
+                    <div class="mb-3">
+                        <label for="id_driving_license" class="form-label">Upload Driving License</label>
+                        {{ form.driving_license }}
+                    </div>
+
+                    <!-- Move Capacity -->
+                    <div class="mb-3">
+                        <label for="id_move_capacity" class="form-label">Move Capacity (in kg)</label>
+                        {{ form.move_capacity }}
+                    </div>
+
+                    <!-- Certification -->
+                    <div class="mb-3">
+                        <label for="id_certification" class="form-label">Do you have Canadian Professional Mover Course Certification?</label>
+                        {{ form.certification }}
+                        <small class="form-text text-muted">If yes, upload your certification.</small>
+                    </div>
+
+                    <!-- Payment Information -->
+                    <div class="mb-3">
+                        <label for="id_payment_info" class="form-label">Payment Information</label>
+                        {{ form.payment_info }}
+                        <small class="form-text text-muted">Enter your bank details for payment transactions.</small>
+                    </div>
+
+                    <!-- Location Map -->
+                    <div class="mb-3">
+                        <label for="location_map" class="form-label">Select Location</label>
+                        <input type="text" id="location_map" class="form-control mb-2" placeholder="Search for location" readonly>
+                        <div id="location_map_canvas" class="map-container mb-3"></div>
+                        <input type="hidden" id="mover_location" name="location">
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-3">
+                        <label for="id_password1" class="form-label">Password</label>
+                        {{ form.password1 }}
+                        <small class="form-text text-muted">Your password must be at least 8 characters long.</small>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="mb-3">
+                        <label for="id_password2" class="form-label">Confirm Password</label>
+                        {{ form.password2 }}
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-success w-100"><i class="fas fa-check-circle"></i> Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Leaflet and Geocoder Scripts -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+<script>
+    function initMap() {
+        var map = L.map('location_map_canvas').setView([51.505, -0.09], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        var geocoder = L.Control.Geocoder.nominatim();
+        L.Control.geocoder({
+            query: '',
+            placeholder: 'Search for a location',
+            collapsed: false,
+            geocoder: geocoder
+        }).addTo(map);
+
+        var marker;
+
+        function onLocationSelected(latlng) {
+            if (marker) {
+                map.removeLayer(marker);
+            }
+            marker = L.marker(latlng).addTo(map);
+            document.getElementById('location_map').value = `${latlng.lat}, ${latlng.lng}`;
+            document.getElementById('mover_location').value = `${latlng.lat},${latlng.lng}`;
+        }
+
+        map.on('click', function(e) {
+            onLocationSelected(e.latlng);
+        });
+
+        geocoder.on('select', function(event) {
+            onLocationSelected(event.latlng);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', initMap);
+</script>
+{% endblock %}
