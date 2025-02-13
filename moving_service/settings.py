@@ -60,6 +60,7 @@ TEMPLATES = [
 # WSGI Application
 WSGI_APPLICATION = 'moving_service.wsgi.application'
 
+
 # Database Configuration
 DATABASES = {
     'default': {
@@ -117,3 +118,5 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'your-email@gmail.com'
 EMAIL_HOST_PASSWORD = 'your-email-password'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
