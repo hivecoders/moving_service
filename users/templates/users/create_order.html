@@ -4,46 +4,35 @@
 {% block title %}Create Order{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-10">
-        <div class="card shadow-lg border-info">
-            <div class="card-header bg-info text-white text-center">
-                <h4><i class="fas fa-box-open"></i> Create New Order</h4>
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white text-center">
+                <h4><i class="fas fa-box"></i> Create Order</h4>
             </div>
             <div class="card-body">
                 <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
-
-                    <!-- Order Details -->
-                    <h5 class="text-primary"><i class="fas fa-info-circle"></i> Order Details</h5>
-                    <hr>
                     {{ order_form.as_p }}
-
-                    <!-- Hidden Inputs for Location Coordinates -->
-                    <input type="hidden" name="origin_location" id="id_origin_location">
-                    <input type="hidden" name="destination_location" id="id_destination_location">
-
-                    <!-- Map for Selecting Locations -->
-                    <h5 class="text-primary mt-4"><i class="fas fa-map-marked-alt"></i> Select Origin & Destination</h5>
-                    <div id="map" class="map-container mb-4"></div>
-
-                    <!-- Upload Photos -->
-                    <h5 class="text-primary"><i class="fas fa-camera"></i> Upload Photos of Items</h5>
-                    <small class="text-muted">You can upload multiple photos to help movers assess the size and type of items.</small>
-                    <hr>
-                    {{ photo_formset.management_form }}
-                    <div class="row">
-                        {% for form in photo_formset %}
-                            <div class="col-md-4 mb-3">
-                                {{ form.as_p }}
-                            </div>
-                        {% endfor %}
-                    </div>
-
-                    <!-- Submit Button -->
-                    <button type="submit" class="btn btn-success w-100 mt-3">
-                        <i class="fas fa-truck-loading"></i> Submit Order
-                    </button>
+                    <div id="origin_map_canvas" style="height: 400px;"></div>
+                    <input type="hidden" id="origin_location" name="origin_location">
+                    <div id="destination_map_canvas" style="height: 400px;"></div>
+                    <input type="hidden" id="destination_location" name="destination_location">
+                    {% if order_form.errors %}
+                        <div class="alert alert-danger">
+                            <ul>
+                                {% for field in order_form %}
+                                    {% for error in field.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in order_form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    <button type="submit" class="btn btn-success w-100"><i class="fas fa-check-circle"></i> Submit</button>
                 </form>
             </div>
         </div>
@@ -52,28 +41,76 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<!-- Leaflet and Geocoder Scripts -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
 <script>
-    // Initialize the map
-    var map = L.map('map').setView([51.505, -0.09], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+    function initMap() {
+        var originMap = L.map('origin_map_canvas').setView([51.505, -0.09], 13);
+        var destinationMap = L.map('destination_map_canvas').setView([51.505, -0.09], 13);
 
-    var originMarker, destinationMarker;
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(originMap);
 
-    map.on('click', function(e) {
-        if (!originMarker) {
-            originMarker = L.marker(e.latlng, { draggable: true })
-                .addTo(map)
-                .bindPopup('Origin Location').openPopup();
-            document.getElementById('id_origin_location').value = `${e.latlng.lat},${e.latlng.lng}`;
-        } else if (!destinationMarker) {
-            destinationMarker = L.marker(e.latlng, { draggable: true, icon: L.icon({
-                iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-red.png'
-            })}).addTo(map)
-              .bindPopup('Destination Location').openPopup();
-            document.getElementById('id_destination_location').value = `${e.latlng.lat},${e.latlng.lng}`;
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(destinationMap);
+
+        var originGeocoder = L.Control.Geocoder.nominatim();
+        var destinationGeocoder = L.Control.Geocoder.nominatim();
+
+        L.Control.geocoder({
+            query: '',
+            placeholder: 'Search for origin location',
+            collapsed: false,
+            geocoder: originGeocoder
+        }).addTo(originMap);
+
+        L.Control.geocoder({
+            query: '',
+            placeholder: 'Search for destination location',
+            collapsed: false,
+            geocoder: destinationGeocoder
+        }).addTo(destinationMap);
+
+        var originMarker;
+        var destinationMarker;
+
+        function onOriginLocationSelected(latlng) {
+            if (originMarker) {
+                originMap.removeLayer(originMarker);
+            }
+            originMarker = L.marker(latlng).addTo(originMap);
+            document.getElementById('origin_location').value = `${latlng.lat}, ${latlng.lng}`;
         }
-    });
+
+        function onDestinationLocationSelected(latlng) {
+            if (destinationMarker) {
+                destinationMap.removeLayer(destinationMarker);
+            }
+            destinationMarker = L.marker(latlng).addTo(destinationMap);
+            document.getElementById('destination_location').value = `${latlng.lat}, ${latlng.lng}`;
+        }
+
+        originMap.on('click', function(e) {
+            onOriginLocationSelected(e.latlng);
+        });
+
+        destinationMap.on('click', function(e) {
+            onDestinationLocationSelected(e.latlng);
+        });
+
+        originGeocoder.on('select', function(event) {
+            onOriginLocationSelected(event.latlng);
+        });
+
+        destinationGeocoder.on('select', function(event) {
+            onDestinationLocationSelected(event.latlng);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', initMap);
 </script>
 {% endblock %}

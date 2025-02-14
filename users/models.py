@@ -14,32 +14,18 @@ class Customer(models.Model):
 
 # --- Mover Model ---
 class Mover(models.Model):
-    MOVER_TYPES = [
-        ('Pro Mover', 'Professional Mover'),
-        ('Mover', 'Simple Mover'),
-        ('Box Packer', 'Box Packer'),
-        ('Driver with Help', 'Driver with Help'),
-        ('Driver without Help', 'Driver without Help'),
-    ]
-    VEHICLE_TYPES = [
-        ('Car', 'Car'),
-        ('Small Van', 'Small Van'),
-        ('Large Van', 'Large Van'),
-    ]
-
-    
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    full_name = models.CharField(max_length=100)  # Full Name
-    phone = models.CharField(max_length=15, default="0000000000")
-    email = models.EmailField(unique=True)  # Email
-    vehicle_type = models.CharField(max_length=100, choices=VEHICLE_TYPES)
-    mover_type = models.CharField(max_length=20, choices=MOVER_TYPES)
-    location = models.CharField(max_length=100)  # Location as string
-    profile_photo = models.ImageField(upload_to='profile_photos/', null=True, blank=True)  # Profile Photo
-    payment_info = models.CharField(max_length=255, default='Not Provided')
+    full_name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=15)
+    vehicle_type = models.CharField(max_length=100, choices=[('Car', 'Car'), ('Small Van', 'Small Van'), ('Large Van', 'Large Van')], null=True, blank=True)
+    mover_type = models.CharField(max_length=20, choices=[('Pro Mover', 'Professional Mover'), ('Mover', 'Simple Mover'), ('Box Packer', 'Box Packer'), ('Driver with Help', 'Driver with Help'), ('Driver without Help', 'Driver without Help')])
+    location = models.CharField(max_length=255)
+    payment_info = models.CharField(max_length=255)
+    driving_license = models.ImageField(upload_to='licenses/', null=True, blank=True)
+    carrying_capacity = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.full_name} - {self.mover_type}"
+        return self.full_name
 
 # --- Order Model ---
 class Order(models.Model):

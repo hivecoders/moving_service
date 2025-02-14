@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from geopy.distance import geodesic
@@ -11,7 +11,6 @@ from .models import Customer, Mover, Order, DetectedItem, Photo
 from utils.volume_weight_estimates import VOLUME_WEIGHT_ESTIMATES
 from django.contrib.auth.decorators import login_required
 from .forms import MoverRegistrationForm, CustomerRegistrationForm, CustomUserLoginForm, OrderForm, PhotoFormSet
-
 
 # Stripe Configuration
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -66,25 +65,29 @@ def register_mover(request):
     if request.method == 'POST':
         form = MoverRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
-            user = form.save()  
+            user = form.save()
             mover = Mover.objects.create(
                 user=user,
                 full_name=form.cleaned_data.get('full_name'),
                 phone=form.cleaned_data.get('phone'),
-                vehicle_type=form.cleaned_data.get('vehicle_type'),
+                vehicle_type=form.cleaned_data.get('vehicle_type') if form.cleaned_data.get('has_vehicle') == 'Yes' else None,
                 mover_type=form.cleaned_data.get('mover_type'),
-                location=form.cleaned_data.get('location'),
-                payment_info=form.cleaned_data.get('payment_info')
+                location=request.POST.get('location_map'),  
+                payment_info=form.cleaned_data.get('payment_info'),
+                driving_license=form.cleaned_data.get('driving_license') if form.cleaned_data.get('has_vehicle') == 'Yes' else None,
+                carrying_capacity=form.cleaned_data.get('carrying_capacity') if form.cleaned_data.get('has_vehicle') == 'Yes' else None
             )
-            login(request, user)  # Auto-login after registration
+            login(request, user)
             messages.success(request, "Account created successfully!")
-            return redirect('mover_dashboard')  # Redirect to mover dashboard
+            return redirect('mover_dashboard')
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
         form = MoverRegistrationForm()
     return render(request, 'users/register_mover.html', {'form': form})
 
 # Dashboard Views
-#@login_required
+@login_required
 def dashboard(request):
     if hasattr(request.user, 'customer'):
         # Check if customer has filled out all profile information
@@ -97,7 +100,7 @@ def dashboard(request):
         messages.error(request, "You do not have permission to access this page.")
         return redirect('home')
 
-#@login_required
+@login_required
 def mover_dashboard(request):
     if hasattr(request.user, 'mover'):
         orders = Order.objects.filter(items_detected__isnull=False).distinct()
@@ -107,6 +110,7 @@ def mover_dashboard(request):
         return redirect('home')
 
 # Order Creation & Image Processing
+@login_required
 def create_order(request):
     if request.method == 'POST':
         order_form = OrderForm(request.POST)
@@ -119,44 +123,14 @@ def create_order(request):
             order.customer = request.user.customer  # Assign order to logged-in customer
             order.save()
 
-            # YOLO Model for Image Processing
-            yolo_model = YOLO('yolov8l.pt')  # Load YOLO model
-            total_volume, total_weight = 0.0, 0.0
-
             for form in photo_formset.cleaned_data:
                 if form:
-                    photo_instance = Photo.objects.create(order=order, image=form['image'])
-                    results = yolo_model(photo_instance.image.path)
+                    Photo.objects.create(order=order, image=form['image'])
 
-                    # Process YOLO results
-                    for result in results:
-                        for box in result.boxes.data:
-                            item_class_idx = int(box.cls.item())
-                            item_class_name = yolo_model.names[item_class_idx]
-                            estimates = VOLUME_WEIGHT_ESTIMATES.get(item_class_name, {"volume": 0, "weight": 0})
-
-                            DetectedItem.objects.create(
-                                order=order,
-                                item_class=item_class_name,
-                                confidence=float(box.conf.item()),
-                                volume=estimates["volume"],
-                                weight=estimates["weight"],
-                                bbox={  # Store bounding box data
-                                    'x1': float(box.xyxy[0].item()),
-                                    'y1': float(box.xyxy[1].item()),
-                                    'x2': float(box.xyxy[2].item()),
-                                    'y2': float(box.xyxy[3].item())
-                                }
-                            )
-                            total_volume += estimates["volume"]
-                            total_weight += estimates["weight"]
-
-            order.total_volume = total_volume
-            order.total_weight = total_weight
-            order.save()
-
-            messages.success(request, "Order successfully created with detected items!")
+            messages.success(request, "Order successfully created!")
             return redirect('dashboard')
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
         order_form = OrderForm()
         photo_formset = PhotoFormSet(queryset=Photo.objects.none())
@@ -208,25 +182,32 @@ def process_payment(request, order_id):
         cancel_url=request.build_absolute_uri('/payment_cancel/'),
     )
 
-    return redirect(session.url, code=303)
-
 @csrf_exempt
 def stripe_webhook(request):
     payload = request.body
-    sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
-    secret = settings.STRIPE_WEBHOOK_SECRET
+    sig_header = request.META['HTTP_STRIPE_SIGNATURE']
+    event = None
 
     try:
-        event = stripe.Webhook.construct_event(payload, sig_header, secret)
-        if event['type'] == 'checkout.session.completed':
-            session = event['data']['object']
-            order_id = session.get('metadata', {}).get('order_id')
-            if order_id:
-                order = Order.objects.get(id=order_id)
-                order.paid = True
-                order.save()
-                return JsonResponse({"status": "success"}, status=200)
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
+        )
     except ValueError as e:
-        return JsonResponse({"error": str(e)}, status=400)
-    except stripe.error.SignatureVerificationError:
-        return JsonResponse({"error": "Invalid signature"}, status=400)
+        # Invalid payload
+        return HttpResponse(status=400)
+    except stripe.error.SignatureVerificationError as e:
+        # Invalid signature
+        return HttpResponse(status=400)
+
+    # Handle the event
+    if event['type'] == 'payment_intent.succeeded':
+        payment_intent = event['data']['object']
+        # Then define and call a method to handle the successful payment intent.
+        handle_payment_intent_succeeded(payment_intent)
+    # ... handle other event types
+
+    return HttpResponse(status=200)
+
+def handle_payment_intent_succeeded(payment_intent):
+    # Fulfill the purchase...
+    print("PaymentIntent was successful!")

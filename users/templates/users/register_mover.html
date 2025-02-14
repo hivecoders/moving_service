@@ -13,108 +13,23 @@
             <div class="card-body">
                 <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
-
-                    <!-- Full Name -->
-                    <div class="mb-3">
-                        <label for="id_full_name" class="form-label">Full Name</label>
-                        {{ form.full_name }}
-                        {% if form.full_name.errors %}
-                            <div class="text-danger">{{ form.full_name.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <!-- Email -->
-                    <div class="mb-3">
-                        <label for="id_email" class="form-label">Email</label>
-                        {{ form.email }}
-                        <small class="form-text text-muted">We'll never share your email with anyone else.</small>
-                        {% if form.email.errors %}
-                            <div class="text-danger">{{ form.email.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <!-- Phone -->
-                    <div class="mb-3">
-                        <label for="id_phone" class="form-label">Phone</label>
-                        {{ form.phone }}
-                        <small class="form-text text-muted">Include country code if applicable.</small>
-                        {% if form.phone.errors %}
-                            <div class="text-danger">{{ form.phone.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <!-- Mover Type -->
-                    <div class="mb-3">
-                        <label for="id_mover_type" class="form-label">Mover Type</label>
-                        {{ form.mover_type }}
-                    </div>
-
-                    <!-- Profile Photo -->
-                    <div class="mb-3">
-                        <label for="id_profile_photo" class="form-label">Profile Photo</label>
-                        {{ form.profile_photo }}
-                    </div>
-
-                    <!-- Identification ID -->
-                    <div class="mb-3">
-                        <label for="id_identification_id" class="form-label">Identification ID (Passport, Work/Study Permit, SIN)</label>
-                        {{ form.identification_id }}
-                    </div>
-
-                    <!-- Vehicle Type -->
-                    <div class="mb-3">
-                        <label for="id_vehicle_type" class="form-label">Vehicle Type</label>
-                        {{ form.vehicle_type }}
-                    </div>
-
-                    <!-- Driving License -->
-                    <div class="mb-3">
-                        <label for="id_driving_license" class="form-label">Upload Driving License</label>
-                        {{ form.driving_license }}
-                    </div>
-
-                    <!-- Move Capacity -->
-                    <div class="mb-3">
-                        <label for="id_move_capacity" class="form-label">Move Capacity (in kg)</label>
-                        {{ form.move_capacity }}
-                    </div>
-
-                    <!-- Certification -->
-                    <div class="mb-3">
-                        <label for="id_certification" class="form-label">Do you have Canadian Professional Mover Course Certification?</label>
-                        {{ form.certification }}
-                        <small class="form-text text-muted">If yes, upload your certification.</small>
-                    </div>
-
-                    <!-- Payment Information -->
-                    <div class="mb-3">
-                        <label for="id_payment_info" class="form-label">Payment Information</label>
-                        {{ form.payment_info }}
-                        <small class="form-text text-muted">Enter your bank details for payment transactions.</small>
-                    </div>
-
-                    <!-- Location Map -->
-                    <div class="mb-3">
-                        <label for="location_map" class="form-label">Select Location</label>
-                        <input type="text" id="location_map" class="form-control mb-2" placeholder="Search for location" readonly>
-                        <div id="location_map_canvas" class="map-container mb-3"></div>
-                        <input type="hidden" id="mover_location" name="location">
-                    </div>
-
-                    <!-- Password -->
-                    <div class="mb-3">
-                        <label for="id_password1" class="form-label">Password</label>
-                        {{ form.password1 }}
-                        <small class="form-text text-muted">Your password must be at least 8 characters long.</small>
-                    </div>
-
-                    <!-- Confirm Password -->
-                    <div class="mb-3">
-                        <label for="id_password2" class="form-label">Confirm Password</label>
-                        {{ form.password2 }}
-                    </div>
-
-                    <!-- Submit Button -->
+                    {{ form.as_p }}
+                    <div id="location_map_canvas" style="height: 400px;"></div>
+                    <input type="hidden" id="location_map" name="location_map">
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <ul>
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
                     <button type="submit" class="btn btn-success w-100"><i class="fas fa-check-circle"></i> Submit</button>
                 </form>
             </div>
@@ -152,7 +67,6 @@
             }
             marker = L.marker(latlng).addTo(map);
             document.getElementById('location_map').value = `${latlng.lat}, ${latlng.lng}`;
-            document.getElementById('mover_location').value = `${latlng.lat},${latlng.lng}`;
         }
 
         map.on('click', function(e) {
@@ -165,5 +79,26 @@
     }
 
     document.addEventListener('DOMContentLoaded', initMap);
+
+    // JavaScript to toggle vehicle fields
+    document.addEventListener('DOMContentLoaded', function() {
+        var hasVehicleField = document.getElementById('id_has_vehicle');
+        var vehicleFields = ['id_vehicle_type', 'id_carrying_capacity', 'id_driving_license'];
+
+        function toggleVehicleFields() {
+            if (hasVehicleField.value === 'Yes') {
+                vehicleFields.forEach(function(fieldId) {
+                    document.getElementById(fieldId).closest('.form-group').style.display = 'block';
+                });
+            } else {
+                vehicleFields.forEach(function(fieldId) {
+                    document.getElementById(fieldId).closest('.form-group').style.display = 'none';
+                });
+            }
+        }
+
+        hasVehicleField.addEventListener('change', toggleVehicleFields);
+        toggleVehicleFields();  // Initial call to set the correct state
+    });
 </script>
 {% endblock %}
