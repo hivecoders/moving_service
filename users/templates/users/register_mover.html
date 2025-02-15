@@ -14,7 +14,10 @@
                 <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     {{ form.as_p }}
-                    <div id="location_map_canvas" style="height: 400px;"></div>
+                    <div class="mb-3">
+                        <label for="location_map_canvas" class="form-label">Select your location</label>
+                        <div id="location_map_canvas" style="height: 400px;"></div>
+                    </div>
                     <input type="hidden" id="location_map" name="location_map">
                     {% if form.errors %}
                         <div class="alert alert-danger">

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.conf import settings
@@ -44,20 +44,23 @@ def register_customer(request):
     if request.method == 'POST':
         form = CustomerRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
-            user = form.save()  # Save User first
+            user = form.save(commit=False)
+            user.username = form.cleaned_data.get('email')  # استفاده از ایمیل به عنوان نام کاربری
+            user.save()
             customer = Customer.objects.create(
                 user=user,
-                full_name=form.cleaned_data.get('full_name'),  # Use full_name field
-                phone=form.cleaned_data.get('phone')
+                full_name=form.cleaned_data.get('full_name'),
+                phone=form.cleaned_data.get('phone'),
+                email=form.cleaned_data.get('email'),
+                profile_photo=form.cleaned_data.get('profile_photo')
             )
-            login(request, user)  # Auto-login after registration
-            messages.success(request, "Customer registration successful!")
-            return redirect('dashboard')  # Redirect to dashboard after successful registration
+            login(request, user)
+            messages.success(request, "Account created successfully!")
+            return redirect('customer_dashboard')
         else:
-            messages.error(request, "Please fill out all required fields.")
+            messages.error(request, "Please correct the errors below.")
     else:
         form = CustomerRegistrationForm()
-
     return render(request, 'users/register_customer.html', {'form': form})
 
 # Mover Registration
@@ -65,14 +68,16 @@ def register_mover(request):
     if request.method == 'POST':
         form = MoverRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
-            user = form.save()
+            user = form.save(commit=False)
+            user.username = form.cleaned_data.get('email')  # استفاده از ایمیل به عنوان نام کاربری
+            user.save()
             mover = Mover.objects.create(
                 user=user,
                 full_name=form.cleaned_data.get('full_name'),
                 phone=form.cleaned_data.get('phone'),
                 vehicle_type=form.cleaned_data.get('vehicle_type') if form.cleaned_data.get('has_vehicle') == 'Yes' else None,
                 mover_type=form.cleaned_data.get('mover_type'),
-                location=request.POST.get('location_map'),  
+                location=request.POST.get('location_map'),  # ذخیره لوکیشن انتخاب شده
                 payment_info=form.cleaned_data.get('payment_info'),
                 driving_license=form.cleaned_data.get('driving_license') if form.cleaned_data.get('has_vehicle') == 'Yes' else None,
                 carrying_capacity=form.cleaned_data.get('carrying_capacity') if form.cleaned_data.get('has_vehicle') == 'Yes' else None
@@ -94,11 +99,7 @@ def dashboard(request):
         if not request.user.customer.phone or not request.user.customer.payment_info:
             messages.warning(request, "Please complete your profile information before placing an order.")
             return redirect('complete_profile')  # Redirect to profile completion page
-        orders = Order.objects.filter(customer=request.user.customer)
-        return render(request, 'users/dashboard.html', {'orders': orders})
-    else:
-        messages.error(request, "You do not have permission to access this page.")
-        return redirect('home')
+    return render(request, 'users/dashboard.html')
 
 @login_required
 def mover_dashboard(request):
@@ -211,3 +212,8 @@ def stripe_webhook(request):
 def handle_payment_intent_succeeded(payment_intent):
     # Fulfill the purchase...
     print("PaymentIntent was successful!")
+
+def logout_view(request):
+    logout(request)
+    messages.success(request, "You have been logged out.")
+    return redirect('home')

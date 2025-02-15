@@ -32,7 +32,6 @@ class MoverRegistrationForm(UserCreationForm):
     has_vehicle = forms.ChoiceField(choices=[('Yes', 'Yes'), ('No', 'No')], label='Do you have a vehicle?', required=True)
     vehicle_type = forms.ChoiceField(choices=[('Car', 'Car'), ('Small Van', 'Small Van'), ('Large Van', 'Large Van')], required=False)
     mover_type = forms.ChoiceField(choices=[('Pro Mover', 'Professional Mover'), ('Mover', 'Simple Mover'), ('Box Packer', 'Box Packer'), ('Driver with Help', 'Driver with Help'), ('Driver without Help', 'Driver without Help')], required=True)
-    location = forms.CharField(max_length=255, required=True)
     payment_info = forms.CharField(max_length=255, help_text="Enter your bank account details", required=True)
     driving_license = forms.ImageField(required=False, label='Upload Driving License')
     carrying_capacity = forms.IntegerField(label='Carrying Capacity (kg)', required=False)
@@ -41,7 +40,13 @@ class MoverRegistrationForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ['email', 'password1', 'password2', 'full_name', 'phone', 'profile_photo', 'identification_id', 'has_vehicle', 'vehicle_type', 'mover_type', 'location', 'payment_info', 'driving_license', 'carrying_capacity', 'has_mover_certification', 'mover_certification_document']
+        fields = ['email', 'password1', 'password2', 'full_name', 'phone', 'profile_photo', 'identification_id', 'has_vehicle', 'vehicle_type', 'mover_type', 'payment_info', 'driving_license', 'carrying_capacity', 'has_mover_certification', 'mover_certification_document']
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("This email is already taken. Please choose a different one.")
+        return email
 
     def clean(self):
         cleaned_data = super().clean()
