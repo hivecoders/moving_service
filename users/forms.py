@@ -7,20 +7,13 @@ from .models import Customer, Mover, Order, Photo
 # --- Customer Registration Form ---
 class CustomerRegistrationForm(UserCreationForm):
     full_name = forms.CharField(max_length=100, label='Full Name', required=True)
-    phone = forms.CharField(max_length=15, required=False)
+    phone = forms.CharField(max_length=15, required=True)
     email = forms.EmailField(label='Email', required=True)
     profile_photo = forms.ImageField(required=False)
-    payment_info = forms.CharField(max_length=255, required=False, help_text="Enter your payment information")
 
     class Meta:
         model = User
-        fields = ['email', 'password1', 'password2', 'full_name', 'phone', 'profile_photo', 'payment_info']
-
-    def clean(self):
-        cleaned_data = super().clean()
-        if not cleaned_data.get('full_name') or not cleaned_data.get('email'):
-            raise forms.ValidationError('Please fill out all required fields.')
-        return cleaned_data
+        fields = ['username', 'email', 'password1', 'password2', 'full_name', 'phone', 'profile_photo']
 
 # --- Mover Registration Form ---
 class MoverRegistrationForm(UserCreationForm):
@@ -40,7 +33,7 @@ class MoverRegistrationForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ['email', 'password1', 'password2', 'full_name', 'phone', 'profile_photo', 'identification_id', 'has_vehicle', 'vehicle_type', 'mover_type', 'payment_info', 'driving_license', 'carrying_capacity', 'has_mover_certification', 'mover_certification_document']
+        fields = ['username', 'email', 'password1', 'password2', 'full_name', 'phone', 'profile_photo', 'identification_id', 'has_vehicle', 'vehicle_type', 'mover_type', 'payment_info', 'driving_license', 'carrying_capacity', 'has_mover_certification', 'mover_certification_document']
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -70,16 +63,29 @@ class MoverRegistrationForm(UserCreationForm):
 
 # --- Custom User Login Form ---
 class CustomUserLoginForm(AuthenticationForm):
-    username = forms.EmailField(label='Email', required=True)
-    password = forms.CharField(widget=forms.PasswordInput, label='Password', required=True)
+    username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Email'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}))
 
 # --- Order Form ---
-from .models import Order
-
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
-        fields = ['origin', 'destination', 'origin_floor', 'destination_floor', 'has_elevator', 'need_pro_mover', 'need_box_packer', 'move_date', 'origin_location', 'destination_location']
+        fields = ['origin', 'destination', 'origin_floor', 'destination_floor', 'has_elevator', 'need_pro_mover', 'need_box_packer', 'move_date', 'origin_location', 'destination_location', 'total_volume', 'total_weight']
 
 # --- Photo FormSet ---
 PhotoFormSet = modelformset_factory(Photo, fields=('image',), extra=1)
+
+class MoverProfileForm(forms.ModelForm):
+    class Meta:
+        model = Mover
+        fields = ['full_name', 'phone', 'identification_id', 'has_vehicle', 'vehicle_type', 'mover_type', 'payment_info', 'driving_license', 'carrying_capacity', 'has_mover_certification', 'mover_certification_document']
+
+class CustomerProfileForm(forms.ModelForm):
+    class Meta:
+        model = Customer
+        fields = ['full_name', 'phone', 'profile_photo']
+
+class PhotoUploadForm(forms.ModelForm):
+    class Meta:
+        model = Photo
+        fields = ['image']

@@ -23,6 +23,10 @@ class Mover(models.Model):
     payment_info = models.CharField(max_length=255)
     driving_license = models.ImageField(upload_to='licenses/', null=True, blank=True)
     carrying_capacity = models.IntegerField(null=True, blank=True)
+    identification_id = models.CharField(max_length=100, null=True, blank=True)  # Added field
+    has_vehicle = models.BooleanField(default=False)  # Added field
+    has_mover_certification = models.BooleanField(default=False)  # Added field
+    mover_certification_document = models.ImageField(upload_to='certifications/', null=True, blank=True)  # Added field
 
     def __str__(self):
         return self.full_name
@@ -42,13 +46,15 @@ class Order(models.Model):
     destination_location = models.CharField(max_length=100)
     total_volume = models.FloatField(default=0)
     total_weight = models.FloatField(default=0)
+    items_detected = models.ManyToManyField('DetectedItem', blank=True, related_name='orders')
+    status = models.CharField(max_length=20, default='Pending')  # Status of the order
 
     def __str__(self):
         return f"Order #{self.id} by {self.customer.full_name}"
 
 # --- DetectedItem Model for YOLO Detection ---
 class DetectedItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items_detected')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='detected_items')
     item_class = models.CharField(max_length=50)
     confidence = models.FloatField()
     volume = models.FloatField(default=0.0)  # Estimated volume in cubic meters
@@ -60,8 +66,8 @@ class DetectedItem(models.Model):
 
 # --- Photo Model for Uploaded Images ---
 class Photo(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='photos')
-    image = models.FileField(upload_to='photos/')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='photos/')
 
     def __str__(self):
         return f"Photo for Order #{self.order.id}"

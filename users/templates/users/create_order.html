@@ -4,36 +4,52 @@
 {% block title %}Create Order{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-8">
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white text-center">
-                <h4><i class="fas fa-box"></i> Create Order</h4>
-            </div>
-            <div class="card-body">
-                <form method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ order_form.as_p }}
-                    <div id="origin_map_canvas" style="height: 400px;"></div>
-                    <input type="hidden" id="origin_location" name="origin_location">
-                    <div id="destination_map_canvas" style="height: 400px;"></div>
-                    <input type="hidden" id="destination_location" name="destination_location">
-                    {% if order_form.errors %}
-                        <div class="alert alert-danger">
-                            <ul>
-                                {% for field in order_form %}
-                                    {% for error in field.errors %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4><i class="fas fa-plus-circle"></i> Create Order</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ order_form.as_p }}
+                        <div class="mb-3">
+                            <label for="id_image" class="form-label">Upload Photos</label>
+                            <input type="file" name="image" id="id_image" class="form-control" multiple>
+                        </div>
+                        <div id="origin_map_canvas" style="height: 400px;"></div>
+                        <input type="hidden" id="origin_location" name="origin_location">
+                        <div id="destination_map_canvas" style="height: 400px;"></div>
+                        <input type="hidden" id="destination_location" name="destination_location">
+                        {% if order_form.errors %}
+                            <div class="alert alert-danger">
+                                <ul>
+                                    {% for field in order_form %}
+                                        {% for error in field.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                    {% for error in order_form.non_field_errors %}
                                         <li>{{ error }}</li>
                                     {% endfor %}
-                                {% endfor %}
-                                {% for error in order_form.non_field_errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
+                                </ul>
+                            </div>
+                        {% endif %}
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-check-circle"></i> Submit Order
+                        </button>
+                    </form>
+
+                    {% if messages %}
+                        <div class="mt-3">
+                            {% for message in messages %}
+                                <div class="alert alert-danger">{{ message }}</div>
+                            {% endfor %}
                         </div>
                     {% endif %}
-                    <button type="submit" class="btn btn-success w-100"><i class="fas fa-check-circle"></i> Submit</button>
-                </form>
+                </div>
             </div>
         </div>
     </div>

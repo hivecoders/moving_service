@@ -168,4 +168,14 @@ VOLUME_WEIGHT_ESTIMATES = {
     'collectibles': {'volume': 0.5, 'weight': 10},
     'jewelry boxes': {'volume': 0.2, 'weight': 3},
     'luxury items': {'volume': 2.0, 'weight': 40},
+    "chair": {"volume": 0.5, "weight": 7.5},
+    "table": {"volume": 1.2, "weight": 20.0},
+    "sofa": {"volume": 2.5, "weight": 50.0},
+    "bed": {"volume": 3.0, "weight": 80.0},
+    "tv": {"volume": 0.2, "weight": 10.0},
+    "fridge": {"volume": 1.8, "weight": 60.0},
+    "washing_machine": {"volume": 1.5, "weight": 55.0},
+    "microwave": {"volume": 0.3, "weight": 12.0},
+    "box": {"volume": 0.4, "weight": 5.0}
+
 }

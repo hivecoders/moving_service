@@ -6,11 +6,14 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from geopy.distance import geodesic
 from ultralytics import YOLO
-import stripe, json
+import stripe
 from .models import Customer, Mover, Order, DetectedItem, Photo
 from utils.volume_weight_estimates import VOLUME_WEIGHT_ESTIMATES
 from django.contrib.auth.decorators import login_required
-from .forms import MoverRegistrationForm, CustomerRegistrationForm, CustomUserLoginForm, OrderForm, PhotoFormSet
+from .forms import MoverRegistrationForm, CustomerRegistrationForm, CustomUserLoginForm, OrderForm, PhotoFormSet, MoverProfileForm, CustomerProfileForm, PhotoUploadForm
+
+# Load YOLO model
+yolo_model = YOLO("yolov8l.pt")
 
 # Stripe Configuration
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -24,17 +27,15 @@ def login_view(request):
     if request.method == 'POST':
         form = CustomUserLoginForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data.get('username') 
+            username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            if user:
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
                 login(request, user)
-                if hasattr(user, 'customer'):  
-                    return redirect('dashboard')  
-                elif hasattr(user, 'mover'):  
-                    return redirect('mover_dashboard')  
+                messages.success(request, "You have successfully logged in.")
+                return redirect('dashboard')
             else:
-                messages.error(request, "Incorrect username or password.")
+                messages.error(request, "Invalid username or password.")
     else:
         form = CustomUserLoginForm()
     return render(request, 'users/login.html', {'form': form})
@@ -111,35 +112,71 @@ def mover_dashboard(request):
         return redirect('home')
 
 # Order Creation & Image Processing
+def estimate_volume_weight(item_class):
+    estimates = VOLUME_WEIGHT_ESTIMATES.get(item_class.lower())
+    if estimates:
+        return estimates['volume'], estimates['weight']
+    else:
+        return 0.5, 10  # مقادیر پیش‌فرض
+
 @login_required
 def create_order(request):
     if request.method == 'POST':
         order_form = OrderForm(request.POST)
-        photo_formset = PhotoFormSet(request.POST, request.FILES, queryset=Photo.objects.none())
+        photo_form = PhotoUploadForm(request.POST, request.FILES)
+        if order_form.is_valid() and photo_form.is_valid():
+            order = order_form.save()
+            photo = photo_form.save(commit=False)
+            photo.order = order
+            photo.save()
 
-        if order_form.is_valid() and photo_formset.is_valid():
-            order = order_form.save(commit=False)
-            order.origin_location = request.POST.get('origin_location')
-            order.destination_location = request.POST.get('destination_location')
-            order.customer = request.user.customer  # Assign order to logged-in customer
-            order.save()
-
-            for form in photo_formset.cleaned_data:
-                if form:
-                    Photo.objects.create(order=order, image=form['image'])
+            # Process image with YOLO and estimate volume & weight
+            detect_objects(photo.image.path, order)
 
             messages.success(request, "Order successfully created!")
             return redirect('dashboard')
-        else:
-            messages.error(request, "Please correct the errors below.")
     else:
         order_form = OrderForm()
-        photo_formset = PhotoFormSet(queryset=Photo.objects.none())
+        photo_form = PhotoUploadForm()
+    return render(request, 'users/create_order.html', {'order_form': order_form, 'photo_form': photo_form})
 
-    return render(request, 'users/create_order.html', {
-        'order_form': order_form,
-        'photo_formset': photo_formset
-    })
+def detect_objects(image_path, order):
+    results = yolo_model(image_path)  # Run YOLO detection
+    total_volume = 0.0
+    total_weight = 0.0
+
+    for result in results:
+        for box in result.boxes.data:
+            item_name = result.names[int(box.cls.item())]
+            confidence = float(box.conf.item())
+
+            # Get estimated volume & weight from JSON
+            item_data = VOLUME_WEIGHT_ESTIMATES.get(item_name, {"volume": 0.5, "weight": 10.0})
+            volume = item_data["volume"]
+            weight = item_data["weight"]
+
+            # Save detected item
+            DetectedItem.objects.create(
+                order=order,
+                item_class=item_name,
+                confidence=confidence,
+                bbox={
+                    'x1': float(box.xyxy[0].item()),
+                    'y1': float(box.xyxy[1].item()),
+                    'x2': float(box.xyxy[2].item()),
+                    'y2': float(box.xyxy[3].item())
+                },
+                volume=volume,
+                weight=weight
+            )
+
+            total_volume += volume
+            total_weight += weight
+
+    # Update order with total volume & weight
+    order.total_volume = total_volume
+    order.total_weight = total_weight
+    order.save()
 
 # Movers & Proximity Logic
 def nearest_movers(request, order_id):
@@ -213,7 +250,50 @@ def handle_payment_intent_succeeded(payment_intent):
     # Fulfill the purchase...
     print("PaymentIntent was successful!")
 
+@login_required
+def edit_profile(request):
+    if hasattr(request.user, 'mover'):
+        if request.method == 'POST':
+            form = MoverProfileForm(request.POST, request.FILES, instance=request.user.mover)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Profile updated successfully!")
+                return redirect('mover_dashboard')
+        else:
+            form = MoverProfileForm(instance=request.user.mover)
+    elif hasattr(request.user, 'customer'):
+        if request.method == 'POST':
+            form = CustomerProfileForm(request.POST, request.FILES, instance=request.user.customer)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Profile updated successfully!")
+                return redirect('customer_dashboard')
+        else:
+            form = CustomerProfileForm(instance=request.user.customer)
+    else:
+        return redirect('home')
+
+    return render(request, 'users/edit_profile.html', {'form': form})
+
 def logout_view(request):
     logout(request)
     messages.success(request, "You have been logged out.")
     return redirect('home')
+
+@login_required
+def accept_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    # Logic for accepting the order
+    order.status = 'Accepted'
+    order.save()
+    messages.success(request, "Order accepted successfully!")
+    return redirect('mover_dashboard')
+
+@login_required
+def reject_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    # Logic for rejecting the order
+    order.status = 'Rejected'
+    order.save()
+    messages.success(request, "Order rejected successfully!")
+    return redirect('mover_dashboard')

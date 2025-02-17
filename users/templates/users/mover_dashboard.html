@@ -5,43 +5,70 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="card shadow-sm">
-        <div class="card-header bg-dark text-white text-center">
-            <h2><i class="fas fa-box-open"></i> Available Orders</h2>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                {% for order in orders %}
-                <div class="col-md-6 mb-4">
-                    <div class="card border-info shadow-sm h-100">
-                        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0"><i class="fas fa-truck"></i> Order #{{ order.id }}</h5>
-                            <span class="badge bg-warning text-dark">{{ order.move_date|date:"M d, Y" }}</span>
-                        </div>
-                        <div class="card-body">
-                            <p><strong><i class="fas fa-map-marker-alt"></i> Origin:</strong> {{ order.origin }} <small>(Floor: {{ order.origin_floor }})</small></p>
-                            <p><strong><i class="fas fa-map-pin"></i> Destination:</strong> {{ order.destination }} <small>(Floor: {{ order.destination_floor }})</small></p>
-                            <p><strong><i class="fas fa-elevator"></i> Elevator Available:</strong> {{ order.has_elevator|yesno:"Yes,No" }}</p>
-                            <p><strong><i class="fas fa-cube"></i> Total Volume:</strong> {{ order.total_volume }} m³</p>
-                            <p><strong><i class="fas fa-weight-hanging"></i> Total Weight:</strong> {{ order.total_weight }} kg</p>
-
-                            <div class="photo-gallery d-flex flex-wrap gap-2 mt-3">
-                                {% for photo in order.photos.all %}
-                                    <img src="{{ photo.image.url }}" class="img-thumbnail" style="max-height: 120px; width: auto;" alt="Order Photo">
-                                {% empty %}
-                                    <p class="text-muted">No photos available.</p>
-                                {% endfor %}
-                            </div>
-
-                            <a href="{% url 'process_payment' order.id %}" class="btn btn-success mt-3 w-100">
-                                <i class="fas fa-check-circle"></i> Accept Order
-                            </a>
-                        </div>
-                    </div>
+    <h1 class="text-center">Mover Dashboard</h1>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <img src="{{ user.mover.profile_photo.url }}" class="img-thumbnail rounded-circle mb-3" alt="Profile Photo" style="width: 150px; height: 150px;">
+                    <h4>{{ user.mover.full_name }}</h4>
+                    <p>{{ user.email }}</p>
+                    <a href="{% url 'edit_profile' %}" class="btn btn-primary w-100 mb-2"><i class="fas fa-edit"></i> Edit Profile</a>
+                    <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
+                        {% csrf_token %}
+                    </form>
+                    <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="btn btn-danger w-100"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 </div>
-                {% empty %}
-                <p class="text-center text-muted"><i class="fas fa-info-circle"></i> No orders available at the moment.</p>
-                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white text-center">
+                    <h2><i class="fas fa-box-open"></i> Available Orders</h2>
+                </div>
+                <div class="card-body">
+                    <table class="table mt-4">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Origin</th>
+                                <th>Destination</th>
+                                <th>Total Volume (m³)</th>
+                                <th>Total Weight (kg)</th>
+                                <th>Detected Items</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr>
+                                <td>{{ order.id }}</td>
+                                <td>{{ order.origin }}</td>
+                                <td>{{ order.destination }}</td>
+                                <td>{{ order.total_volume|floatformat:2 }}</td>
+                                <td>{{ order.total_weight|floatformat:2 }}</td>
+                                <td>
+                                    <ul>
+                                        {% for item in order.items_detected.all %}
+                                        <li>{{ item.item_class }} - Volume: {{ item.volume|floatformat:2 }}m³ - Weight: {{ item.weight|floatformat:2 }}kg</li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                                <td>
+                                    <form method="post" action="{% url 'accept_order' order.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success btn-sm">Accept</button>
+                                    </form>
+                                    <form method="post" action="{% url 'reject_order' order.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm mt-2">Reject</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
