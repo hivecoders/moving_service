@@ -118,30 +118,8 @@
             font-weight: bold;
         }
 
-        /* Dark Mode Support */
-        @media (prefers-color-scheme: dark) {
-            body {
-                background-color: #1e1e2f;
-                color: #e0e0e0;
-            }
-
-            .navbar {
-                background: linear-gradient(90deg, #333, #555);
-            }
-
-            .navbar-brand, .nav-link {
-                color: #f0f0f0 !important;
-            }
-
-            footer {
-                background-color: #222;
-            }
-
-            .card {
-                background-color: #2c2c3e;
-                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
-            }
-        }
+        
+        
     </style>
     
     {% block extra_head %}{% endblock %}
@@ -171,7 +149,7 @@
                         <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
                             {% csrf_token %}
                         </form>
-                        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="btn btn-danger w-100"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                       
                     {% else %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a>
@@ -195,7 +173,7 @@
 
     <!-- Footer -->
     <footer>
-        <p>&copy; 2024 Moving Companion | Designed with <i class="fas fa-heart text-danger"></i> by HIVE</p>
+        <p>&copy; 2025 Moving Companion | Designed with <i class="fas fa-heart text-danger"></i> by HIVE</p>
         <p><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
     </footer>
 

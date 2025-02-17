@@ -27,18 +27,18 @@ def login_view(request):
     if request.method == 'POST':
         form = CustomUserLoginForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data.get('username')
+            email = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
-            user = authenticate(request, username=username, password=password)
+            user = authenticate(request, email=email, password=password)
             if user is not None:
                 login(request, user)
                 messages.success(request, "You have successfully logged in.")
                 return redirect('dashboard')
             else:
-                messages.error(request, "Invalid username or password.")
+                messages.error(request, "Invalid email or password.")
     else:
         form = CustomUserLoginForm()
-    return render(request, 'users/login.html', {'form': form})
+    return render(request, 'registration/login.html', {'form': form})
 
 # Customer Registration
 def register_customer(request):
@@ -46,7 +46,6 @@ def register_customer(request):
         form = CustomerRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save(commit=False)
-            user.username = form.cleaned_data.get('email')  # استفاده از ایمیل به عنوان نام کاربری
             user.save()
             customer = Customer.objects.create(
                 user=user,
@@ -70,7 +69,6 @@ def register_mover(request):
         form = MoverRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save(commit=False)
-            user.username = form.cleaned_data.get('email')  # استفاده از ایمیل به عنوان نام کاربری
             user.save()
             mover = Mover.objects.create(
                 user=user,
@@ -177,6 +175,12 @@ def detect_objects(image_path, order):
     order.total_volume = total_volume
     order.total_weight = total_weight
     order.save()
+
+# Order Details View
+@login_required
+def order_details(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'users/order_details.html', {'order': order})
 
 # Movers & Proximity Logic
 def nearest_movers(request, order_id):

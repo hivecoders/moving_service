@@ -1,8 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth.models import User
 from django.forms import modelformset_factory
-from .models import Customer, Mover, Order, Photo
+from .models import Customer, Mover, Order, Photo, CustomUser
 
 # --- Customer Registration Form ---
 class CustomerRegistrationForm(UserCreationForm):
@@ -12,8 +11,14 @@ class CustomerRegistrationForm(UserCreationForm):
     profile_photo = forms.ImageField(required=False)
 
     class Meta:
-        model = User
-        fields = ['username', 'email', 'password1', 'password2', 'full_name', 'phone', 'profile_photo']
+        model = CustomUser
+        fields = ['email', 'password1', 'password2', 'full_name', 'phone', 'profile_photo']
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if CustomUser.objects.filter(email=email).exists():
+            raise forms.ValidationError("This email is already taken. Please choose a different one.")
+        return email
 
 # --- Mover Registration Form ---
 class MoverRegistrationForm(UserCreationForm):
@@ -32,12 +37,12 @@ class MoverRegistrationForm(UserCreationForm):
     mover_certification_document = forms.ImageField(required=False, label='Upload Certification Document')
 
     class Meta:
-        model = User
-        fields = ['username', 'email', 'password1', 'password2', 'full_name', 'phone', 'profile_photo', 'identification_id', 'has_vehicle', 'vehicle_type', 'mover_type', 'payment_info', 'driving_license', 'carrying_capacity', 'has_mover_certification', 'mover_certification_document']
+        model = CustomUser
+        fields = ['email', 'password1', 'password2', 'full_name', 'phone', 'profile_photo', 'identification_id', 'has_vehicle', 'vehicle_type', 'mover_type', 'payment_info', 'driving_license', 'carrying_capacity', 'has_mover_certification', 'mover_certification_document']
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        if User.objects.filter(email=email).exists():
+        if CustomUser.objects.filter(email=email).exists():
             raise forms.ValidationError("This email is already taken. Please choose a different one.")
         return email
 
@@ -63,7 +68,7 @@ class MoverRegistrationForm(UserCreationForm):
 
 # --- Custom User Login Form ---
 class CustomUserLoginForm(AuthenticationForm):
-    username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Email'}))
+    username = forms.EmailField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Email'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}))
 
 # --- Order Form ---
