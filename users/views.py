@@ -95,13 +95,14 @@ def register_mover(request):
 # Dashboard Views
 
 @login_required
-def dashboard(request):
+def customer_dashboard(request):
     if hasattr(request.user, 'customer'):
-        # اگر مشتری است، داشبورد مربوط به او را نمایش بدهید
-        return render(request, 'users/customer_dashboard.html')
-    else:
-        messages.error(request, "You do not have permission to access this page.")
-        return redirect('home')
+        # Check if customer has filled out all profile information
+        if not request.user.customer.phone or not request.user.customer.payment_info:
+            messages.warning(request, "Please complete your profile information before placing an order.")
+            return redirect('complete_profile')  # Redirect to profile completion page
+    return render(request, 'users/customer_dashboard.html')
+
 
 @login_required
 def mover_dashboard(request):
@@ -118,7 +119,7 @@ def estimate_volume_weight(item_class):
     if estimates:
         return estimates['volume'], estimates['weight']
     else:
-        return 0.5, 10  # مقادیر پیش‌فرض
+        return 0.5, 10  
 
 @login_required
 def create_order(request):
