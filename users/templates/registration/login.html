@@ -20,7 +20,8 @@
                 {% endif %}
                 <form method="POST" class="needs-validation" novalidate>
                     {% csrf_token %}
-
+                    <input type="hidden" name="next" value="{{ next }}">
+                
                     <!-- Email -->
                     <div class="mb-3">
                         <label for="id_username" class="form-label">Email</label>
@@ -30,7 +31,7 @@
                             <div class="text-danger">{{ form.username.errors }}</div>
                         {% endif %}
                     </div>
-
+                
                     <!-- Password -->
                     <div class="mb-3">
                         <label for="id_password" class="form-label">Password</label>
@@ -40,12 +41,12 @@
                             <div class="text-danger">{{ form.password.errors }}</div>
                         {% endif %}
                     </div>
-
+                
                     <!-- Submit Button -->
                     <button type="submit" class="btn btn-success w-100">
                         <i class="fas fa-sign-in-alt"></i> Login
                     </button>
-
+                
                 </form>
                 <div class="text-center mt-3">
                     <a href="{% url 'register_customer' %}" class="btn btn-link">Register as Customer</a> | 

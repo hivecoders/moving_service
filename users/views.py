@@ -101,7 +101,9 @@ def customer_dashboard(request):
         if not request.user.customer.phone or not request.user.customer.payment_info:
             messages.warning(request, "Please complete your profile information before placing an order.")
             return redirect('complete_profile')  # Redirect to profile completion page
-    return render(request, 'users/customer_dashboard.html')
+    orders = Order.objects.filter(customer=request.user.customer)
+    context = {'orders': orders}
+    return render(request, 'users/customer_dashboard.html', context)
 
 
 @login_required
