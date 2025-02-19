@@ -1,3 +1,5 @@
+# urls.py
+
 from django.urls import path
 from . import views
 
@@ -15,8 +17,8 @@ urlpatterns = [
 
     # Payment URLs
     path('process_payment/<int:order_id>/', views.process_payment, name='process_payment'),
-    path('payment_success/', views.home, name='payment_success'),  # Redirect to home after payment success
-    path('payment_cancel/', views.home, name='payment_cancel'),    # Redirect to home if payment is canceled
+    path('payment_success/', views.home, name='payment_success'),
+    path('payment_cancel/', views.home, name='payment_cancel'),
 
     # Stripe webhook
     path('stripe_webhook/', views.stripe_webhook, name='stripe_webhook'),

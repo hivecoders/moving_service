@@ -93,14 +93,15 @@ def register_mover(request):
     return render(request, 'users/register_mover.html', {'form': form})
 
 # Dashboard Views
+
 @login_required
-def customer_dashboard(request):
+def dashboard(request):
     if hasattr(request.user, 'customer'):
-        # Check if customer has filled out all profile information
-        if not request.user.customer.phone or not request.user.customer.payment_info:
-            messages.warning(request, "Please complete your profile information before placing an order.")
-            return redirect('complete_profile')  # Redirect to profile completion page
-    return render(request, 'users/dashboard.html')
+        # اگر مشتری است، داشبورد مربوط به او را نمایش بدهید
+        return render(request, 'users/customer_dashboard.html')
+    else:
+        messages.error(request, "You do not have permission to access this page.")
+        return redirect('home')
 
 @login_required
 def mover_dashboard(request):
