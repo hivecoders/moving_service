@@ -5,14 +5,28 @@ from .models import Customer, Mover, Order, Photo, CustomUser
 
 # --- Customer Registration Form ---
 class CustomerRegistrationForm(UserCreationForm):
-    full_name = forms.CharField(max_length=100, label='Full Name', required=True)
-    phone = forms.CharField(max_length=15, required=True)
-    email = forms.EmailField(label='Email', required=True)
-    profile_photo = forms.ImageField(required=False)
+    email = forms.EmailField(widget=forms.EmailInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Enter your email',
+        'required': 'required',
+    }))
+    full_name = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Enter your full name',
+        'required': 'required',
+    }))
+    phone = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Enter your phone number',
+        'required': 'required',
+    }))
+    profile_photo = forms.ImageField(widget=forms.FileInput(attrs={
+        'class': 'form-control',
+    }))
 
     class Meta:
         model = CustomUser
-        fields = ['email', 'password1', 'password2', 'full_name', 'phone', 'profile_photo']
+        fields = ['email', 'full_name', 'phone', 'profile_photo', 'password1', 'password2']
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -68,8 +82,16 @@ class MoverRegistrationForm(UserCreationForm):
 
 # --- Custom User Login Form ---
 class CustomUserLoginForm(AuthenticationForm):
-    username = forms.EmailField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Email'}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}))
+    username = forms.EmailField(widget=forms.EmailInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Enter your email',
+        'required': 'required',
+    }))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Enter your password',
+        'required': 'required',
+    }))
 
 # --- Order Form ---
 class OrderForm(forms.ModelForm):

@@ -11,44 +11,67 @@
                 <h4><i class="fas fa-user-plus"></i> Register as Customer</h4>
             </div>
             <div class="card-body">
+                {% if messages %}
+                    <div class="alert alert-danger">
+                        {% for message in messages %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
                 <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
                     {% csrf_token %}
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
                         {{ form.email }}
+                        <div class="invalid-feedback">Please enter a valid email.</div>
+                        {% if form.email.errors %}
+                            <div class="text-danger">{{ form.email.errors }}</div>
+                        {% endif %}
                     </div>
                     <div class="mb-3">
                         <label for="full_name" class="form-label">Full Name</label>
                         {{ form.full_name }}
+                        <div class="invalid-feedback">Please enter your full name.</div>
+                        {% if form.full_name.errors %}
+                            <div class="text-danger">{{ form.full_name.errors }}</div>
+                        {% endif %}
                     </div>
                     <div class="mb-3">
                         <label for="phone" class="form-label">Phone</label>
                         {{ form.phone }}
+                        <div class="invalid-feedback">Please enter your phone number.</div>
+                        {% if form.phone.errors %}
+                            <div class="text-danger">{{ form.phone.errors }}</div>
+                        {% endif %}
                     </div>
                     <div class="mb-3">
                         <label for="profile_photo" class="form-label">Profile Photo</label>
                         {{ form.profile_photo }}
+                        <div class="invalid-feedback">Please upload a profile photo.</div>
+                        {% if form.profile_photo.errors %}
+                            <div class="text-danger">{{ form.profile_photo.errors }}</div>
+                        {% endif %}
                     </div>
                     <div class="mb-3">
                         <label for="password1" class="form-label">Password</label>
                         {{ form.password1 }}
+                        <div class="invalid-feedback">Please enter a password.</div>
+                        {% if form.password1.errors %}
+                            <div class="text-danger">{{ form.password1.errors }}</div>
+                        {% endif %}
                     </div>
                     <div class="mb-3">
                         <label for="password2" class="form-label">Confirm Password</label>
                         {{ form.password2 }}
+                        <div class="invalid-feedback">Please confirm your password.</div>
+                        {% if form.password2.errors %}
+                            <div class="text-danger">{{ form.password2.errors }}</div>
+                        {% endif %}
                     </div>
                     <button type="submit" class="btn btn-success w-100">
                         <i class="fas fa-user-plus"></i> Register
                     </button>
                 </form>
-
-                {% if messages %}
-                    <div class="mt-3">
-                        {% for message in messages %}
-                            <div class="alert alert-danger">{{ message }}</div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
             </div>
         </div>
     </div>

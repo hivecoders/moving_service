@@ -33,9 +33,11 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, "You have successfully logged in.")
-                return redirect('dashboard')
+                return redirect('customer_dashboard')
             else:
                 messages.error(request, "Invalid email or password.")
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
         form = CustomUserLoginForm()
     return render(request, 'registration/login.html', {'form': form})
@@ -92,7 +94,7 @@ def register_mover(request):
 
 # Dashboard Views
 @login_required
-def dashboard(request):
+def customer_dashboard(request):
     if hasattr(request.user, 'customer'):
         # Check if customer has filled out all profile information
         if not request.user.customer.phone or not request.user.customer.payment_info:
