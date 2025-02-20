@@ -10,14 +10,24 @@
         <div class="col-md-3">
             <div class="card shadow-sm">
                 <div class="card-body text-center">
-                    <img src="{{ user.mover.profile_photo.url }}" class="img-thumbnail rounded-circle mb-3" alt="Profile Photo" style="width: 150px; height: 150px;">
+                    <img src="{{ user.mover.profile_photo.url }}" 
+                         class="img-thumbnail rounded-circle mb-3" 
+                         alt="Profile Photo" 
+                         style="width: 150px; height: 150px;"
+                         onerror="this.onerror=null; this.src='{% static 'images/default_profile.png' %}';">
+                    
                     <h4>{{ user.mover.full_name }}</h4>
                     <p>{{ user.email }}</p>
-                    <a href="{% url 'edit_profile' %}" class="btn btn-primary w-100 mb-2"><i class="fas fa-edit"></i> Edit Profile</a>
+                    <a href="{% url 'edit_profile' %}" class="btn btn-primary w-100 mb-2">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </a>
                     <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
                         {% csrf_token %}
                     </form>
-                    <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="btn btn-danger w-100"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" 
+                       class="btn btn-danger w-100">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
                 </div>
             </div>
         </div>
@@ -27,6 +37,7 @@
                     <h2><i class="fas fa-box-open"></i> Available Orders</h2>
                 </div>
                 <div class="card-body">
+                    {% if orders %}
                     <table class="table mt-4">
                         <thead>
                             <tr>
@@ -49,9 +60,13 @@
                                 <td>{{ order.total_weight|floatformat:2 }}</td>
                                 <td>
                                     <ul>
-                                        {% for item in order.items_detected.all %}
-                                        <li>{{ item.item_class }} - Volume: {{ item.volume|floatformat:2 }}m³ - Weight: {{ item.weight|floatformat:2 }}kg</li>
-                                        {% endfor %}
+                                        {% if order.items_detected.all %}
+                                            {% for item in order.items_detected.all %}
+                                                <li>{{ item.item_class }} - Volume: {{ item.volume|floatformat:2 }}m³ - Weight: {{ item.weight|floatformat:2 }}kg</li>
+                                            {% endfor %}
+                                        {% else %}
+                                            <li class="text-muted">No detected items.</li>
+                                        {% endif %}
                                     </ul>
                                 </td>
                                 <td>
@@ -68,6 +83,9 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                    {% else %}
+                    <p class="text-center text-muted"><i class="fas fa-info-circle"></i> No available orders at the moment.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>

@@ -18,27 +18,36 @@
                         {% endfor %}
                     </div>
                 {% endif %}
+                
                 <form method="POST" class="needs-validation" novalidate>
                     {% csrf_token %}
                     <input type="hidden" name="next" value="{{ next }}">
                 
-                    <!-- Email -->
+                    <!-- Email Field -->
                     <div class="mb-3">
-                        <label for="id_username" class="form-label">Email</label>
-                        {{ form.username }}
+                        <label for="id_email" class="form-label">Email</label>
+                        {{ form.email }}  
                         <div class="invalid-feedback">Please enter a valid email.</div>
-                        {% if form.username.errors %}
-                            <div class="text-danger">{{ form.username.errors }}</div>
+                        {% if form.email.errors %}
+                            <div class="text-danger">
+                                {% for error in form.email.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
                         {% endif %}
                     </div>
                 
-                    <!-- Password -->
+                    <!-- Password Field -->
                     <div class="mb-3">
                         <label for="id_password" class="form-label">Password</label>
                         {{ form.password }}
                         <div class="invalid-feedback">Please enter your password.</div>
                         {% if form.password.errors %}
-                            <div class="text-danger">{{ form.password.errors }}</div>
+                            <div class="text-danger">
+                                {% for error in form.password.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
                         {% endif %}
                     </div>
                 
@@ -48,6 +57,8 @@
                     </button>
                 
                 </form>
+                
+                <!-- Register Links -->
                 <div class="text-center mt-3">
                     <a href="{% url 'register_customer' %}" class="btn btn-link">Register as Customer</a> | 
                     <a href="{% url 'register_mover' %}" class="btn btn-link">Register as Mover</a>

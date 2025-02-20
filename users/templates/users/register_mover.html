@@ -11,29 +11,117 @@
                 <h4><i class="fas fa-truck"></i> Register as Mover</h4>
             </div>
             <div class="card-body">
+                {% if messages %}
+                    <div class="alert alert-danger">
+                        {% for message in messages %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
                 <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
-                    {{ form.as_p }}
+                    
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="id_email" class="form-label">Email</label>
+                        {{ form.email }}
+                        {% for error in form.email.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Full Name -->
+                    <div class="mb-3">
+                        <label for="id_full_name" class="form-label">Full Name</label>
+                        {{ form.full_name }}
+                        {% for error in form.full_name.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="mb-3">
+                        <label for="id_phone" class="form-label">Phone</label>
+                        {{ form.phone }}
+                        {% for error in form.phone.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Profile Photo -->
+                    <div class="mb-3">
+                        <label for="id_profile_photo" class="form-label">Profile Photo</label>
+                        {{ form.profile_photo }}
+                        {% for error in form.profile_photo.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Identification ID -->
+                    <div class="mb-3">
+                        <label for="id_identification_id" class="form-label">Identification ID</label>
+                        {{ form.identification_id }}
+                        {% for error in form.identification_id.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Do you have a vehicle? -->
+                    <div class="mb-3">
+                        <label for="id_has_vehicle" class="form-label">Do you have a vehicle?</label>
+                        {{ form.has_vehicle }}
+                        {% for error in form.has_vehicle.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Vehicle Fields (conditionally displayed) -->
+                    <div id="vehicleFields" style="display: none;">
+                        <div class="mb-3">
+                            <label for="id_vehicle_type" class="form-label">Vehicle Type</label>
+                            {{ form.vehicle_type }}
+                            {% for error in form.vehicle_type.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_carrying_capacity" class="form-label">Carrying Capacity (kg)</label>
+                            {{ form.carrying_capacity }}
+                            {% for error in form.carrying_capacity.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_driving_license" class="form-label">Upload Driving License</label>
+                            {{ form.driving_license }}
+                            {% for error in form.driving_license.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Mover Type -->
+                    <div class="mb-3">
+                        <label for="id_mover_type" class="form-label">Mover Type</label>
+                        {{ form.mover_type }}
+                        {% for error in form.mover_type.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Select Location (Map) -->
                     <div class="mb-3">
                         <label for="location_map_canvas" class="form-label">Select your location</label>
                         <div id="location_map_canvas" style="height: 400px;"></div>
+                        <input type="hidden" id="location_map" name="location_map">
                     </div>
-                    <input type="hidden" id="location_map" name="location_map">
-                    {% if form.errors %}
-                        <div class="alert alert-danger">
-                            <ul>
-                                {% for field in form %}
-                                    {% for error in field.errors %}
-                                        <li>{{ error }}</li>
-                                    {% endfor %}
-                                {% endfor %}
-                                {% for error in form.non_field_errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
-                    <button type="submit" class="btn btn-success w-100"><i class="fas fa-check-circle"></i> Submit</button>
+
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="fas fa-check-circle"></i> Submit
+                    </button>
                 </form>
             </div>
         </div>
@@ -51,15 +139,7 @@
         var map = L.map('location_map_canvas').setView([51.505, -0.09], 13);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-
-        var geocoder = L.Control.Geocoder.nominatim();
-        L.Control.geocoder({
-            query: '',
-            placeholder: 'Search for a location',
-            collapsed: false,
-            geocoder: geocoder
+            attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
         var marker;
@@ -75,33 +155,25 @@
         map.on('click', function(e) {
             onLocationSelected(e.latlng);
         });
-
-        geocoder.on('select', function(event) {
-            onLocationSelected(event.latlng);
-        });
     }
 
     document.addEventListener('DOMContentLoaded', initMap);
 
-    // JavaScript to toggle vehicle fields
+    // Toggle vehicle fields based on selection
     document.addEventListener('DOMContentLoaded', function() {
         var hasVehicleField = document.getElementById('id_has_vehicle');
-        var vehicleFields = ['id_vehicle_type', 'id_carrying_capacity', 'id_driving_license'];
+        var vehicleFields = document.getElementById('vehicleFields');
 
         function toggleVehicleFields() {
             if (hasVehicleField.value === 'Yes') {
-                vehicleFields.forEach(function(fieldId) {
-                    document.getElementById(fieldId).closest('.form-group').style.display = 'block';
-                });
+                vehicleFields.style.display = 'block';
             } else {
-                vehicleFields.forEach(function(fieldId) {
-                    document.getElementById(fieldId).closest('.form-group').style.display = 'none';
-                });
+                vehicleFields.style.display = 'none';
             }
         }
 
         hasVehicleField.addEventListener('change', toggleVehicleFields);
-        toggleVehicleFields();  // Initial call to set the correct state
+        toggleVehicleFields(); // Initial state
     });
 </script>
 {% endblock %}

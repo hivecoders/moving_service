@@ -20,58 +20,75 @@
                 {% endif %}
                 <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
                     {% csrf_token %}
+                    
+                    <!-- Email -->
                     <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
+                        <label for="id_email" class="form-label">Email</label>
                         {{ form.email }}
                         <div class="invalid-feedback">Please enter a valid email.</div>
-                        {% if form.email.errors %}
-                            <div class="text-danger">{{ form.email.errors }}</div>
-                        {% endif %}
+                        {% for error in form.email.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
                     </div>
+
+                    <!-- Full Name -->
                     <div class="mb-3">
-                        <label for="full_name" class="form-label">Full Name</label>
+                        <label for="id_full_name" class="form-label">Full Name</label>
                         {{ form.full_name }}
                         <div class="invalid-feedback">Please enter your full name.</div>
-                        {% if form.full_name.errors %}
-                            <div class="text-danger">{{ form.full_name.errors }}</div>
-                        {% endif %}
+                        {% for error in form.full_name.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
                     </div>
+
+                    <!-- Phone -->
                     <div class="mb-3">
-                        <label for="phone" class="form-label">Phone</label>
+                        <label for="id_phone" class="form-label">Phone</label>
                         {{ form.phone }}
                         <div class="invalid-feedback">Please enter your phone number.</div>
-                        {% if form.phone.errors %}
-                            <div class="text-danger">{{ form.phone.errors }}</div>
-                        {% endif %}
+                        {% for error in form.phone.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
                     </div>
+
+                    <!-- Profile Photo -->
                     <div class="mb-3">
-                        <label for="profile_photo" class="form-label">Profile Photo</label>
+                        <label for="id_profile_photo" class="form-label">Profile Photo (Optional)</label>
                         {{ form.profile_photo }}
-                        <div class="invalid-feedback">Please upload a profile photo.</div>
-                        {% if form.profile_photo.errors %}
-                            <div class="text-danger">{{ form.profile_photo.errors }}</div>
-                        {% endif %}
+                        {% for error in form.profile_photo.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
                     </div>
+
+                    <!-- Password -->
                     <div class="mb-3">
-                        <label for="password1" class="form-label">Password</label>
+                        <label for="id_password1" class="form-label">Password</label>
                         {{ form.password1 }}
-                        <div class="invalid-feedback">Please enter a password.</div>
-                        {% if form.password1.errors %}
-                            <div class="text-danger">{{ form.password1.errors }}</div>
-                        {% endif %}
+                        <div class="invalid-feedback">Please enter a strong password.</div>
+                        {% for error in form.password1.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
                     </div>
+
+                    <!-- Confirm Password -->
                     <div class="mb-3">
-                        <label for="password2" class="form-label">Confirm Password</label>
+                        <label for="id_password2" class="form-label">Confirm Password</label>
                         {{ form.password2 }}
                         <div class="invalid-feedback">Please confirm your password.</div>
-                        {% if form.password2.errors %}
-                            <div class="text-danger">{{ form.password2.errors }}</div>
-                        {% endif %}
+                        {% for error in form.password2.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
                     </div>
+
+                    <!-- Submit Button -->
                     <button type="submit" class="btn btn-success w-100">
                         <i class="fas fa-user-plus"></i> Register
                     </button>
+                
                 </form>
+                <div class="text-center mt-3">
+                    <a href="{% url 'login' %}" class="btn btn-link">Already have an account? Login here</a>
+                </div>
             </div>
         </div>
     </div>

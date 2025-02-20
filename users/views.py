@@ -7,10 +7,13 @@ from django.views.decorators.csrf import csrf_exempt
 from geopy.distance import geodesic
 from ultralytics import YOLO
 import stripe
-from .models import Customer, Mover, Order, DetectedItem, Photo
+from .models import Customer, Mover, Order, DetectedItem, Photo, CustomUser
 from utils.volume_weight_estimates import VOLUME_WEIGHT_ESTIMATES
 from django.contrib.auth.decorators import login_required
-from .forms import MoverRegistrationForm, CustomerRegistrationForm, CustomUserLoginForm, OrderForm, PhotoFormSet, MoverProfileForm, CustomerProfileForm, PhotoUploadForm
+from .forms import (
+    MoverRegistrationForm, CustomerRegistrationForm, CustomUserLoginForm, 
+    OrderForm, PhotoFormSet, MoverProfileForm, CustomerProfileForm, PhotoUploadForm
+)
 
 # Load YOLO model
 yolo_model = YOLO("yolov8l.pt")
@@ -27,19 +30,43 @@ def login_view(request):
     if request.method == 'POST':
         form = CustomUserLoginForm(request.POST)
         if form.is_valid():
-            email = form.cleaned_data.get('username')
+            email = form.cleaned_data.get('username').lower()  # Convert email to lowercase
             password = form.cleaned_data.get('password')
-            user = authenticate(request, email=email, password=password)
+            print(f"🔍 Attempting login with: {email}")
+
+            user = authenticate(request, username=email, password=password)
+            print(f"🔎 Authentication Result: {user}")
+
             if user is not None:
+                print(f"✅ User authenticated: {user}")
                 login(request, user)
+
+                if '_auth_user_id' not in request.session:
+                    print("⚠️ Warning: User session was not created. Login failed!")
+                    messages.error(request, "Login failed due to session issue. Try again.")
+                    return redirect('login')
+
                 messages.success(request, "You have successfully logged in.")
-                return redirect('customer_dashboard')
+
+                if hasattr(user, 'customer'):
+                    next_url = request.POST.get('next', '/users/dashboard/customer/')
+                elif hasattr(user, 'mover'):
+                    next_url = request.POST.get('next', '/users/dashboard/mover/')
+                else:
+                    next_url = '/'
+
+                print(f"🔀 Redirecting to: {next_url}")
+                return redirect(next_url)
             else:
+                print("❌ Authentication failed!")  
                 messages.error(request, "Invalid email or password.")
         else:
+            print(f"❌ Form validation failed: {form.errors}")  
             messages.error(request, "Please correct the errors below.")
+
     else:
         form = CustomUserLoginForm()
+
     return render(request, 'registration/login.html', {'form': form})
 
 # Customer Registration
@@ -47,19 +74,25 @@ def register_customer(request):
     if request.method == 'POST':
         form = CustomerRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
-            user = form.save(commit=False)
-            user.save()
+            user = form.save(commit=True)  # Save user immediately
             customer = Customer.objects.create(
                 user=user,
-                full_name=form.cleaned_data.get('full_name'),
                 phone=form.cleaned_data.get('phone'),
-                email=form.cleaned_data.get('email'),
                 profile_photo=form.cleaned_data.get('profile_photo')
             )
             login(request, user)
+            print(f"✅ User {user.email} successfully registered and logged in!")
+
+            if '_auth_user_id' not in request.session:
+                print("⚠️ Warning: User session was not created. Login failed!")
+                messages.error(request, "Registration failed due to session issue. Try logging in.")
+                return redirect('login')
+
+            print(f"🔀 Redirecting to: customer_dashboard")
             messages.success(request, "Account created successfully!")
             return redirect('customer_dashboard')
         else:
+            print(f"❌ Registration failed: {form.errors}")  
             messages.error(request, "Please correct the errors below.")
     else:
         form = CustomerRegistrationForm()
@@ -70,42 +103,48 @@ def register_mover(request):
     if request.method == 'POST':
         form = MoverRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
-            user = form.save(commit=False)
-            user.save()
+            user = form.save(commit=True)
             mover = Mover.objects.create(
                 user=user,
-                full_name=form.cleaned_data.get('full_name'),
                 phone=form.cleaned_data.get('phone'),
                 vehicle_type=form.cleaned_data.get('vehicle_type') if form.cleaned_data.get('has_vehicle') == 'Yes' else None,
                 mover_type=form.cleaned_data.get('mover_type'),
-                location=request.POST.get('location_map'),  # ذخیره لوکیشن انتخاب شده
+                location=request.POST.get('location_map'),
                 payment_info=form.cleaned_data.get('payment_info'),
                 driving_license=form.cleaned_data.get('driving_license') if form.cleaned_data.get('has_vehicle') == 'Yes' else None,
                 carrying_capacity=form.cleaned_data.get('carrying_capacity') if form.cleaned_data.get('has_vehicle') == 'Yes' else None
             )
             login(request, user)
+
+            if '_auth_user_id' not in request.session:
+                print("⚠️ Warning: User session was not created. Login failed!")
+                messages.error(request, "Registration failed due to session issue. Try logging in.")
+                return redirect('login')
+
             messages.success(request, "Account created successfully!")
             return redirect('mover_dashboard')
         else:
+            print(f"❌ Form validation failed: {form.errors}")  
             messages.error(request, "Please correct the errors below.")
     else:
         form = MoverRegistrationForm()
     return render(request, 'users/register_mover.html', {'form': form})
 
-# Dashboard Views
-
+# Customer Dashboard
 @login_required
 def customer_dashboard(request):
+    print(f"👤 Logged-in user: {request.user}")
+    print(f"🔍 Is authenticated? {request.user.is_authenticated}")
+
     if hasattr(request.user, 'customer'):
-        # Check if customer has filled out all profile information
-        if not request.user.customer.phone or not request.user.customer.payment_info:
+        if not request.user.customer.phone:
             messages.warning(request, "Please complete your profile information before placing an order.")
-            return redirect('complete_profile')  # Redirect to profile completion page
+            return redirect('edit_profile')
+
     orders = Order.objects.filter(customer=request.user.customer)
-    context = {'orders': orders}
-    return render(request, 'users/customer_dashboard.html', context)
+    return render(request, 'users/customer_dashboard.html', {'orders': orders})
 
-
+# Mover Dashboard
 @login_required
 def mover_dashboard(request):
     if hasattr(request.user, 'mover'):
@@ -115,13 +154,13 @@ def mover_dashboard(request):
         messages.error(request, "You do not have permission to access this page.")
         return redirect('home')
 
-# Order Creation & Image Processing
-def estimate_volume_weight(item_class):
-    estimates = VOLUME_WEIGHT_ESTIMATES.get(item_class.lower())
-    if estimates:
-        return estimates['volume'], estimates['weight']
-    else:
-        return 0.5, 10  
+# Logout View
+def logout_view(request):
+    logout(request)
+    messages.success(request, "You have been logged out.")
+    return redirect('home')
+
+
 
 @login_required
 def create_order(request):
