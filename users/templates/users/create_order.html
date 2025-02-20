@@ -14,15 +14,70 @@
                 <div class="card-body">
                     <form method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
-                        {{ order_form.as_p }}
+
+                        <!-- Origin Selection -->
+                        <h5 class="text-center">Select Origin</h5>
+                        <div id="origin_map_canvas" style="height: 400px; margin-bottom: 10px;"></div>
+                        <input type="hidden" id="origin_location" name="origin_location">
+
+                        <div class="mb-3">
+                            <label for="id_origin" class="form-label">Origin Address</label>
+                            {{ order_form.origin }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_origin_floor" class="form-label">Origin Floor</label>
+                            {{ order_form.origin_floor }}
+                        </div>
+
+                        <!-- Destination Selection -->
+                        <h5 class="text-center">Select Destination</h5>
+                        <div id="destination_map_canvas" style="height: 400px; margin-bottom: 10px;"></div>
+                        <input type="hidden" id="destination_location" name="destination_location">
+
+                        <div class="mb-3">
+                            <label for="id_destination" class="form-label">Destination Address</label>
+                            {{ order_form.destination }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_destination_floor" class="form-label">Destination Floor</label>
+                            {{ order_form.destination_floor }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_move_date" class="form-label">Move Date</label>
+                            {{ order_form.move_date }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_has_elevator" class="form-label">Elevator Available?</label>
+                            {{ order_form.has_elevator }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_need_pro_mover" class="form-label">Need Professional Mover?</label>
+                            {{ order_form.need_pro_mover }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_need_box_packer" class="form-label">Need Box Packer?</label>
+                            {{ order_form.need_box_packer }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_total_volume" class="form-label">Total Volume (m³)</label>
+                            {{ order_form.total_volume }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_total_weight" class="form-label">Total Weight (kg)</label>
+                            {{ order_form.total_weight }}
+                        </div>
+
                         <div class="mb-3">
                             <label for="id_image" class="form-label">Upload Photos</label>
                             <input type="file" name="image" id="id_image" class="form-control" multiple>
                         </div>
-                        <div id="origin_map_canvas" style="height: 400px;"></div>
-                        <input type="hidden" id="origin_location" name="origin_location">
-                        <div id="destination_map_canvas" style="height: 400px;"></div>
-                        <input type="hidden" id="destination_location" name="destination_location">
+
                         {% if order_form.errors %}
                             <div class="alert alert-danger">
                                 <ul>
@@ -37,6 +92,7 @@
                                 </ul>
                             </div>
                         {% endif %}
+
                         <button type="submit" class="btn btn-success w-100">
                             <i class="fas fa-check-circle"></i> Submit Order
                         </button>
@@ -62,71 +118,39 @@
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
 <script>
-    function initMap() {
-        var originMap = L.map('origin_map_canvas').setView([51.505, -0.09], 13);
-        var destinationMap = L.map('destination_map_canvas').setView([51.505, -0.09], 13);
-
+    function setupMap(mapId, inputId, placeholderText) {
+        var map = L.map(mapId).setView([51.505, -0.09], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(originMap);
+        }).addTo(map);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(destinationMap);
-
-        var originGeocoder = L.Control.Geocoder.nominatim();
-        var destinationGeocoder = L.Control.Geocoder.nominatim();
-
+        var geocoder = L.Control.Geocoder.nominatim();
         L.Control.geocoder({
             query: '',
-            placeholder: 'Search for origin location',
+            placeholder: placeholderText,
             collapsed: false,
-            geocoder: originGeocoder
-        }).addTo(originMap);
+            geocoder: geocoder
+        }).addTo(map);
 
-        L.Control.geocoder({
-            query: '',
-            placeholder: 'Search for destination location',
-            collapsed: false,
-            geocoder: destinationGeocoder
-        }).addTo(destinationMap);
-
-        var originMarker;
-        var destinationMarker;
-
-        function onOriginLocationSelected(latlng) {
-            if (originMarker) {
-                originMap.removeLayer(originMarker);
-            }
-            originMarker = L.marker(latlng).addTo(originMap);
-            document.getElementById('origin_location').value = `${latlng.lat}, ${latlng.lng}`;
+        var marker;
+        function onLocationSelected(latlng) {
+            if (marker) map.removeLayer(marker);
+            marker = L.marker(latlng).addTo(map);
+            document.getElementById(inputId).value = `${latlng.lat}, ${latlng.lng}`;
         }
 
-        function onDestinationLocationSelected(latlng) {
-            if (destinationMarker) {
-                destinationMap.removeLayer(destinationMarker);
-            }
-            destinationMarker = L.marker(latlng).addTo(destinationMap);
-            document.getElementById('destination_location').value = `${latlng.lat}, ${latlng.lng}`;
-        }
-
-        originMap.on('click', function(e) {
-            onOriginLocationSelected(e.latlng);
+        map.on('click', function(e) {
+            onLocationSelected(e.latlng);
         });
 
-        destinationMap.on('click', function(e) {
-            onDestinationLocationSelected(e.latlng);
-        });
-
-        originGeocoder.on('select', function(event) {
-            onOriginLocationSelected(event.latlng);
-        });
-
-        destinationGeocoder.on('select', function(event) {
-            onDestinationLocationSelected(event.latlng);
+        geocoder.on('select', function(event) {
+            onLocationSelected(event.latlng);
         });
     }
 
-    document.addEventListener('DOMContentLoaded', initMap);
+    document.addEventListener('DOMContentLoaded', function () {
+        setupMap('origin_map_canvas', 'origin_location', 'Click to select origin location');
+        setupMap('destination_map_canvas', 'destination_location', 'Click to select destination location');
+    });
 </script>
 {% endblock %}

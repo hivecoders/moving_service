@@ -67,6 +67,15 @@
                         {% endfor %}
                     </div>
 
+                    <!-- Payment Info -->
+                    <div class="mb-3">
+                        <label for="id_payment_info" class="form-label">Payment Info</label>
+                        {{ form.payment_info }}
+                        {% for error in form.payment_info.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
                     <!-- Do you have a vehicle? -->
                     <div class="mb-3">
                         <label for="id_has_vehicle" class="form-label">Do you have a vehicle?</label>
@@ -110,6 +119,17 @@
                         {% for error in form.mover_type.errors %}
                             <div class="text-danger">{{ error }}</div>
                         {% endfor %}
+                    </div>
+
+                    <!-- Mover Certification Field -->
+                    <div id="certificationField" style="display: none;">
+                        <div class="mb-3">
+                            <label for="id_mover_certification_document" class="form-label">Upload Certification Document</label>
+                            {{ form.mover_certification_document }}
+                            {% for error in form.mover_certification_document.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
                     </div>
 
                     <!-- Select Location (Map) -->
@@ -165,15 +185,24 @@
         var vehicleFields = document.getElementById('vehicleFields');
 
         function toggleVehicleFields() {
-            if (hasVehicleField.value === 'Yes') {
-                vehicleFields.style.display = 'block';
-            } else {
-                vehicleFields.style.display = 'none';
-            }
+            vehicleFields.style.display = hasVehicleField.value === 'Yes' ? 'block' : 'none';
         }
 
         hasVehicleField.addEventListener('change', toggleVehicleFields);
-        toggleVehicleFields(); // Initial state
+        toggleVehicleFields(); 
+    });
+
+    // Toggle Pro Mover certification field
+    document.addEventListener('DOMContentLoaded', function () {
+        var moverTypeField = document.getElementById('id_mover_type');
+        var certificationField = document.getElementById('certificationField');
+
+        function toggleCertificationField() {
+            certificationField.style.display = moverTypeField.value === 'Pro Mover' ? 'block' : 'none';
+        }
+
+        moverTypeField.addEventListener('change', toggleCertificationField);
+        toggleCertificationField();
     });
 </script>
 {% endblock %}

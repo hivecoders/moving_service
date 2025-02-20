@@ -30,40 +30,26 @@ def login_view(request):
     if request.method == 'POST':
         form = CustomUserLoginForm(request.POST)
         if form.is_valid():
-            email = form.cleaned_data.get('username').lower()  # Convert email to lowercase
+            email = form.cleaned_data.get('username').lower()
             password = form.cleaned_data.get('password')
-            print(f"🔍 Attempting login with: {email}")
 
             user = authenticate(request, username=email, password=password)
-            print(f"🔎 Authentication Result: {user}")
 
             if user is not None:
-                print(f"✅ User authenticated: {user}")
                 login(request, user)
-
-                if '_auth_user_id' not in request.session:
-                    print("⚠️ Warning: User session was not created. Login failed!")
-                    messages.error(request, "Login failed due to session issue. Try again.")
-                    return redirect('login')
-
-                messages.success(request, "You have successfully logged in.")
+                request.session.save()
 
                 if hasattr(user, 'customer'):
-                    next_url = request.POST.get('next', '/users/dashboard/customer/')
+                    return redirect('customer_dashboard')
                 elif hasattr(user, 'mover'):
-                    next_url = request.POST.get('next', '/users/dashboard/mover/')
+                    return redirect('mover_dashboard')
                 else:
-                    next_url = '/'
-
-                print(f"🔀 Redirecting to: {next_url}")
-                return redirect(next_url)
+                    return redirect('home')
             else:
-                print("❌ Authentication failed!")  
                 messages.error(request, "Invalid email or password.")
         else:
-            print(f"❌ Form validation failed: {form.errors}")  
             messages.error(request, "Please correct the errors below.")
-
+    
     else:
         form = CustomUserLoginForm()
 
@@ -74,25 +60,17 @@ def register_customer(request):
     if request.method == 'POST':
         form = CustomerRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
-            user = form.save(commit=True)  # Save user immediately
-            customer = Customer.objects.create(
+            user = form.save(commit=True)
+            Customer.objects.create(
                 user=user,
                 phone=form.cleaned_data.get('phone'),
                 profile_photo=form.cleaned_data.get('profile_photo')
             )
             login(request, user)
-            print(f"✅ User {user.email} successfully registered and logged in!")
-
-            if '_auth_user_id' not in request.session:
-                print("⚠️ Warning: User session was not created. Login failed!")
-                messages.error(request, "Registration failed due to session issue. Try logging in.")
-                return redirect('login')
-
-            print(f"🔀 Redirecting to: customer_dashboard")
+            request.session.save()
             messages.success(request, "Account created successfully!")
             return redirect('customer_dashboard')
         else:
-            print(f"❌ Registration failed: {form.errors}")  
             messages.error(request, "Please correct the errors below.")
     else:
         form = CustomerRegistrationForm()
@@ -112,56 +90,27 @@ def register_mover(request):
                 location=request.POST.get('location_map'),
                 payment_info=form.cleaned_data.get('payment_info'),
                 driving_license=form.cleaned_data.get('driving_license') if form.cleaned_data.get('has_vehicle') == 'Yes' else None,
-                carrying_capacity=form.cleaned_data.get('carrying_capacity') if form.cleaned_data.get('has_vehicle') == 'Yes' else None
+                carrying_capacity=form.cleaned_data.get('carrying_capacity') if form.cleaned_data.get('has_vehicle') == 'Yes' else None,
+                has_mover_certification=request.POST.get('has_mover_certification') == 'on',
+                mover_certification_document=request.FILES.get('mover_certification_document') if request.POST.get('has_mover_certification') == 'on' else None
             )
             login(request, user)
-
-            if '_auth_user_id' not in request.session:
-                print("⚠️ Warning: User session was not created. Login failed!")
-                messages.error(request, "Registration failed due to session issue. Try logging in.")
-                return redirect('login')
-
+            request.session.save()
             messages.success(request, "Account created successfully!")
             return redirect('mover_dashboard')
         else:
-            print(f"❌ Form validation failed: {form.errors}")  
             messages.error(request, "Please correct the errors below.")
     else:
         form = MoverRegistrationForm()
     return render(request, 'users/register_mover.html', {'form': form})
 
-# Customer Dashboard
-@login_required
-def customer_dashboard(request):
-    print(f"👤 Logged-in user: {request.user}")
-    print(f"🔍 Is authenticated? {request.user.is_authenticated}")
-
-    if hasattr(request.user, 'customer'):
-        if not request.user.customer.phone:
-            messages.warning(request, "Please complete your profile information before placing an order.")
-            return redirect('edit_profile')
-
-    orders = Order.objects.filter(customer=request.user.customer)
-    return render(request, 'users/customer_dashboard.html', {'orders': orders})
-
-# Mover Dashboard
-@login_required
-def mover_dashboard(request):
-    if hasattr(request.user, 'mover'):
-        orders = Order.objects.filter(items_detected__isnull=False).distinct()
-        return render(request, 'users/mover_dashboard.html', {'orders': orders})
-    else:
-        messages.error(request, "You do not have permission to access this page.")
-        return redirect('home')
-
 # Logout View
 def logout_view(request):
     logout(request)
     messages.success(request, "You have been logged out.")
-    return redirect('home')
+    return redirect('login')
 
-
-
+# Order Creation
 @login_required
 def create_order(request):
     if request.method == 'POST':
@@ -172,33 +121,27 @@ def create_order(request):
             photo = photo_form.save(commit=False)
             photo.order = order
             photo.save()
-
-            # Process image with YOLO and estimate volume & weight
             detect_objects(photo.image.path, order)
-
             messages.success(request, "Order successfully created!")
-            return redirect('dashboard')
+            return redirect('customer_dashboard')
     else:
         order_form = OrderForm()
         photo_form = PhotoUploadForm()
     return render(request, 'users/create_order.html', {'order_form': order_form, 'photo_form': photo_form})
 
 def detect_objects(image_path, order):
-    results = yolo_model(image_path)  # Run YOLO detection
-    total_volume = 0.0
-    total_weight = 0.0
+    results = yolo_model(image_path)
+    total_volume, total_weight = 0.0, 0.0
 
     for result in results:
         for box in result.boxes.data:
             item_name = result.names[int(box.cls.item())]
             confidence = float(box.conf.item())
 
-            # Get estimated volume & weight from JSON
             item_data = VOLUME_WEIGHT_ESTIMATES.get(item_name, {"volume": 0.5, "weight": 10.0})
             volume = item_data["volume"]
             weight = item_data["weight"]
 
-            # Save detected item
             DetectedItem.objects.create(
                 order=order,
                 item_class=item_name,
@@ -216,10 +159,46 @@ def detect_objects(image_path, order):
             total_volume += volume
             total_weight += weight
 
-    # Update order with total volume & weight
-    order.total_volume = total_volume
-    order.total_weight = total_weight
+    order.total_volume, order.total_weight = total_volume, total_weight
     order.save()
+
+# Customer Dashboard
+@login_required
+def customer_dashboard(request):
+    if hasattr(request.user, 'customer'):
+        orders = Order.objects.filter(customer=request.user.customer)
+        return render(request, 'users/customer_dashboard.html', {'orders': orders})
+    else:
+        messages.error(request, "Access denied.")
+        return redirect('home')
+
+# Mover Dashboard
+@login_required
+def mover_dashboard(request):
+    if hasattr(request.user, 'mover'):
+        orders = Order.objects.filter(items_detected__isnull=False).distinct()
+        return render(request, 'users/mover_dashboard.html', {'orders': orders})
+    else:
+        messages.error(request, "Access denied.")
+        return redirect('home')
+
+# Accept or Reject Orders
+@login_required
+def accept_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    order.status = 'Accepted'
+    order.save()
+    messages.success(request, "Order accepted successfully!")
+    return redirect('mover_dashboard')
+
+@login_required
+def reject_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    order.status = 'Rejected'
+    order.save()
+    messages.success(request, "Order rejected successfully!")
+    return redirect('mover_dashboard')
+
 
 # Order Details View
 @login_required
@@ -324,25 +303,3 @@ def edit_profile(request):
 
     return render(request, 'users/edit_profile.html', {'form': form})
 
-def logout_view(request):
-    logout(request)
-    messages.success(request, "You have been logged out.")
-    return redirect('home')
-
-@login_required
-def accept_order(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    # Logic for accepting the order
-    order.status = 'Accepted'
-    order.save()
-    messages.success(request, "Order accepted successfully!")
-    return redirect('mover_dashboard')
-
-@login_required
-def reject_order(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    # Logic for rejecting the order
-    order.status = 'Rejected'
-    order.save()
-    messages.success(request, "Order rejected successfully!")
-    return redirect('mover_dashboard')

@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.forms import modelformset_factory
 from .models import Customer, Mover, Order, Photo, CustomUser
 
-### ✅ **Customer Registration Form**
+# Customer Registration Form
 class CustomerRegistrationForm(UserCreationForm):
     email = forms.EmailField(widget=forms.EmailInput(attrs={
         'class': 'form-control',
@@ -31,15 +31,11 @@ class CustomerRegistrationForm(UserCreationForm):
 
     def clean_email(self):
         email = self.cleaned_data.get('email').lower()
-        print(f"🔍 Checking email: {email}")
-
         if CustomUser.objects.filter(email=email).exists():
-            print("❌ Email already exists!")
             raise forms.ValidationError("This email is already taken. Please choose a different one.")
-
         return email
 
-### ✅ **Mover Registration Form**
+# Mover Registration Form
 class MoverRegistrationForm(UserCreationForm):
     full_name = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control',
@@ -93,9 +89,11 @@ class MoverRegistrationForm(UserCreationForm):
     }), required=False)
     has_mover_certification = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={
         'class': 'form-check-input',
+        'id': 'certification_toggle'
     }))
     mover_certification_document = forms.ImageField(widget=forms.FileInput(attrs={
         'class': 'form-control',
+        'id': 'certification_document'
     }), required=False)
 
     class Meta:
@@ -104,12 +102,8 @@ class MoverRegistrationForm(UserCreationForm):
 
     def clean_email(self):
         email = self.cleaned_data.get('email').lower()
-        print(f"🔍 Checking email: {email}")
-
         if CustomUser.objects.filter(email=email).exists():
-            print("❌ Email already exists!")
             raise forms.ValidationError("This email is already taken. Please choose a different one.")
-
         return email
 
     def clean(self):
@@ -119,8 +113,6 @@ class MoverRegistrationForm(UserCreationForm):
         move_capacity = cleaned_data.get('carrying_capacity')
         driving_license = cleaned_data.get('driving_license')
 
-        print(f"🚗 Vehicle Status: {has_vehicle}")
-
         if has_vehicle == 'Yes':
             if not vehicle_type:
                 self.add_error('vehicle_type', 'Vehicle type is required if you have a vehicle.')
@@ -128,13 +120,15 @@ class MoverRegistrationForm(UserCreationForm):
                 self.add_error('carrying_capacity', 'Move Capacity is required if you have a vehicle.')
             if not driving_license:
                 self.add_error('driving_license', 'Driving License is required if you have a vehicle.')
-        
-        if cleaned_data.get('has_mover_certification') and not cleaned_data.get('mover_certification_document'):
-            self.add_error('mover_certification_document', 'Certification Document is required if you have Canadian Mover Certification.')
-        
+
+        mover_type = cleaned_data.get('mover_type')
+
+        if mover_type == 'Pro Mover' and not cleaned_data.get('mover_certification_document'):
+            self.add_error('mover_certification_document', 'Certification document is required for Pro Movers.')
+
         return cleaned_data
 
-### ✅ **Custom User Login Form**
+# Custom User Login Form
 class CustomUserLoginForm(AuthenticationForm):
     email = forms.EmailField(widget=forms.EmailInput(attrs={
         'class': 'form-control',
@@ -152,38 +146,35 @@ class CustomUserLoginForm(AuthenticationForm):
         email = cleaned_data.get("email").lower()
         password = cleaned_data.get("password")
 
-        print(f"🔑 Login Attempt with: {email}")
-
         if email and password:
-            self.user_cache = authenticate(username=email, password=password)
+            self.user_cache = authenticate(email=email, password=password)
             if self.user_cache is None:
-                print("❌ Authentication failed!")
                 raise forms.ValidationError("Invalid email or password.")
-        
+
         return cleaned_data
 
-### ✅ **Order Form**
+# Order Form
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
         fields = ['origin', 'destination', 'origin_floor', 'destination_floor', 'has_elevator', 'need_pro_mover', 'need_box_packer', 'move_date', 'origin_location', 'destination_location', 'total_volume', 'total_weight']
 
-### ✅ **Photo FormSet**
+# Photo FormSet
 PhotoFormSet = modelformset_factory(Photo, fields=('image',), extra=1)
 
-### ✅ **Mover Profile Form**
+# Mover Profile Form
 class MoverProfileForm(forms.ModelForm):
     class Meta:
         model = Mover
         fields = ['full_name', 'phone', 'identification_id', 'has_vehicle', 'vehicle_type', 'mover_type', 'payment_info', 'driving_license', 'carrying_capacity', 'has_mover_certification', 'mover_certification_document']
 
-### ✅ **Customer Profile Form**
+# Customer Profile Form
 class CustomerProfileForm(forms.ModelForm):
     class Meta:
         model = Customer
         fields = ['full_name', 'phone', 'profile_photo']
 
-### ✅ **Photo Upload Form**
+# Photo Upload Form
 class PhotoUploadForm(forms.ModelForm):
     class Meta:
         model = Photo
