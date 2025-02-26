@@ -1,5 +1,8 @@
+import logging
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+
+logger = logging.getLogger(__name__)
 
 # Custom User Manager
 class CustomUserManager(BaseUserManager):
@@ -8,16 +11,19 @@ class CustomUserManager(BaseUserManager):
         if not email:
             raise ValueError("The Email field must be set")
         email = self.normalize_email(email).lower()
+        logger.info(f"Creating user with email: {email}")
         user = self.model(email=email, **extra_fields)
         if password:
             user.set_password(password)
         user.save(using=self._db)
+        logger.info(f"User {email} created successfully")
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
         """Creates and returns a superuser with admin privileges."""
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
+        logger.info(f"Creating superuser with email: {email}")
         return self.create_user(email, password, **extra_fields)
 
 # Custom User Model
@@ -37,28 +43,17 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
-    # Groups and permissions fields for Django admin panel
-    groups = models.ManyToManyField(
-        "auth.Group",
-        related_name="customuser_set",
-        blank=True,
-        help_text="The groups this user belongs to.",
-        verbose_name="groups",
-    )
-    user_permissions = models.ManyToManyField(
-        "auth.Permission",
-        related_name="customuser_set",
-        blank=True,
-        help_text="Specific permissions for this user.",
-        verbose_name="user permissions",
-    )
-
 # Customer Model
 class Customer(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=100)
     phone = models.CharField(max_length=15, default="0000000000")
     profile_photo = models.ImageField(upload_to="profile_photos/", null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        logger.info(f"Saving customer: {self.user.email}")
+        super().save(*args, **kwargs)
+        logger.info(f"Customer {self.user.email} saved successfully")
 
     def __str__(self):
         return f"Customer: {self.user.full_name} - {self.user.email}"
@@ -93,6 +88,11 @@ class Mover(models.Model):
     has_mover_certification = models.BooleanField(default=False)
     mover_certification_document = models.ImageField(upload_to="certifications/", null=True, blank=True)
 
+    def save(self, *args, **kwargs):
+        logger.info(f"Saving mover: {self.user.email}")
+        super().save(*args, **kwargs)
+        logger.info(f"Mover {self.user.email} saved successfully")
+
     def __str__(self):
         return f"Mover: {self.user.full_name} - {self.user.email}"
 
@@ -113,6 +113,11 @@ class Order(models.Model):
     total_weight = models.FloatField(default=0)
     items_detected = models.ManyToManyField("DetectedItem", blank=True, related_name="orders")
     status = models.CharField(max_length=20, default="Pending")
+
+    def save(self, *args, **kwargs):
+        logger.info(f"Saving order #{self.id} by {self.customer.user.email}")
+        super().save(*args, **kwargs)
+        logger.info(f"Order #{self.id} saved successfully")
 
     def __str__(self):
         return f"Order #{self.id} by {self.customer.user.email}"
