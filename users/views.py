@@ -32,12 +32,22 @@ def home(request):
 # User Authentication & Signup
 def login_view(request):
     logger.info("Login attempt")
+
+    next_url = request.GET.get('next', '')
+    
     if request.method == 'POST':
-        form = CustomUserLoginForm(request.POST)
+        form = CustomUserLoginForm(request, data=request.POST)
+
+
         if form.is_valid():
-            email = form.cleaned_data.get('username').lower()
+            email = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
-            logger.debug(f"Authenticating user: {email}")
+
+            if email:
+                email = email.lower()  # to lower letter
+                logger.debug(f"Authenticating user: {email}")
+
+            # `username` to `email` change
             user = authenticate(request, username=email, password=password)
 
             if user is not None:
@@ -57,9 +67,12 @@ def login_view(request):
         else:
             logger.error(f"Form validation failed: {form.errors}")
             messages.error(request, "Please correct the errors below.")
+
     else:
         form = CustomUserLoginForm()
-    return render(request, 'registration/login.html', {'form': form})
+
+    return render(request, 'registration/login.html', {'form': form, 'next': next_url})
+
 
 # Customer Registration
 def register_customer(request):

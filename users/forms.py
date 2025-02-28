@@ -115,11 +115,12 @@ class MoverRegistrationForm(UserCreationForm):
 
 # Custom User Login Form
 class CustomUserLoginForm(AuthenticationForm):
-    username = forms.EmailField(widget=forms.EmailInput(attrs={
+    username = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control',
         'placeholder': 'Enter your email',
         'required': 'required',
     }))
+
     password = forms.CharField(widget=forms.PasswordInput(attrs={
         'class': 'form-control',
         'placeholder': 'Enter your password',
@@ -128,11 +129,11 @@ class CustomUserLoginForm(AuthenticationForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        email = cleaned_data.get("username").lower()
+        email = cleaned_data.get("username")
         password = cleaned_data.get("password")
-        logger.debug(f"Attempting login with: {email}")
+        logger.debug(f"Attempting login with email: {email}")
         if email and password:
-            self.user_cache = authenticate(username=email, password=password)
+            self.user_cache = authenticate(email=email, password=password)
             if self.user_cache is None:
                 logger.error(f"Authentication failed for: {email}")
                 raise forms.ValidationError("Invalid email or password.")
