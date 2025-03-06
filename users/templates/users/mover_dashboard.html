@@ -10,7 +10,7 @@
         <div class="col-md-3">
             <div class="card shadow-sm">
                 <div class="card-body text-center">
-                    <img src="{{ user.mover.profile_photo.url }}" 
+                    <img src="{{ user.profile_photo.url }}" 
                          class="img-thumbnail rounded-circle mb-3" 
                          alt="Profile Photo" 
                          style="width: 150px; height: 150px;"
@@ -19,8 +19,12 @@
                     <h4>{{ user.mover.full_name }}</h4>
                     <p>{{ user.email }}</p>
                     <a href="{% url 'edit_profile' %}" class="btn btn-primary w-100 mb-2">
-                        <i class="fas fa-edit"></i> Edit Profile
+                        <i class="fas fa-user-edit"></i> Edit Profile
                     </a>
+
+                    
+                    </a>
+
                     <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
                         {% csrf_token %}
                     </form>

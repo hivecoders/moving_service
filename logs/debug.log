@@ -16592,3 +16592,753 @@ DEBUG 2025-02-28 23:30:29,920 utils (0.000) SELECT "django_session"."session_key
 DEBUG 2025-02-28 23:30:29,920 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
 DEBUG 2025-02-28 23:30:29,920 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 1 LIMIT 21; args=(1,); alias=default
 DEBUG 2025-02-28 23:30:29,920 utils (0.000) SELECT "users_order"."id", "users_order"."customer_id", "users_order"."origin", "users_order"."destination", "users_order"."origin_floor", "users_order"."destination_floor", "users_order"."has_elevator", "users_order"."need_pro_mover", "users_order"."need_box_packer", "users_order"."move_date", "users_order"."origin_location", "users_order"."destination_location", "users_order"."total_volume", "users_order"."total_weight", "users_order"."status" FROM "users_order" WHERE "users_order"."customer_id" = 1; args=(1,); alias=default
+DEBUG 2025-03-06 00:19:45,257 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+DEBUG 2025-03-06 00:19:45,260 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+DEBUG 2025-03-06 00:25:16,824 utils (0.000) BEGIN; args=None; alias=default
+DEBUG 2025-03-06 00:25:16,826 utils (0.000) SELECT JSON('{"a": "b"}'); args=None; alias=default
+DEBUG 2025-03-06 00:25:16,826 utils (0.000) COMMIT; args=None; alias=default
+DEBUG 2025-03-06 00:25:16,894 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+DEBUG 2025-03-06 00:25:16,896 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+DEBUG 2025-03-06 00:25:16,897 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+DEBUG 2025-03-06 00:25:16,897 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+DEBUG 2025-03-06 00:25:16,924 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+DEBUG 2025-03-06 00:25:16,925 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+DEBUG 2025-03-06 00:25:16,927 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'admin'; args=('admin',); alias=default
+DEBUG 2025-03-06 00:25:16,927 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'admin' AND "django_content_type"."model" IN ('logentry')); args=('admin', 'logentry'); alias=default
+DEBUG 2025-03-06 00:25:16,929 utils (0.000) SELECT "auth_permission"."content_type_id", "auth_permission"."codename" FROM "auth_permission" INNER JOIN "django_content_type" ON ("auth_permission"."content_type_id" = "django_content_type"."id") WHERE "auth_permission"."content_type_id" IN (1) ORDER BY "django_content_type"."app_label" ASC, "django_content_type"."model" ASC, "auth_permission"."codename" ASC; args=(1,); alias=default
+DEBUG 2025-03-06 00:25:16,929 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'admin'; args=('admin',); alias=default
+DEBUG 2025-03-06 00:25:16,930 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'auth'; args=('auth',); alias=default
+DEBUG 2025-03-06 00:25:16,931 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'auth' AND "django_content_type"."model" IN ('permission', 'group')); args=('auth', 'permission', 'group'); alias=default
+DEBUG 2025-03-06 00:25:16,931 utils (0.000) SELECT "auth_permission"."content_type_id", "auth_permission"."codename" FROM "auth_permission" INNER JOIN "django_content_type" ON ("auth_permission"."content_type_id" = "django_content_type"."id") WHERE "auth_permission"."content_type_id" IN (2, 3) ORDER BY "django_content_type"."app_label" ASC, "django_content_type"."model" ASC, "auth_permission"."codename" ASC; args=(2, 3); alias=default
+DEBUG 2025-03-06 00:25:16,933 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'auth'; args=('auth',); alias=default
+DEBUG 2025-03-06 00:25:16,934 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'contenttypes'; args=('contenttypes',); alias=default
+DEBUG 2025-03-06 00:25:16,934 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'contenttypes' AND "django_content_type"."model" IN ('contenttype')); args=('contenttypes', 'contenttype'); alias=default
+DEBUG 2025-03-06 00:25:16,935 utils (0.000) SELECT "auth_permission"."content_type_id", "auth_permission"."codename" FROM "auth_permission" INNER JOIN "django_content_type" ON ("auth_permission"."content_type_id" = "django_content_type"."id") WHERE "auth_permission"."content_type_id" IN (4) ORDER BY "django_content_type"."app_label" ASC, "django_content_type"."model" ASC, "auth_permission"."codename" ASC; args=(4,); alias=default
+DEBUG 2025-03-06 00:25:16,936 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'contenttypes'; args=('contenttypes',); alias=default
+DEBUG 2025-03-06 00:25:16,936 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'sessions'; args=('sessions',); alias=default
+DEBUG 2025-03-06 00:25:16,937 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'sessions' AND "django_content_type"."model" IN ('session')); args=('sessions', 'session'); alias=default
+DEBUG 2025-03-06 00:25:16,938 utils (0.000) SELECT "auth_permission"."content_type_id", "auth_permission"."codename" FROM "auth_permission" INNER JOIN "django_content_type" ON ("auth_permission"."content_type_id" = "django_content_type"."id") WHERE "auth_permission"."content_type_id" IN (5) ORDER BY "django_content_type"."app_label" ASC, "django_content_type"."model" ASC, "auth_permission"."codename" ASC; args=(5,); alias=default
+DEBUG 2025-03-06 00:25:16,939 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'sessions'; args=('sessions',); alias=default
+DEBUG 2025-03-06 00:25:16,939 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'django_extensions'; args=('django_extensions',); alias=default
+DEBUG 2025-03-06 00:25:16,940 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'django_extensions'; args=('django_extensions',); alias=default
+DEBUG 2025-03-06 00:25:16,940 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'admin_interface'; args=('admin_interface',); alias=default
+DEBUG 2025-03-06 00:25:16,941 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'admin_interface' AND "django_content_type"."model" IN ('theme')); args=('admin_interface', 'theme'); alias=default
+DEBUG 2025-03-06 00:25:16,942 utils (0.000) SELECT "auth_permission"."content_type_id", "auth_permission"."codename" FROM "auth_permission" INNER JOIN "django_content_type" ON ("auth_permission"."content_type_id" = "django_content_type"."id") WHERE "auth_permission"."content_type_id" IN (6) ORDER BY "django_content_type"."app_label" ASC, "django_content_type"."model" ASC, "auth_permission"."codename" ASC; args=(6,); alias=default
+DEBUG 2025-03-06 00:25:16,942 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'admin_interface'; args=('admin_interface',); alias=default
+DEBUG 2025-03-06 00:25:16,943 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'users'; args=('users',); alias=default
+DEBUG 2025-03-06 00:25:16,944 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'users' AND "django_content_type"."model" IN ('order', 'customuser', 'mover', 'photo', 'customer', 'detecteditem')); args=('users', 'order', 'customuser', 'mover', 'photo', 'customer', 'detecteditem'); alias=default
+DEBUG 2025-03-06 00:25:16,945 utils (0.000) SELECT "auth_permission"."content_type_id", "auth_permission"."codename" FROM "auth_permission" INNER JOIN "django_content_type" ON ("auth_permission"."content_type_id" = "django_content_type"."id") WHERE "auth_permission"."content_type_id" IN (7, 8, 9, 10, 11, 12) ORDER BY "django_content_type"."app_label" ASC, "django_content_type"."model" ASC, "auth_permission"."codename" ASC; args=(7, 8, 9, 10, 11, 12); alias=default
+DEBUG 2025-03-06 00:25:16,945 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'users'; args=('users',); alias=default
+DEBUG 2025-03-06 00:26:07,215 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+DEBUG 2025-03-06 00:26:07,218 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+DEBUG 2025-03-06 00:26:12,046 utils (0.016) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+DEBUG 2025-03-06 00:26:12,048 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+DEBUG 2025-03-06 00:38:09,121 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."email" = 'customer@gmail.com' LIMIT 21; args=('customer@gmail.com',); alias=default
+DEBUG 2025-03-06 00:38:09,392 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."email" = 'customer@gmail.com' LIMIT 21; args=('customer@gmail.com',); alias=default
+DEBUG 2025-03-06 00:38:09,647 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."email" = 'customer@gmail.com' LIMIT 21; args=('customer@gmail.com',); alias=default
+DEBUG 2025-03-06 00:38:09,902 utils (0.000) SELECT 1 AS "a" FROM "django_session" WHERE "django_session"."session_key" = 'ddveize0dmrh512xjhikeb58odq8odki' LIMIT 1; args=(1, 'ddveize0dmrh512xjhikeb58odq8odki'); alias=default
+DEBUG 2025-03-06 00:38:09,904 utils (0.000) BEGIN; args=None; alias=default
+DEBUG 2025-03-06 00:38:09,905 utils (0.000) INSERT INTO "django_session" ("session_key", "session_data", "expire_date") VALUES ('ddveize0dmrh512xjhikeb58odq8odki', 'e30:1tpvyL:u8ROFXpfTsSm7lrF7FM7-vrhEYi75MtoNz_c53luzl0', '2025-03-19 21:08:09.904518'); args=('ddveize0dmrh512xjhikeb58odq8odki', 'e30:1tpvyL:u8ROFXpfTsSm7lrF7FM7-vrhEYi75MtoNz_c53luzl0', '2025-03-19 21:08:09.904518'); alias=default
+DEBUG 2025-03-06 00:38:09,908 utils (0.000) COMMIT; args=None; alias=default
+DEBUG 2025-03-06 00:38:09,910 utils (0.000) UPDATE "users_customuser" SET "last_login" = '2025-03-05 21:08:09.908509' WHERE "users_customuser"."id" = 1; args=('2025-03-05 21:08:09.908509', 1); alias=default
+DEBUG 2025-03-06 00:38:09,912 utils (0.000) BEGIN; args=None; alias=default
+DEBUG 2025-03-06 00:38:09,913 utils (0.000) UPDATE "django_session" SET "session_data" = '.eJxVjMsOwiAQRf-FtSHAAAMu3fsNZHhUqgaS0q6M_65NutDtPefcFwu0rTVsoyxhzuzMJDv9bpHSo7Qd5Du1W-ept3WZI98VftDBrz2X5-Vw_w4qjfqtNRACoFRKg0_SklcefZ6y0JNLZNEYo5J2ECOkKGyRGVQEFIBOWUD2_gCyczaC:1tpvyL:Fkw4p_dpvK0hrs8lEJRmjpD7kKr9gEV3pTkjg9_uDP4', "expire_date" = '2025-03-19 21:08:09.912013' WHERE "django_session"."session_key" = 'ddveize0dmrh512xjhikeb58odq8odki'; args=('.eJxVjMsOwiAQRf-FtSHAAAMu3fsNZHhUqgaS0q6M_65NutDtPefcFwu0rTVsoyxhzuzMJDv9bpHSo7Qd5Du1W-ept3WZI98VftDBrz2X5-Vw_w4qjfqtNRACoFRKg0_SklcefZ6y0JNLZNEYo5J2ECOkKGyRGVQEFIBOWUD2_gCyczaC:1tpvyL:Fkw4p_dpvK0hrs8lEJRmjpD7kKr9gEV3pTkjg9_uDP4', '2025-03-19 21:08:09.912013', 'ddveize0dmrh512xjhikeb58odq8odki'); alias=default
+DEBUG 2025-03-06 00:38:09,915 utils (0.000) COMMIT; args=None; alias=default
+DEBUG 2025-03-06 00:38:09,916 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 00:38:09,916 utils (0.000) BEGIN; args=None; alias=default
+DEBUG 2025-03-06 00:38:09,917 utils (0.000) UPDATE "django_session" SET "session_data" = '.eJxVjMsOwiAQRf-FtSHAAAMu3fsNZHhUqgaS0q6M_65NutDtPefcFwu0rTVsoyxhzuzMJDv9bpHSo7Qd5Du1W-ept3WZI98VftDBrz2X5-Vw_w4qjfqtNRACoFRKg0_SklcefZ6y0JNLZNEYo5J2ECOkKGyRGVQEFIBOWUD2_gCyczaC:1tpvyL:Fkw4p_dpvK0hrs8lEJRmjpD7kKr9gEV3pTkjg9_uDP4', "expire_date" = '2025-03-19 21:08:09.916661' WHERE "django_session"."session_key" = 'ddveize0dmrh512xjhikeb58odq8odki'; args=('.eJxVjMsOwiAQRf-FtSHAAAMu3fsNZHhUqgaS0q6M_65NutDtPefcFwu0rTVsoyxhzuzMJDv9bpHSo7Qd5Du1W-ept3WZI98VftDBrz2X5-Vw_w4qjfqtNRACoFRKg0_SklcefZ6y0JNLZNEYo5J2ECOkKGyRGVQEFIBOWUD2_gCyczaC:1tpvyL:Fkw4p_dpvK0hrs8lEJRmjpD7kKr9gEV3pTkjg9_uDP4', '2025-03-19 21:08:09.916661', 'ddveize0dmrh512xjhikeb58odq8odki'); alias=default
+DEBUG 2025-03-06 00:38:09,920 utils (0.000) COMMIT; args=None; alias=default
+DEBUG 2025-03-06 00:38:09,929 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-05 21:08:09.926852' AND "django_session"."session_key" = 'ddveize0dmrh512xjhikeb58odq8odki') LIMIT 21; args=('2025-03-05 21:08:09.926852', 'ddveize0dmrh512xjhikeb58odq8odki'); alias=default
+DEBUG 2025-03-06 00:38:09,931 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 00:38:09,932 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 00:38:09,959 utils (0.000) SELECT "users_order"."id", "users_order"."customer_id", "users_order"."origin", "users_order"."destination", "users_order"."origin_floor", "users_order"."destination_floor", "users_order"."has_elevator", "users_order"."need_pro_mover", "users_order"."need_box_packer", "users_order"."move_date", "users_order"."origin_location", "users_order"."destination_location", "users_order"."total_volume", "users_order"."total_weight", "users_order"."status" FROM "users_order" WHERE "users_order"."customer_id" = 1; args=(1,); alias=default
+DEBUG 2025-03-06 00:38:23,217 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-05 21:08:23.216856' AND "django_session"."session_key" = 'ddveize0dmrh512xjhikeb58odq8odki') LIMIT 21; args=('2025-03-05 21:08:23.216856', 'ddveize0dmrh512xjhikeb58odq8odki'); alias=default
+DEBUG 2025-03-06 00:38:23,218 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 00:38:23,220 utils (0.000) SELECT "users_mover"."id", "users_mover"."user_id", "users_mover"."full_name", "users_mover"."phone", "users_mover"."vehicle_type", "users_mover"."mover_type", "users_mover"."location", "users_mover"."payment_info", "users_mover"."driving_license", "users_mover"."carrying_capacity", "users_mover"."identification_id", "users_mover"."has_vehicle", "users_mover"."has_mover_certification", "users_mover"."mover_certification_document" FROM "users_mover" WHERE "users_mover"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 00:38:23,222 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 20:27:19,945 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+DEBUG 2025-03-06 20:27:19,945 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+DEBUG 2025-03-06 20:27:42,278 utils (0.000) BEGIN; args=None; alias=default
+DEBUG 2025-03-06 20:27:42,278 utils (0.000) SELECT JSON('{"a": "b"}'); args=None; alias=default
+DEBUG 2025-03-06 20:27:42,278 utils (0.000) COMMIT; args=None; alias=default
+DEBUG 2025-03-06 20:27:42,340 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+DEBUG 2025-03-06 20:27:42,340 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+DEBUG 2025-03-06 20:27:42,340 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+DEBUG 2025-03-06 20:27:42,340 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+DEBUG 2025-03-06 20:27:42,356 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+DEBUG 2025-03-06 20:27:42,356 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'admin'; args=('admin',); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'admin' AND "django_content_type"."model" IN ('logentry')); args=('admin', 'logentry'); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "auth_permission"."content_type_id", "auth_permission"."codename" FROM "auth_permission" INNER JOIN "django_content_type" ON ("auth_permission"."content_type_id" = "django_content_type"."id") WHERE "auth_permission"."content_type_id" IN (1) ORDER BY "django_content_type"."app_label" ASC, "django_content_type"."model" ASC, "auth_permission"."codename" ASC; args=(1,); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'admin'; args=('admin',); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'auth'; args=('auth',); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'auth' AND "django_content_type"."model" IN ('group', 'permission')); args=('auth', 'group', 'permission'); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "auth_permission"."content_type_id", "auth_permission"."codename" FROM "auth_permission" INNER JOIN "django_content_type" ON ("auth_permission"."content_type_id" = "django_content_type"."id") WHERE "auth_permission"."content_type_id" IN (2, 3) ORDER BY "django_content_type"."app_label" ASC, "django_content_type"."model" ASC, "auth_permission"."codename" ASC; args=(2, 3); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'auth'; args=('auth',); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'contenttypes'; args=('contenttypes',); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'contenttypes' AND "django_content_type"."model" IN ('contenttype')); args=('contenttypes', 'contenttype'); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "auth_permission"."content_type_id", "auth_permission"."codename" FROM "auth_permission" INNER JOIN "django_content_type" ON ("auth_permission"."content_type_id" = "django_content_type"."id") WHERE "auth_permission"."content_type_id" IN (4) ORDER BY "django_content_type"."app_label" ASC, "django_content_type"."model" ASC, "auth_permission"."codename" ASC; args=(4,); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'contenttypes'; args=('contenttypes',); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'sessions'; args=('sessions',); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'sessions' AND "django_content_type"."model" IN ('session')); args=('sessions', 'session'); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "auth_permission"."content_type_id", "auth_permission"."codename" FROM "auth_permission" INNER JOIN "django_content_type" ON ("auth_permission"."content_type_id" = "django_content_type"."id") WHERE "auth_permission"."content_type_id" IN (5) ORDER BY "django_content_type"."app_label" ASC, "django_content_type"."model" ASC, "auth_permission"."codename" ASC; args=(5,); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'sessions'; args=('sessions',); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'django_extensions'; args=('django_extensions',); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'django_extensions'; args=('django_extensions',); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'admin_interface'; args=('admin_interface',); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'admin_interface' AND "django_content_type"."model" IN ('theme')); args=('admin_interface', 'theme'); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "auth_permission"."content_type_id", "auth_permission"."codename" FROM "auth_permission" INNER JOIN "django_content_type" ON ("auth_permission"."content_type_id" = "django_content_type"."id") WHERE "auth_permission"."content_type_id" IN (6) ORDER BY "django_content_type"."app_label" ASC, "django_content_type"."model" ASC, "auth_permission"."codename" ASC; args=(6,); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'admin_interface'; args=('admin_interface',); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'users'; args=('users',); alias=default
+DEBUG 2025-03-06 20:27:42,372 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE ("django_content_type"."app_label" = 'users' AND "django_content_type"."model" IN ('customer', 'detecteditem', 'order', 'customuser', 'photo', 'mover')); args=('users', 'customer', 'detecteditem', 'order', 'customuser', 'photo', 'mover'); alias=default
+DEBUG 2025-03-06 20:27:42,388 utils (0.000) SELECT "auth_permission"."content_type_id", "auth_permission"."codename" FROM "auth_permission" INNER JOIN "django_content_type" ON ("auth_permission"."content_type_id" = "django_content_type"."id") WHERE "auth_permission"."content_type_id" IN (7, 8, 9, 10, 11, 12) ORDER BY "django_content_type"."app_label" ASC, "django_content_type"."model" ASC, "auth_permission"."codename" ASC; args=(7, 8, 9, 10, 11, 12); alias=default
+DEBUG 2025-03-06 20:27:42,388 utils (0.000) SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."app_label" = 'users'; args=('users',); alias=default
+DEBUG 2025-03-06 20:43:36,432 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+DEBUG 2025-03-06 20:43:36,434 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+DEBUG 2025-03-06 20:43:41,127 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+DEBUG 2025-03-06 20:43:41,127 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+DEBUG 2025-03-06 20:44:14,409 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 17:14:14.407849' AND "django_session"."session_key" = 'ddveize0dmrh512xjhikeb58odq8odki') LIMIT 21; args=('2025-03-06 17:14:14.407849', 'ddveize0dmrh512xjhikeb58odq8odki'); alias=default
+DEBUG 2025-03-06 20:44:14,412 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 20:44:30,940 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 17:14:30.938086' AND "django_session"."session_key" = 'ddveize0dmrh512xjhikeb58odq8odki') LIMIT 21; args=('2025-03-06 17:14:30.938086', 'ddveize0dmrh512xjhikeb58odq8odki'); alias=default
+DEBUG 2025-03-06 20:44:30,941 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 20:44:30,942 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 20:44:30,974 utils (0.000) SELECT "users_order"."id", "users_order"."customer_id", "users_order"."origin", "users_order"."destination", "users_order"."origin_floor", "users_order"."destination_floor", "users_order"."has_elevator", "users_order"."need_pro_mover", "users_order"."need_box_packer", "users_order"."move_date", "users_order"."origin_location", "users_order"."destination_location", "users_order"."total_volume", "users_order"."total_weight", "users_order"."status" FROM "users_order" WHERE "users_order"."customer_id" = 1; args=(1,); alias=default
+DEBUG 2025-03-06 20:46:33,572 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 17:16:33.570886' AND "django_session"."session_key" = 'ddveize0dmrh512xjhikeb58odq8odki') LIMIT 21; args=('2025-03-06 17:16:33.570886', 'ddveize0dmrh512xjhikeb58odq8odki'); alias=default
+DEBUG 2025-03-06 20:46:33,575 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 20:46:33,576 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 20:46:33,602 utils (0.000) SELECT "users_order"."id", "users_order"."customer_id", "users_order"."origin", "users_order"."destination", "users_order"."origin_floor", "users_order"."destination_floor", "users_order"."has_elevator", "users_order"."need_pro_mover", "users_order"."need_box_packer", "users_order"."move_date", "users_order"."origin_location", "users_order"."destination_location", "users_order"."total_volume", "users_order"."total_weight", "users_order"."status" FROM "users_order" WHERE "users_order"."customer_id" = 1; args=(1,); alias=default
+DEBUG 2025-03-06 20:46:39,315 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 17:16:39.313210' AND "django_session"."session_key" = 'ddveize0dmrh512xjhikeb58odq8odki') LIMIT 21; args=('2025-03-06 17:16:39.313210', 'ddveize0dmrh512xjhikeb58odq8odki'); alias=default
+DEBUG 2025-03-06 20:46:39,316 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 20:54:13,949 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 17:24:13.946618' AND "django_session"."session_key" = 'ddveize0dmrh512xjhikeb58odq8odki') LIMIT 21; args=('2025-03-06 17:24:13.946618', 'ddveize0dmrh512xjhikeb58odq8odki'); alias=default
+DEBUG 2025-03-06 20:54:13,951 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 20:54:27,502 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 17:24:27.500910' AND "django_session"."session_key" = 'ddveize0dmrh512xjhikeb58odq8odki') LIMIT 21; args=('2025-03-06 17:24:27.500910', 'ddveize0dmrh512xjhikeb58odq8odki'); alias=default
+DEBUG 2025-03-06 20:54:27,503 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 20:54:27,504 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 20:54:27,509 utils (0.000) SELECT "users_order"."id", "users_order"."customer_id", "users_order"."origin", "users_order"."destination", "users_order"."origin_floor", "users_order"."destination_floor", "users_order"."has_elevator", "users_order"."need_pro_mover", "users_order"."need_box_packer", "users_order"."move_date", "users_order"."origin_location", "users_order"."destination_location", "users_order"."total_volume", "users_order"."total_weight", "users_order"."status" FROM "users_order" WHERE "users_order"."customer_id" = 1; args=(1,); alias=default
+DEBUG 2025-03-06 20:54:29,933 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 17:24:29.931314' AND "django_session"."session_key" = 'ddveize0dmrh512xjhikeb58odq8odki') LIMIT 21; args=('2025-03-06 17:24:29.931314', 'ddveize0dmrh512xjhikeb58odq8odki'); alias=default
+DEBUG 2025-03-06 20:54:29,934 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 20:54:29,936 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE "django_session"."session_key" = 'ddveize0dmrh512xjhikeb58odq8odki' LIMIT 21; args=('ddveize0dmrh512xjhikeb58odq8odki',); alias=default
+DEBUG 2025-03-06 20:54:29,943 utils (0.000) DELETE FROM "django_session" WHERE "django_session"."session_key" IN ('ddveize0dmrh512xjhikeb58odq8odki'); args=('ddveize0dmrh512xjhikeb58odq8odki',); alias=default
+DEBUG 2025-03-06 20:54:36,542 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."email" = 'fatemeh.sadat.mortazavi77@gmail.com' LIMIT 21; args=('fatemeh.sadat.mortazavi77@gmail.com',); alias=default
+DEBUG 2025-03-06 20:55:37,017 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."email" = 'mover@gmail.com' LIMIT 21; args=('mover@gmail.com',); alias=default
+DEBUG 2025-03-06 20:55:37,284 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."email" = 'mover@gmail.com' LIMIT 21; args=('mover@gmail.com',); alias=default
+DEBUG 2025-03-06 20:55:37,538 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."email" = 'mover@gmail.com' LIMIT 21; args=('mover@gmail.com',); alias=default
+DEBUG 2025-03-06 20:55:37,791 utils (0.000) SELECT 1 AS "a" FROM "django_session" WHERE "django_session"."session_key" = 'p7kfojaye2wk6yb6i6uw5v7klgbo7x5b' LIMIT 1; args=(1, 'p7kfojaye2wk6yb6i6uw5v7klgbo7x5b'); alias=default
+DEBUG 2025-03-06 20:55:37,792 utils (0.000) BEGIN; args=None; alias=default
+DEBUG 2025-03-06 20:55:37,795 utils (0.000) INSERT INTO "django_session" ("session_key", "session_data", "expire_date") VALUES ('p7kfojaye2wk6yb6i6uw5v7klgbo7x5b', 'e30:1tqEyX:EwOLfpAlzpFXbO_HpbECWok2hIaUOow53BMHogzfW8o', '2025-03-20 17:25:37.792729'); args=('p7kfojaye2wk6yb6i6uw5v7klgbo7x5b', 'e30:1tqEyX:EwOLfpAlzpFXbO_HpbECWok2hIaUOow53BMHogzfW8o', '2025-03-20 17:25:37.792729'); alias=default
+DEBUG 2025-03-06 20:55:37,798 utils (0.016) COMMIT; args=None; alias=default
+DEBUG 2025-03-06 20:55:37,802 utils (0.000) UPDATE "users_customuser" SET "last_login" = '2025-03-06 17:25:37.798726' WHERE "users_customuser"."id" = 2; args=('2025-03-06 17:25:37.798726', 2); alias=default
+DEBUG 2025-03-06 20:55:37,802 utils (0.000) BEGIN; args=None; alias=default
+DEBUG 2025-03-06 20:55:37,804 utils (0.000) UPDATE "django_session" SET "session_data" = '.eJxVjMsOwiAQRf-FtSE8OkBduu83EJgZpWogKe3K-O_apAvd3nPOfYmYtrXErfMSZxJnYcTpd8sJH1x3QPdUb01iq-syZ7kr8qBdTo34eTncv4OSevnWLlgGk3m8umwTokX2ymQPTgcAzRpRAdAwKoLBK8eKDQ2BUCudkYx4fwDhezfA:1tqEyX:lKSuSsMtMYiAi-rYHoLQqjJcWz2GRjRvmfX91seu10w', "expire_date" = '2025-03-20 17:25:37.802219' WHERE "django_session"."session_key" = 'p7kfojaye2wk6yb6i6uw5v7klgbo7x5b'; args=('.eJxVjMsOwiAQRf-FtSE8OkBduu83EJgZpWogKe3K-O_apAvd3nPOfYmYtrXErfMSZxJnYcTpd8sJH1x3QPdUb01iq-syZ7kr8qBdTo34eTncv4OSevnWLlgGk3m8umwTokX2ymQPTgcAzRpRAdAwKoLBK8eKDQ2BUCudkYx4fwDhezfA:1tqEyX:lKSuSsMtMYiAi-rYHoLQqjJcWz2GRjRvmfX91seu10w', '2025-03-20 17:25:37.802219', 'p7kfojaye2wk6yb6i6uw5v7klgbo7x5b'); alias=default
+DEBUG 2025-03-06 20:55:37,805 utils (0.000) COMMIT; args=None; alias=default
+DEBUG 2025-03-06 20:55:37,806 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2025-03-06 20:55:37,807 utils (0.000) SELECT "users_mover"."id", "users_mover"."user_id", "users_mover"."full_name", "users_mover"."phone", "users_mover"."vehicle_type", "users_mover"."mover_type", "users_mover"."location", "users_mover"."payment_info", "users_mover"."driving_license", "users_mover"."carrying_capacity", "users_mover"."identification_id", "users_mover"."has_vehicle", "users_mover"."has_mover_certification", "users_mover"."mover_certification_document" FROM "users_mover" WHERE "users_mover"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2025-03-06 20:55:37,807 utils (0.000) BEGIN; args=None; alias=default
+DEBUG 2025-03-06 20:55:37,808 utils (0.000) UPDATE "django_session" SET "session_data" = '.eJxVjMsOwiAQRf-FtSE8OkBduu83EJgZpWogKe3K-O_apAvd3nPOfYmYtrXErfMSZxJnYcTpd8sJH1x3QPdUb01iq-syZ7kr8qBdTo34eTncv4OSevnWLlgGk3m8umwTokX2ymQPTgcAzRpRAdAwKoLBK8eKDQ2BUCudkYx4fwDhezfA:1tqEyX:lKSuSsMtMYiAi-rYHoLQqjJcWz2GRjRvmfX91seu10w', "expire_date" = '2025-03-20 17:25:37.807819' WHERE "django_session"."session_key" = 'p7kfojaye2wk6yb6i6uw5v7klgbo7x5b'; args=('.eJxVjMsOwiAQRf-FtSE8OkBduu83EJgZpWogKe3K-O_apAvd3nPOfYmYtrXErfMSZxJnYcTpd8sJH1x3QPdUb01iq-syZ7kr8qBdTo34eTncv4OSevnWLlgGk3m8umwTokX2ymQPTgcAzRpRAdAwKoLBK8eKDQ2BUCudkYx4fwDhezfA:1tqEyX:lKSuSsMtMYiAi-rYHoLQqjJcWz2GRjRvmfX91seu10w', '2025-03-20 17:25:37.807819', 'p7kfojaye2wk6yb6i6uw5v7klgbo7x5b'); alias=default
+DEBUG 2025-03-06 20:55:37,811 utils (0.000) COMMIT; args=None; alias=default
+DEBUG 2025-03-06 20:55:37,818 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 17:25:37.816284' AND "django_session"."session_key" = 'p7kfojaye2wk6yb6i6uw5v7klgbo7x5b') LIMIT 21; args=('2025-03-06 17:25:37.816284', 'p7kfojaye2wk6yb6i6uw5v7klgbo7x5b'); alias=default
+DEBUG 2025-03-06 20:55:37,819 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2025-03-06 20:55:37,820 utils (0.000) SELECT "users_mover"."id", "users_mover"."user_id", "users_mover"."full_name", "users_mover"."phone", "users_mover"."vehicle_type", "users_mover"."mover_type", "users_mover"."location", "users_mover"."payment_info", "users_mover"."driving_license", "users_mover"."carrying_capacity", "users_mover"."identification_id", "users_mover"."has_vehicle", "users_mover"."has_mover_certification", "users_mover"."mover_certification_document" FROM "users_mover" WHERE "users_mover"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2025-03-06 20:55:37,833 base Exception while resolving variable 'profile_photo' in template 'users/mover_dashboard.html'.
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 883, in _resolve_lookup
+    current = current[bit]
+TypeError: 'Mover' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 893, in _resolve_lookup
+    current = getattr(current, bit)
+AttributeError: 'Mover' object has no attribute 'profile_photo'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 899, in _resolve_lookup
+    current = current[int(bit)]
+ValueError: invalid literal for int() with base 10: 'profile_photo'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 906, in _resolve_lookup
+    raise VariableDoesNotExist(
+django.template.base.VariableDoesNotExist: Failed lookup for key [profile_photo] in <Mover: Mover: mover - mover@gmail.com>
+DEBUG 2025-03-06 20:55:37,849 utils (0.000) SELECT DISTINCT "users_order"."id", "users_order"."customer_id", "users_order"."origin", "users_order"."destination", "users_order"."origin_floor", "users_order"."destination_floor", "users_order"."has_elevator", "users_order"."need_pro_mover", "users_order"."need_box_packer", "users_order"."move_date", "users_order"."origin_location", "users_order"."destination_location", "users_order"."total_volume", "users_order"."total_weight", "users_order"."status" FROM "users_order" INNER JOIN "users_order_items_detected" ON ("users_order"."id" = "users_order_items_detected"."order_id") WHERE "users_order_items_detected"."detecteditem_id" IS NOT NULL; args=(); alias=default
+DEBUG 2025-03-06 21:03:48,165 utils (0.000) SELECT "users_mover"."id", "users_mover"."user_id", "users_mover"."full_name", "users_mover"."phone", "users_mover"."vehicle_type", "users_mover"."mover_type", "users_mover"."location", "users_mover"."payment_info", "users_mover"."driving_license", "users_mover"."carrying_capacity", "users_mover"."identification_id", "users_mover"."has_vehicle", "users_mover"."has_mover_certification", "users_mover"."mover_certification_document" FROM "users_mover"; args=(); alias=default
+DEBUG 2025-03-06 21:03:48,166 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2025-03-06 21:16:03,761 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser"; args=(); alias=default
+DEBUG 2025-03-06 21:19:46,766 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 17:49:46.764537' AND "django_session"."session_key" = 'p7kfojaye2wk6yb6i6uw5v7klgbo7x5b') LIMIT 21; args=('2025-03-06 17:49:46.764537', 'p7kfojaye2wk6yb6i6uw5v7klgbo7x5b'); alias=default
+DEBUG 2025-03-06 21:19:46,768 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2025-03-06 21:19:46,769 utils (0.000) SELECT "users_mover"."id", "users_mover"."user_id", "users_mover"."full_name", "users_mover"."phone", "users_mover"."vehicle_type", "users_mover"."mover_type", "users_mover"."location", "users_mover"."payment_info", "users_mover"."driving_license", "users_mover"."carrying_capacity", "users_mover"."identification_id", "users_mover"."has_vehicle", "users_mover"."has_mover_certification", "users_mover"."mover_certification_document" FROM "users_mover" WHERE "users_mover"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2025-03-06 21:19:46,785 utils (0.000) SELECT DISTINCT "users_order"."id", "users_order"."customer_id", "users_order"."origin", "users_order"."destination", "users_order"."origin_floor", "users_order"."destination_floor", "users_order"."has_elevator", "users_order"."need_pro_mover", "users_order"."need_box_packer", "users_order"."move_date", "users_order"."origin_location", "users_order"."destination_location", "users_order"."total_volume", "users_order"."total_weight", "users_order"."status" FROM "users_order" INNER JOIN "users_order_items_detected" ON ("users_order"."id" = "users_order_items_detected"."order_id") WHERE "users_order_items_detected"."detecteditem_id" IS NOT NULL; args=(); alias=default
+DEBUG 2025-03-06 21:20:23,315 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 17:50:23.314757' AND "django_session"."session_key" = 'p7kfojaye2wk6yb6i6uw5v7klgbo7x5b') LIMIT 21; args=('2025-03-06 17:50:23.314757', 'p7kfojaye2wk6yb6i6uw5v7klgbo7x5b'); alias=default
+DEBUG 2025-03-06 21:20:23,316 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2025-03-06 21:20:23,318 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE "django_session"."session_key" = 'p7kfojaye2wk6yb6i6uw5v7klgbo7x5b' LIMIT 21; args=('p7kfojaye2wk6yb6i6uw5v7klgbo7x5b',); alias=default
+DEBUG 2025-03-06 21:20:23,322 utils (0.000) DELETE FROM "django_session" WHERE "django_session"."session_key" IN ('p7kfojaye2wk6yb6i6uw5v7klgbo7x5b'); args=('p7kfojaye2wk6yb6i6uw5v7klgbo7x5b',); alias=default
+DEBUG 2025-03-06 21:20:53,237 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."email" = 'customer@gmail.com' LIMIT 21; args=('customer@gmail.com',); alias=default
+DEBUG 2025-03-06 21:20:53,501 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."email" = 'customer@gmail.com' LIMIT 21; args=('customer@gmail.com',); alias=default
+DEBUG 2025-03-06 21:20:53,754 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."email" = 'customer@gmail.com' LIMIT 21; args=('customer@gmail.com',); alias=default
+DEBUG 2025-03-06 21:20:54,006 utils (0.000) SELECT 1 AS "a" FROM "django_session" WHERE "django_session"."session_key" = '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz' LIMIT 1; args=(1, '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz'); alias=default
+DEBUG 2025-03-06 21:20:54,006 utils (0.000) BEGIN; args=None; alias=default
+DEBUG 2025-03-06 21:20:54,009 utils (0.000) INSERT INTO "django_session" ("session_key", "session_data", "expire_date") VALUES ('7wmkko9ik2wje0t0ja3oyxlvlfdo39kz', 'e30:1tqFN0:BNhk0eMRMPb_xJTWTrNcp2-aQW2trzNjh78uKQd3c2A', '2025-03-20 17:50:54.006881'); args=('7wmkko9ik2wje0t0ja3oyxlvlfdo39kz', 'e30:1tqFN0:BNhk0eMRMPb_xJTWTrNcp2-aQW2trzNjh78uKQd3c2A', '2025-03-20 17:50:54.006881'); alias=default
+DEBUG 2025-03-06 21:20:54,012 utils (0.000) COMMIT; args=None; alias=default
+DEBUG 2025-03-06 21:20:54,015 utils (0.016) UPDATE "users_customuser" SET "last_login" = '2025-03-06 17:50:54.012936' WHERE "users_customuser"."id" = 1; args=('2025-03-06 17:50:54.012936', 1); alias=default
+DEBUG 2025-03-06 21:20:54,016 utils (0.000) BEGIN; args=None; alias=default
+DEBUG 2025-03-06 21:20:54,017 utils (0.000) UPDATE "django_session" SET "session_data" = '.eJxVjMsOwiAQRf-FtSHAAAMu3fsNZHhUqgaS0q6M_65NutDtPefcFwu0rTVsoyxhzuzMJDv9bpHSo7Qd5Du1W-ept3WZI98VftDBrz2X5-Vw_w4qjfqtNRACoFRKg0_SklcefZ6y0JNLZNEYo5J2ECOkKGyRGVQEFIBOWUD2_gCyczaC:1tqFN0:wLYdSk63HGDm39HWZ9_88d32haaXp7cymjabG9D-btg', "expire_date" = '2025-03-20 17:50:54.016466' WHERE "django_session"."session_key" = '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz'; args=('.eJxVjMsOwiAQRf-FtSHAAAMu3fsNZHhUqgaS0q6M_65NutDtPefcFwu0rTVsoyxhzuzMJDv9bpHSo7Qd5Du1W-ept3WZI98VftDBrz2X5-Vw_w4qjfqtNRACoFRKg0_SklcefZ6y0JNLZNEYo5J2ECOkKGyRGVQEFIBOWUD2_gCyczaC:1tqFN0:wLYdSk63HGDm39HWZ9_88d32haaXp7cymjabG9D-btg', '2025-03-20 17:50:54.016466', '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz'); alias=default
+DEBUG 2025-03-06 21:20:54,020 utils (0.000) COMMIT; args=None; alias=default
+DEBUG 2025-03-06 21:20:54,021 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 21:20:54,021 utils (0.000) BEGIN; args=None; alias=default
+DEBUG 2025-03-06 21:20:54,022 utils (0.000) UPDATE "django_session" SET "session_data" = '.eJxVjMsOwiAQRf-FtSHAAAMu3fsNZHhUqgaS0q6M_65NutDtPefcFwu0rTVsoyxhzuzMJDv9bpHSo7Qd5Du1W-ept3WZI98VftDBrz2X5-Vw_w4qjfqtNRACoFRKg0_SklcefZ6y0JNLZNEYo5J2ECOkKGyRGVQEFIBOWUD2_gCyczaC:1tqFN0:wLYdSk63HGDm39HWZ9_88d32haaXp7cymjabG9D-btg', "expire_date" = '2025-03-20 17:50:54.021521' WHERE "django_session"."session_key" = '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz'; args=('.eJxVjMsOwiAQRf-FtSHAAAMu3fsNZHhUqgaS0q6M_65NutDtPefcFwu0rTVsoyxhzuzMJDv9bpHSo7Qd5Du1W-ept3WZI98VftDBrz2X5-Vw_w4qjfqtNRACoFRKg0_SklcefZ6y0JNLZNEYo5J2ECOkKGyRGVQEFIBOWUD2_gCyczaC:1tqFN0:wLYdSk63HGDm39HWZ9_88d32haaXp7cymjabG9D-btg', '2025-03-20 17:50:54.021521', '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz'); alias=default
+DEBUG 2025-03-06 21:20:54,025 utils (0.000) COMMIT; args=None; alias=default
+DEBUG 2025-03-06 21:20:54,033 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 17:50:54.030691' AND "django_session"."session_key" = '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz') LIMIT 21; args=('2025-03-06 17:50:54.030691', '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz'); alias=default
+DEBUG 2025-03-06 21:20:54,033 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 21:20:54,034 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 21:20:54,037 utils (0.000) SELECT "users_order"."id", "users_order"."customer_id", "users_order"."origin", "users_order"."destination", "users_order"."origin_floor", "users_order"."destination_floor", "users_order"."has_elevator", "users_order"."need_pro_mover", "users_order"."need_box_packer", "users_order"."move_date", "users_order"."origin_location", "users_order"."destination_location", "users_order"."total_volume", "users_order"."total_weight", "users_order"."status" FROM "users_order" WHERE "users_order"."customer_id" = 1; args=(1,); alias=default
+DEBUG 2025-03-06 21:21:01,999 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 17:51:01.997633' AND "django_session"."session_key" = '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz') LIMIT 21; args=('2025-03-06 17:51:01.997633', '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz'); alias=default
+DEBUG 2025-03-06 21:21:02,000 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 21:27:07,775 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 17:57:07.772179' AND "django_session"."session_key" = '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz') LIMIT 21; args=('2025-03-06 17:57:07.772179', '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz'); alias=default
+DEBUG 2025-03-06 21:27:07,776 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 21:27:08,088 base Exception while resolving variable 'name' in template 'unknown'.
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    callback, callback_args, callback_kwargs = self.resolve_request(request)
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 313, in resolve_request
+    resolver_match = resolver.resolve(request.path_info)
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\urls\resolvers.py", line 705, in resolve
+    raise Resolver404({"tried": tried, "path": new_path})
+django.urls.exceptions.Resolver404: {'tried': [[<URLResolver <URLPattern list> (admin:admin) 'admin/'>], [<URLResolver <module 'django.contrib.auth.urls' from 'C:\\Users\\ELITE\\AppData\\Local\\Programs\\Python\\Python310\\lib\\site-packages\\django\\contrib\\auth\\urls.py'> (None:None) 'accounts/'>], [<URLResolver <module 'users.urls' from 'C:\\Users\\ELITE\\Desktop\\moving_service\\moving_service\\users\\urls.py'> (None:None) 'users/'>], [<URLPattern '' [name='home']>], [<URLPattern '^static/(?P<path>.*)$'>], [<URLPattern '^media/(?P<path>.*)$'>]], 'path': 'favicon.ico'}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 883, in _resolve_lookup
+    current = current[bit]
+TypeError: 'URLResolver' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 893, in _resolve_lookup
+    current = getattr(current, bit)
+AttributeError: 'URLResolver' object has no attribute 'name'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 899, in _resolve_lookup
+    current = current[int(bit)]
+ValueError: invalid literal for int() with base 10: 'name'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 906, in _resolve_lookup
+    raise VariableDoesNotExist(
+django.template.base.VariableDoesNotExist: Failed lookup for key [name] in <URLResolver <URLPattern list> (admin:admin) 'admin/'>
+DEBUG 2025-03-06 21:27:08,125 base Exception while resolving variable 'name' in template 'unknown'.
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    callback, callback_args, callback_kwargs = self.resolve_request(request)
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 313, in resolve_request
+    resolver_match = resolver.resolve(request.path_info)
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\urls\resolvers.py", line 705, in resolve
+    raise Resolver404({"tried": tried, "path": new_path})
+django.urls.exceptions.Resolver404: {'tried': [[<URLResolver <URLPattern list> (admin:admin) 'admin/'>], [<URLResolver <module 'django.contrib.auth.urls' from 'C:\\Users\\ELITE\\AppData\\Local\\Programs\\Python\\Python310\\lib\\site-packages\\django\\contrib\\auth\\urls.py'> (None:None) 'accounts/'>], [<URLResolver <module 'users.urls' from 'C:\\Users\\ELITE\\Desktop\\moving_service\\moving_service\\users\\urls.py'> (None:None) 'users/'>], [<URLPattern '' [name='home']>], [<URLPattern '^static/(?P<path>.*)$'>], [<URLPattern '^media/(?P<path>.*)$'>]], 'path': 'favicon.ico'}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 883, in _resolve_lookup
+    current = current[bit]
+TypeError: 'URLResolver' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 893, in _resolve_lookup
+    current = getattr(current, bit)
+AttributeError: 'URLResolver' object has no attribute 'name'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 899, in _resolve_lookup
+    current = current[int(bit)]
+ValueError: invalid literal for int() with base 10: 'name'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 906, in _resolve_lookup
+    raise VariableDoesNotExist(
+django.template.base.VariableDoesNotExist: Failed lookup for key [name] in <URLResolver <module 'django.contrib.auth.urls' from 'C:\\Users\\ELITE\\AppData\\Local\\Programs\\Python\\Python310\\lib\\site-packages\\django\\contrib\\auth\\urls.py'> (None:None) 'accounts/'>
+DEBUG 2025-03-06 21:27:08,128 base Exception while resolving variable 'name' in template 'unknown'.
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    callback, callback_args, callback_kwargs = self.resolve_request(request)
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 313, in resolve_request
+    resolver_match = resolver.resolve(request.path_info)
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\urls\resolvers.py", line 705, in resolve
+    raise Resolver404({"tried": tried, "path": new_path})
+django.urls.exceptions.Resolver404: {'tried': [[<URLResolver <URLPattern list> (admin:admin) 'admin/'>], [<URLResolver <module 'django.contrib.auth.urls' from 'C:\\Users\\ELITE\\AppData\\Local\\Programs\\Python\\Python310\\lib\\site-packages\\django\\contrib\\auth\\urls.py'> (None:None) 'accounts/'>], [<URLResolver <module 'users.urls' from 'C:\\Users\\ELITE\\Desktop\\moving_service\\moving_service\\users\\urls.py'> (None:None) 'users/'>], [<URLPattern '' [name='home']>], [<URLPattern '^static/(?P<path>.*)$'>], [<URLPattern '^media/(?P<path>.*)$'>]], 'path': 'favicon.ico'}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 883, in _resolve_lookup
+    current = current[bit]
+TypeError: 'URLResolver' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 893, in _resolve_lookup
+    current = getattr(current, bit)
+AttributeError: 'URLResolver' object has no attribute 'name'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 899, in _resolve_lookup
+    current = current[int(bit)]
+ValueError: invalid literal for int() with base 10: 'name'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 906, in _resolve_lookup
+    raise VariableDoesNotExist(
+django.template.base.VariableDoesNotExist: Failed lookup for key [name] in <URLResolver <module 'users.urls' from 'C:\\Users\\ELITE\\Desktop\\moving_service\\moving_service\\users\\urls.py'> (None:None) 'users/'>
+WARNING 2025-03-06 21:27:08,130 log Not Found: /favicon.ico
+DEBUG 2025-03-06 21:27:12,406 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 17:57:12.405340' AND "django_session"."session_key" = '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz') LIMIT 21; args=('2025-03-06 17:57:12.405340', '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz'); alias=default
+DEBUG 2025-03-06 21:27:12,407 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 21:27:15,526 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 17:57:15.524429' AND "django_session"."session_key" = '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz') LIMIT 21; args=('2025-03-06 17:57:15.524429', '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz'); alias=default
+DEBUG 2025-03-06 21:27:15,527 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 21:27:15,528 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 21:27:15,533 utils (0.000) SELECT "users_order"."id", "users_order"."customer_id", "users_order"."origin", "users_order"."destination", "users_order"."origin_floor", "users_order"."destination_floor", "users_order"."has_elevator", "users_order"."need_pro_mover", "users_order"."need_box_packer", "users_order"."move_date", "users_order"."origin_location", "users_order"."destination_location", "users_order"."total_volume", "users_order"."total_weight", "users_order"."status" FROM "users_order" WHERE "users_order"."customer_id" = 1; args=(1,); alias=default
+DEBUG 2025-03-06 21:27:17,577 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 17:57:17.575463' AND "django_session"."session_key" = '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz') LIMIT 21; args=('2025-03-06 17:57:17.575463', '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz'); alias=default
+DEBUG 2025-03-06 21:27:17,578 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 21:31:39,066 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 18:01:39.065854' AND "django_session"."session_key" = '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz') LIMIT 21; args=('2025-03-06 18:01:39.065854', '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz'); alias=default
+DEBUG 2025-03-06 21:31:39,069 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 21:48:22,965 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 18:18:22.963769' AND "django_session"."session_key" = '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz') LIMIT 21; args=('2025-03-06 18:18:22.963769', '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz'); alias=default
+DEBUG 2025-03-06 21:48:22,967 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 21:49:58,463 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 18:19:58.461870' AND "django_session"."session_key" = '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz') LIMIT 21; args=('2025-03-06 18:19:58.461870', '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz'); alias=default
+DEBUG 2025-03-06 21:49:58,464 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 21:49:58,465 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 21:49:58,470 utils (0.000) SELECT "users_order"."id", "users_order"."customer_id", "users_order"."origin", "users_order"."destination", "users_order"."origin_floor", "users_order"."destination_floor", "users_order"."has_elevator", "users_order"."need_pro_mover", "users_order"."need_box_packer", "users_order"."move_date", "users_order"."origin_location", "users_order"."destination_location", "users_order"."total_volume", "users_order"."total_weight", "users_order"."status" FROM "users_order" WHERE "users_order"."customer_id" = 1; args=(1,); alias=default
+DEBUG 2025-03-06 21:50:01,368 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 18:20:01.367615' AND "django_session"."session_key" = '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz') LIMIT 21; args=('2025-03-06 18:20:01.367615', '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz'); alias=default
+DEBUG 2025-03-06 21:50:01,370 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 21:50:01,372 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 23:07:28,485 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+DEBUG 2025-03-06 23:07:28,489 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+DEBUG 2025-03-06 23:07:35,486 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 19:37:35.484328' AND "django_session"."session_key" = '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz') LIMIT 21; args=('2025-03-06 19:37:35.484328', '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz'); alias=default
+DEBUG 2025-03-06 23:07:35,487 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 23:07:53,511 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 19:37:53.510097' AND "django_session"."session_key" = '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz') LIMIT 21; args=('2025-03-06 19:37:53.510097', '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz'); alias=default
+DEBUG 2025-03-06 23:07:53,512 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 23:07:53,513 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 23:07:53,517 utils (0.000) SELECT "users_order"."id", "users_order"."customer_id", "users_order"."origin", "users_order"."destination", "users_order"."origin_floor", "users_order"."destination_floor", "users_order"."has_elevator", "users_order"."need_pro_mover", "users_order"."need_box_packer", "users_order"."move_date", "users_order"."origin_location", "users_order"."destination_location", "users_order"."total_volume", "users_order"."total_weight", "users_order"."status" FROM "users_order" WHERE "users_order"."customer_id" = 1; args=(1,); alias=default
+DEBUG 2025-03-06 23:07:57,386 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 19:37:57.383433' AND "django_session"."session_key" = '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz') LIMIT 21; args=('2025-03-06 19:37:57.383433', '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz'); alias=default
+DEBUG 2025-03-06 23:07:57,388 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 23:07:57,390 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 23:07:57,411 base Exception while resolving variable 'location' in template 'users/edit_profile.html'.
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 883, in _resolve_lookup
+    current = current[bit]
+TypeError: 'Customer' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 893, in _resolve_lookup
+    current = getattr(current, bit)
+AttributeError: 'Customer' object has no attribute 'location'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 899, in _resolve_lookup
+    current = current[int(bit)]
+ValueError: invalid literal for int() with base 10: 'location'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 906, in _resolve_lookup
+    raise VariableDoesNotExist(
+django.template.base.VariableDoesNotExist: Failed lookup for key [location] in <Customer: Customer: customer - customer@gmail.com>
+DEBUG 2025-03-06 23:07:57,413 base Exception while resolving variable 'payment_info' in template 'users/edit_profile.html'.
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 883, in _resolve_lookup
+    current = current[bit]
+TypeError: 'Customer' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 893, in _resolve_lookup
+    current = getattr(current, bit)
+AttributeError: 'Customer' object has no attribute 'payment_info'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 899, in _resolve_lookup
+    current = current[int(bit)]
+ValueError: invalid literal for int() with base 10: 'payment_info'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 906, in _resolve_lookup
+    raise VariableDoesNotExist(
+django.template.base.VariableDoesNotExist: Failed lookup for key [payment_info] in <Customer: Customer: customer - customer@gmail.com>
+DEBUG 2025-03-06 23:07:57,415 utils (0.000) SELECT "users_mover"."id", "users_mover"."user_id", "users_mover"."full_name", "users_mover"."phone", "users_mover"."vehicle_type", "users_mover"."mover_type", "users_mover"."location", "users_mover"."payment_info", "users_mover"."driving_license", "users_mover"."carrying_capacity", "users_mover"."identification_id", "users_mover"."has_vehicle", "users_mover"."has_mover_certification", "users_mover"."mover_certification_document" FROM "users_mover" WHERE "users_mover"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 23:07:57,415 base Exception while resolving variable 'mover' in template 'users/edit_profile.html'.
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 883, in _resolve_lookup
+    current = current[bit]
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\utils\functional.py", line 253, in inner
+    return func(_wrapped, *args)
+TypeError: 'CustomUser' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 893, in _resolve_lookup
+    current = getattr(current, bit)
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\utils\functional.py", line 253, in inner
+    return func(_wrapped, *args)
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\fields\related_descriptors.py", line 531, in __get__
+    raise self.RelatedObjectDoesNotExist(
+users.models.CustomUser.mover.RelatedObjectDoesNotExist: CustomUser has no mover.
+DEBUG 2025-03-06 23:25:28,363 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+DEBUG 2025-03-06 23:25:28,366 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+DEBUG 2025-03-06 23:25:39,978 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 19:55:39.976018' AND "django_session"."session_key" = '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz') LIMIT 21; args=('2025-03-06 19:55:39.976018', '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz'); alias=default
+DEBUG 2025-03-06 23:25:39,980 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 23:25:39,981 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 23:25:40,026 utils (0.000) SELECT "users_order"."id", "users_order"."customer_id", "users_order"."origin", "users_order"."destination", "users_order"."origin_floor", "users_order"."destination_floor", "users_order"."has_elevator", "users_order"."need_pro_mover", "users_order"."need_box_packer", "users_order"."move_date", "users_order"."origin_location", "users_order"."destination_location", "users_order"."total_volume", "users_order"."total_weight", "users_order"."status" FROM "users_order" WHERE "users_order"."customer_id" = 1; args=(1,); alias=default
+DEBUG 2025-03-06 23:25:48,376 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 19:55:48.375015' AND "django_session"."session_key" = '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz') LIMIT 21; args=('2025-03-06 19:55:48.375015', '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz'); alias=default
+DEBUG 2025-03-06 23:25:48,377 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 23:25:48,378 utils (0.000) SELECT "users_mover"."id", "users_mover"."user_id", "users_mover"."full_name", "users_mover"."phone", "users_mover"."vehicle_type", "users_mover"."mover_type", "users_mover"."location", "users_mover"."payment_info", "users_mover"."driving_license", "users_mover"."carrying_capacity", "users_mover"."identification_id", "users_mover"."has_vehicle", "users_mover"."has_mover_certification", "users_mover"."mover_certification_document" FROM "users_mover" WHERE "users_mover"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 23:25:48,379 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 23:25:48,382 base Exception while resolving variable 'location' in template 'users/edit_profile.html'.
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 883, in _resolve_lookup
+    current = current[bit]
+TypeError: 'Customer' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 893, in _resolve_lookup
+    current = getattr(current, bit)
+AttributeError: 'Customer' object has no attribute 'location'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 899, in _resolve_lookup
+    current = current[int(bit)]
+ValueError: invalid literal for int() with base 10: 'location'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 906, in _resolve_lookup
+    raise VariableDoesNotExist(
+django.template.base.VariableDoesNotExist: Failed lookup for key [location] in <Customer: Customer: customer - customer@gmail.com>
+DEBUG 2025-03-06 23:25:48,384 base Exception while resolving variable 'payment_info' in template 'users/edit_profile.html'.
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 883, in _resolve_lookup
+    current = current[bit]
+TypeError: 'Customer' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 893, in _resolve_lookup
+    current = getattr(current, bit)
+AttributeError: 'Customer' object has no attribute 'payment_info'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 899, in _resolve_lookup
+    current = current[int(bit)]
+ValueError: invalid literal for int() with base 10: 'payment_info'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 906, in _resolve_lookup
+    raise VariableDoesNotExist(
+django.template.base.VariableDoesNotExist: Failed lookup for key [payment_info] in <Customer: Customer: customer - customer@gmail.com>
+DEBUG 2025-03-06 23:25:48,384 base Exception while resolving variable 'mover' in template 'users/edit_profile.html'.
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 883, in _resolve_lookup
+    current = current[bit]
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\utils\functional.py", line 253, in inner
+    return func(_wrapped, *args)
+TypeError: 'CustomUser' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 893, in _resolve_lookup
+    current = getattr(current, bit)
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\utils\functional.py", line 253, in inner
+    return func(_wrapped, *args)
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\fields\related_descriptors.py", line 531, in __get__
+    raise self.RelatedObjectDoesNotExist(
+users.models.CustomUser.mover.RelatedObjectDoesNotExist: CustomUser has no mover.
+DEBUG 2025-03-06 23:26:48,986 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 19:56:48.983685' AND "django_session"."session_key" = '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz') LIMIT 21; args=('2025-03-06 19:56:48.983685', '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz'); alias=default
+DEBUG 2025-03-06 23:26:48,989 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-06 23:26:48,991 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE "django_session"."session_key" = '7wmkko9ik2wje0t0ja3oyxlvlfdo39kz' LIMIT 21; args=('7wmkko9ik2wje0t0ja3oyxlvlfdo39kz',); alias=default
+DEBUG 2025-03-06 23:26:48,995 utils (0.000) DELETE FROM "django_session" WHERE "django_session"."session_key" IN ('7wmkko9ik2wje0t0ja3oyxlvlfdo39kz'); args=('7wmkko9ik2wje0t0ja3oyxlvlfdo39kz',); alias=default
+DEBUG 2025-03-07 00:40:18,902 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+DEBUG 2025-03-07 00:40:18,905 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+DEBUG 2025-03-07 00:42:32,345 utils (0.000) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default
+DEBUG 2025-03-07 00:42:32,348 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default
+DEBUG 2025-03-07 00:45:18,930 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."email" = 'customer@gmail.com' LIMIT 21; args=('customer@gmail.com',); alias=default
+DEBUG 2025-03-07 00:45:19,207 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."email" = 'customer@gmail.com' LIMIT 21; args=('customer@gmail.com',); alias=default
+DEBUG 2025-03-07 00:45:19,479 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."email" = 'customer@gmail.com' LIMIT 21; args=('customer@gmail.com',); alias=default
+DEBUG 2025-03-07 00:45:19,746 utils (0.000) SELECT 1 AS "a" FROM "django_session" WHERE "django_session"."session_key" = 'cek1xodkm1rexbpnjhszt1us2qwignvf' LIMIT 1; args=(1, 'cek1xodkm1rexbpnjhszt1us2qwignvf'); alias=default
+DEBUG 2025-03-07 00:45:19,746 utils (0.000) BEGIN; args=None; alias=default
+DEBUG 2025-03-07 00:45:19,748 utils (0.000) INSERT INTO "django_session" ("session_key", "session_data", "expire_date") VALUES ('cek1xodkm1rexbpnjhszt1us2qwignvf', 'e30:1tqIYp:3Mcd3hqBGTZay9vgBqOZZantHwNDFMepFvQ76uMZX7c', '2025-03-20 21:15:19.746238'); args=('cek1xodkm1rexbpnjhszt1us2qwignvf', 'e30:1tqIYp:3Mcd3hqBGTZay9vgBqOZZantHwNDFMepFvQ76uMZX7c', '2025-03-20 21:15:19.746238'); alias=default
+DEBUG 2025-03-07 00:45:19,752 utils (0.015) COMMIT; args=None; alias=default
+DEBUG 2025-03-07 00:45:19,755 utils (0.000) UPDATE "users_customuser" SET "last_login" = '2025-03-06 21:15:19.752477' WHERE "users_customuser"."id" = 1; args=('2025-03-06 21:15:19.752477', 1); alias=default
+DEBUG 2025-03-07 00:45:19,756 utils (0.000) BEGIN; args=None; alias=default
+DEBUG 2025-03-07 00:45:19,757 utils (0.000) UPDATE "django_session" SET "session_data" = '.eJxVjMsOwiAQRf-FtSHAAAMu3fsNZHhUqgaS0q6M_65NutDtPefcFwu0rTVsoyxhzuzMJDv9bpHSo7Qd5Du1W-ept3WZI98VftDBrz2X5-Vw_w4qjfqtNRACoFRKg0_SklcefZ6y0JNLZNEYo5J2ECOkKGyRGVQEFIBOWUD2_gCyczaC:1tqIYp:4Bs-49qNYkzdb_IOqc9dsUBaQ2iWOVSdVjta9OmDIOI', "expire_date" = '2025-03-20 21:15:19.756478' WHERE "django_session"."session_key" = 'cek1xodkm1rexbpnjhszt1us2qwignvf'; args=('.eJxVjMsOwiAQRf-FtSHAAAMu3fsNZHhUqgaS0q6M_65NutDtPefcFwu0rTVsoyxhzuzMJDv9bpHSo7Qd5Du1W-ept3WZI98VftDBrz2X5-Vw_w4qjfqtNRACoFRKg0_SklcefZ6y0JNLZNEYo5J2ECOkKGyRGVQEFIBOWUD2_gCyczaC:1tqIYp:4Bs-49qNYkzdb_IOqc9dsUBaQ2iWOVSdVjta9OmDIOI', '2025-03-20 21:15:19.756478', 'cek1xodkm1rexbpnjhszt1us2qwignvf'); alias=default
+DEBUG 2025-03-07 00:45:19,759 utils (0.000) COMMIT; args=None; alias=default
+DEBUG 2025-03-07 00:45:19,760 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-07 00:45:19,760 utils (0.000) BEGIN; args=None; alias=default
+DEBUG 2025-03-07 00:45:19,762 utils (0.000) UPDATE "django_session" SET "session_data" = '.eJxVjMsOwiAQRf-FtSHAAAMu3fsNZHhUqgaS0q6M_65NutDtPefcFwu0rTVsoyxhzuzMJDv9bpHSo7Qd5Du1W-ept3WZI98VftDBrz2X5-Vw_w4qjfqtNRACoFRKg0_SklcefZ6y0JNLZNEYo5J2ECOkKGyRGVQEFIBOWUD2_gCyczaC:1tqIYp:4Bs-49qNYkzdb_IOqc9dsUBaQ2iWOVSdVjta9OmDIOI', "expire_date" = '2025-03-20 21:15:19.760981' WHERE "django_session"."session_key" = 'cek1xodkm1rexbpnjhszt1us2qwignvf'; args=('.eJxVjMsOwiAQRf-FtSHAAAMu3fsNZHhUqgaS0q6M_65NutDtPefcFwu0rTVsoyxhzuzMJDv9bpHSo7Qd5Du1W-ept3WZI98VftDBrz2X5-Vw_w4qjfqtNRACoFRKg0_SklcefZ6y0JNLZNEYo5J2ECOkKGyRGVQEFIBOWUD2_gCyczaC:1tqIYp:4Bs-49qNYkzdb_IOqc9dsUBaQ2iWOVSdVjta9OmDIOI', '2025-03-20 21:15:19.760981', 'cek1xodkm1rexbpnjhszt1us2qwignvf'); alias=default
+DEBUG 2025-03-07 00:45:19,763 utils (0.000) COMMIT; args=None; alias=default
+DEBUG 2025-03-07 00:45:19,773 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 21:15:19.770483' AND "django_session"."session_key" = 'cek1xodkm1rexbpnjhszt1us2qwignvf') LIMIT 21; args=('2025-03-06 21:15:19.770483', 'cek1xodkm1rexbpnjhszt1us2qwignvf'); alias=default
+DEBUG 2025-03-07 00:45:19,774 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-07 00:45:19,774 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-07 00:45:19,778 utils (0.000) SELECT "users_order"."id", "users_order"."customer_id", "users_order"."origin", "users_order"."destination", "users_order"."origin_floor", "users_order"."destination_floor", "users_order"."has_elevator", "users_order"."need_pro_mover", "users_order"."need_box_packer", "users_order"."move_date", "users_order"."origin_location", "users_order"."destination_location", "users_order"."total_volume", "users_order"."total_weight", "users_order"."status" FROM "users_order" WHERE "users_order"."customer_id" = 1; args=(1,); alias=default
+DEBUG 2025-03-07 00:53:04,253 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 21:23:04.252753' AND "django_session"."session_key" = 'cek1xodkm1rexbpnjhszt1us2qwignvf') LIMIT 21; args=('2025-03-06 21:23:04.252753', 'cek1xodkm1rexbpnjhszt1us2qwignvf'); alias=default
+DEBUG 2025-03-07 00:53:04,254 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-07 00:53:04,255 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-07 00:53:04,287 utils (0.000) SELECT "users_order"."id", "users_order"."customer_id", "users_order"."origin", "users_order"."destination", "users_order"."origin_floor", "users_order"."destination_floor", "users_order"."has_elevator", "users_order"."need_pro_mover", "users_order"."need_box_packer", "users_order"."move_date", "users_order"."origin_location", "users_order"."destination_location", "users_order"."total_volume", "users_order"."total_weight", "users_order"."status" FROM "users_order" WHERE "users_order"."customer_id" = 1; args=(1,); alias=default
+DEBUG 2025-03-07 00:53:54,999 utils (0.015) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 21:23:54.998438' AND "django_session"."session_key" = 'cek1xodkm1rexbpnjhszt1us2qwignvf') LIMIT 21; args=('2025-03-06 21:23:54.998438', 'cek1xodkm1rexbpnjhszt1us2qwignvf'); alias=default
+DEBUG 2025-03-07 00:53:55,000 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-07 01:05:56,896 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 21:35:56.892635' AND "django_session"."session_key" = 'cek1xodkm1rexbpnjhszt1us2qwignvf') LIMIT 21; args=('2025-03-06 21:35:56.892635', 'cek1xodkm1rexbpnjhszt1us2qwignvf'); alias=default
+DEBUG 2025-03-07 01:05:56,897 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-07 01:06:32,128 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 21:36:32.123169' AND "django_session"."session_key" = 'cek1xodkm1rexbpnjhszt1us2qwignvf') LIMIT 21; args=('2025-03-06 21:36:32.123169', 'cek1xodkm1rexbpnjhszt1us2qwignvf'); alias=default
+DEBUG 2025-03-07 01:06:32,129 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-07 01:07:01,971 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 21:37:01.968846' AND "django_session"."session_key" = 'cek1xodkm1rexbpnjhszt1us2qwignvf') LIMIT 21; args=('2025-03-06 21:37:01.968846', 'cek1xodkm1rexbpnjhszt1us2qwignvf'); alias=default
+DEBUG 2025-03-07 01:07:01,972 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-07 01:07:18,929 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 21:37:18.928832' AND "django_session"."session_key" = 'cek1xodkm1rexbpnjhszt1us2qwignvf') LIMIT 21; args=('2025-03-06 21:37:18.928832', 'cek1xodkm1rexbpnjhszt1us2qwignvf'); alias=default
+DEBUG 2025-03-07 01:07:18,931 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-07 01:07:27,149 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 21:37:27.147326' AND "django_session"."session_key" = 'cek1xodkm1rexbpnjhszt1us2qwignvf') LIMIT 21; args=('2025-03-06 21:37:27.147326', 'cek1xodkm1rexbpnjhszt1us2qwignvf'); alias=default
+DEBUG 2025-03-07 01:07:27,150 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-07 01:07:27,151 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-07 01:07:27,154 utils (0.000) SELECT "users_order"."id", "users_order"."customer_id", "users_order"."origin", "users_order"."destination", "users_order"."origin_floor", "users_order"."destination_floor", "users_order"."has_elevator", "users_order"."need_pro_mover", "users_order"."need_box_packer", "users_order"."move_date", "users_order"."origin_location", "users_order"."destination_location", "users_order"."total_volume", "users_order"."total_weight", "users_order"."status" FROM "users_order" WHERE "users_order"."customer_id" = 1; args=(1,); alias=default
+DEBUG 2025-03-07 01:07:52,187 utils (0.016) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 21:37:52.183472' AND "django_session"."session_key" = 'cek1xodkm1rexbpnjhszt1us2qwignvf') LIMIT 21; args=('2025-03-06 21:37:52.183472', 'cek1xodkm1rexbpnjhszt1us2qwignvf'); alias=default
+DEBUG 2025-03-07 01:07:52,190 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-07 01:07:52,192 utils (0.000) SELECT "users_mover"."id", "users_mover"."user_id", "users_mover"."full_name", "users_mover"."phone", "users_mover"."vehicle_type", "users_mover"."mover_type", "users_mover"."location", "users_mover"."payment_info", "users_mover"."driving_license", "users_mover"."carrying_capacity", "users_mover"."identification_id", "users_mover"."has_vehicle", "users_mover"."has_mover_certification", "users_mover"."mover_certification_document" FROM "users_mover" WHERE "users_mover"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-07 01:07:52,194 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-07 01:07:52,202 base Exception while resolving variable 'location' in template 'users/edit_profile.html'.
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 883, in _resolve_lookup
+    current = current[bit]
+TypeError: 'Customer' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 893, in _resolve_lookup
+    current = getattr(current, bit)
+AttributeError: 'Customer' object has no attribute 'location'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 899, in _resolve_lookup
+    current = current[int(bit)]
+ValueError: invalid literal for int() with base 10: 'location'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 906, in _resolve_lookup
+    raise VariableDoesNotExist(
+django.template.base.VariableDoesNotExist: Failed lookup for key [location] in <Customer: Customer: customer - customer@gmail.com>
+DEBUG 2025-03-07 01:07:52,203 base Exception while resolving variable 'payment_info' in template 'users/edit_profile.html'.
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 883, in _resolve_lookup
+    current = current[bit]
+TypeError: 'Customer' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 893, in _resolve_lookup
+    current = getattr(current, bit)
+AttributeError: 'Customer' object has no attribute 'payment_info'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 899, in _resolve_lookup
+    current = current[int(bit)]
+ValueError: invalid literal for int() with base 10: 'payment_info'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 906, in _resolve_lookup
+    raise VariableDoesNotExist(
+django.template.base.VariableDoesNotExist: Failed lookup for key [payment_info] in <Customer: Customer: customer - customer@gmail.com>
+DEBUG 2025-03-07 01:07:52,204 base Exception while resolving variable 'mover' in template 'users/edit_profile.html'.
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 883, in _resolve_lookup
+    current = current[bit]
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\utils\functional.py", line 253, in inner
+    return func(_wrapped, *args)
+TypeError: 'CustomUser' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 893, in _resolve_lookup
+    current = getattr(current, bit)
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\utils\functional.py", line 253, in inner
+    return func(_wrapped, *args)
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\fields\related_descriptors.py", line 531, in __get__
+    raise self.RelatedObjectDoesNotExist(
+users.models.CustomUser.mover.RelatedObjectDoesNotExist: CustomUser has no mover.
+DEBUG 2025-03-07 01:08:21,638 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 21:38:21.635143' AND "django_session"."session_key" = 'cek1xodkm1rexbpnjhszt1us2qwignvf') LIMIT 21; args=('2025-03-06 21:38:21.635143', 'cek1xodkm1rexbpnjhszt1us2qwignvf'); alias=default
+DEBUG 2025-03-07 01:08:21,639 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 1 LIMIT 21; args=(1,); alias=default
+DEBUG 2025-03-07 01:08:21,639 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE "django_session"."session_key" = 'cek1xodkm1rexbpnjhszt1us2qwignvf' LIMIT 21; args=('cek1xodkm1rexbpnjhszt1us2qwignvf',); alias=default
+DEBUG 2025-03-07 01:08:21,647 utils (0.000) DELETE FROM "django_session" WHERE "django_session"."session_key" IN ('cek1xodkm1rexbpnjhszt1us2qwignvf'); args=('cek1xodkm1rexbpnjhszt1us2qwignvf',); alias=default
+DEBUG 2025-03-07 01:13:49,097 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."email" = 'mover@gmail.com' LIMIT 21; args=('mover@gmail.com',); alias=default
+DEBUG 2025-03-07 01:13:49,379 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."email" = 'mover@gmail.com' LIMIT 21; args=('mover@gmail.com',); alias=default
+DEBUG 2025-03-07 01:13:49,673 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."email" = 'mover@gmail.com' LIMIT 21; args=('mover@gmail.com',); alias=default
+DEBUG 2025-03-07 01:13:49,981 utils (0.000) SELECT 1 AS "a" FROM "django_session" WHERE "django_session"."session_key" = '44rmcv7tpraft8uxpiuc8mzj2pdafv3g' LIMIT 1; args=(1, '44rmcv7tpraft8uxpiuc8mzj2pdafv3g'); alias=default
+DEBUG 2025-03-07 01:13:49,983 utils (0.000) BEGIN; args=None; alias=default
+DEBUG 2025-03-07 01:13:49,987 utils (0.000) INSERT INTO "django_session" ("session_key", "session_data", "expire_date") VALUES ('44rmcv7tpraft8uxpiuc8mzj2pdafv3g', 'e30:1tqJ0P:Ufu6MjtnSOSfuCley7w2isj83Ku9Vq6ZPmgBu0wZ0UE', '2025-03-20 21:43:49.983258'); args=('44rmcv7tpraft8uxpiuc8mzj2pdafv3g', 'e30:1tqJ0P:Ufu6MjtnSOSfuCley7w2isj83Ku9Vq6ZPmgBu0wZ0UE', '2025-03-20 21:43:49.983258'); alias=default
+DEBUG 2025-03-07 01:13:49,991 utils (0.000) COMMIT; args=None; alias=default
+DEBUG 2025-03-07 01:13:49,996 utils (0.000) UPDATE "users_customuser" SET "last_login" = '2025-03-06 21:43:49.991784' WHERE "users_customuser"."id" = 2; args=('2025-03-06 21:43:49.991784', 2); alias=default
+DEBUG 2025-03-07 01:13:49,997 utils (0.000) BEGIN; args=None; alias=default
+DEBUG 2025-03-07 01:13:50,000 utils (0.015) UPDATE "django_session" SET "session_data" = '.eJxVjMsOwiAQRf-FtSE8OkBduu83EJgZpWogKe3K-O_apAvd3nPOfYmYtrXErfMSZxJnYcTpd8sJH1x3QPdUb01iq-syZ7kr8qBdTo34eTncv4OSevnWLlgGk3m8umwTokX2ymQPTgcAzRpRAdAwKoLBK8eKDQ2BUCudkYx4fwDhezfA:1tqJ0P:e7vCzIY8ljP6D0wRwAcoWepjExpqwst6WWR7EgBFQ_4', "expire_date" = '2025-03-20 21:43:49.997783' WHERE "django_session"."session_key" = '44rmcv7tpraft8uxpiuc8mzj2pdafv3g'; args=('.eJxVjMsOwiAQRf-FtSE8OkBduu83EJgZpWogKe3K-O_apAvd3nPOfYmYtrXErfMSZxJnYcTpd8sJH1x3QPdUb01iq-syZ7kr8qBdTo34eTncv4OSevnWLlgGk3m8umwTokX2ymQPTgcAzRpRAdAwKoLBK8eKDQ2BUCudkYx4fwDhezfA:1tqJ0P:e7vCzIY8ljP6D0wRwAcoWepjExpqwst6WWR7EgBFQ_4', '2025-03-20 21:43:49.997783', '44rmcv7tpraft8uxpiuc8mzj2pdafv3g'); alias=default
+DEBUG 2025-03-07 01:13:50,002 utils (0.000) COMMIT; args=None; alias=default
+DEBUG 2025-03-07 01:13:50,003 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2025-03-07 01:13:50,005 utils (0.000) SELECT "users_mover"."id", "users_mover"."user_id", "users_mover"."full_name", "users_mover"."phone", "users_mover"."vehicle_type", "users_mover"."mover_type", "users_mover"."location", "users_mover"."payment_info", "users_mover"."driving_license", "users_mover"."carrying_capacity", "users_mover"."identification_id", "users_mover"."has_vehicle", "users_mover"."has_mover_certification", "users_mover"."mover_certification_document" FROM "users_mover" WHERE "users_mover"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2025-03-07 01:13:50,006 utils (0.000) BEGIN; args=None; alias=default
+DEBUG 2025-03-07 01:13:50,007 utils (0.000) UPDATE "django_session" SET "session_data" = '.eJxVjMsOwiAQRf-FtSE8OkBduu83EJgZpWogKe3K-O_apAvd3nPOfYmYtrXErfMSZxJnYcTpd8sJH1x3QPdUb01iq-syZ7kr8qBdTo34eTncv4OSevnWLlgGk3m8umwTokX2ymQPTgcAzRpRAdAwKoLBK8eKDQ2BUCudkYx4fwDhezfA:1tqJ0Q:8G_JzjfY83PjPJ1ETCZbo-GK6II8EsMZ4GFJp9osSbU', "expire_date" = '2025-03-20 21:43:50.006782' WHERE "django_session"."session_key" = '44rmcv7tpraft8uxpiuc8mzj2pdafv3g'; args=('.eJxVjMsOwiAQRf-FtSE8OkBduu83EJgZpWogKe3K-O_apAvd3nPOfYmYtrXErfMSZxJnYcTpd8sJH1x3QPdUb01iq-syZ7kr8qBdTo34eTncv4OSevnWLlgGk3m8umwTokX2ymQPTgcAzRpRAdAwKoLBK8eKDQ2BUCudkYx4fwDhezfA:1tqJ0Q:8G_JzjfY83PjPJ1ETCZbo-GK6II8EsMZ4GFJp9osSbU', '2025-03-20 21:43:50.006782', '44rmcv7tpraft8uxpiuc8mzj2pdafv3g'); alias=default
+DEBUG 2025-03-07 01:13:50,010 utils (0.000) COMMIT; args=None; alias=default
+DEBUG 2025-03-07 01:13:50,026 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 21:43:50.021788' AND "django_session"."session_key" = '44rmcv7tpraft8uxpiuc8mzj2pdafv3g') LIMIT 21; args=('2025-03-06 21:43:50.021788', '44rmcv7tpraft8uxpiuc8mzj2pdafv3g'); alias=default
+DEBUG 2025-03-07 01:13:50,027 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2025-03-07 01:13:50,028 utils (0.000) SELECT "users_mover"."id", "users_mover"."user_id", "users_mover"."full_name", "users_mover"."phone", "users_mover"."vehicle_type", "users_mover"."mover_type", "users_mover"."location", "users_mover"."payment_info", "users_mover"."driving_license", "users_mover"."carrying_capacity", "users_mover"."identification_id", "users_mover"."has_vehicle", "users_mover"."has_mover_certification", "users_mover"."mover_certification_document" FROM "users_mover" WHERE "users_mover"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2025-03-07 01:13:50,047 utils (0.000) SELECT DISTINCT "users_order"."id", "users_order"."customer_id", "users_order"."origin", "users_order"."destination", "users_order"."origin_floor", "users_order"."destination_floor", "users_order"."has_elevator", "users_order"."need_pro_mover", "users_order"."need_box_packer", "users_order"."move_date", "users_order"."origin_location", "users_order"."destination_location", "users_order"."total_volume", "users_order"."total_weight", "users_order"."status" FROM "users_order" INNER JOIN "users_order_items_detected" ON ("users_order"."id" = "users_order_items_detected"."order_id") WHERE "users_order_items_detected"."detecteditem_id" IS NOT NULL; args=(); alias=default
+DEBUG 2025-03-07 01:13:55,819 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 21:43:55.818768' AND "django_session"."session_key" = '44rmcv7tpraft8uxpiuc8mzj2pdafv3g') LIMIT 21; args=('2025-03-06 21:43:55.818768', '44rmcv7tpraft8uxpiuc8mzj2pdafv3g'); alias=default
+DEBUG 2025-03-07 01:13:55,822 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2025-03-07 01:13:55,824 utils (0.000) SELECT "users_mover"."id", "users_mover"."user_id", "users_mover"."full_name", "users_mover"."phone", "users_mover"."vehicle_type", "users_mover"."mover_type", "users_mover"."location", "users_mover"."payment_info", "users_mover"."driving_license", "users_mover"."carrying_capacity", "users_mover"."identification_id", "users_mover"."has_vehicle", "users_mover"."has_mover_certification", "users_mover"."mover_certification_document" FROM "users_mover" WHERE "users_mover"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2025-03-07 01:13:55,829 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2025-03-07 01:13:55,830 base Exception while resolving variable 'customer' in template 'users/edit_profile.html'.
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 883, in _resolve_lookup
+    current = current[bit]
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\utils\functional.py", line 253, in inner
+    return func(_wrapped, *args)
+TypeError: 'CustomUser' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 893, in _resolve_lookup
+    current = getattr(current, bit)
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\utils\functional.py", line 253, in inner
+    return func(_wrapped, *args)
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\fields\related_descriptors.py", line 531, in __get__
+    raise self.RelatedObjectDoesNotExist(
+users.models.CustomUser.customer.RelatedObjectDoesNotExist: CustomUser has no customer.
+DEBUG 2025-03-07 01:14:05,292 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 21:44:05.290684' AND "django_session"."session_key" = '44rmcv7tpraft8uxpiuc8mzj2pdafv3g') LIMIT 21; args=('2025-03-06 21:44:05.290684', '44rmcv7tpraft8uxpiuc8mzj2pdafv3g'); alias=default
+DEBUG 2025-03-07 01:14:05,294 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2025-03-07 01:14:05,294 utils (0.000) SELECT "users_mover"."id", "users_mover"."user_id", "users_mover"."full_name", "users_mover"."phone", "users_mover"."vehicle_type", "users_mover"."mover_type", "users_mover"."location", "users_mover"."payment_info", "users_mover"."driving_license", "users_mover"."carrying_capacity", "users_mover"."identification_id", "users_mover"."has_vehicle", "users_mover"."has_mover_certification", "users_mover"."mover_certification_document" FROM "users_mover" WHERE "users_mover"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2025-03-07 01:14:05,297 utils (0.000) SELECT DISTINCT "users_order"."id", "users_order"."customer_id", "users_order"."origin", "users_order"."destination", "users_order"."origin_floor", "users_order"."destination_floor", "users_order"."has_elevator", "users_order"."need_pro_mover", "users_order"."need_box_packer", "users_order"."move_date", "users_order"."origin_location", "users_order"."destination_location", "users_order"."total_volume", "users_order"."total_weight", "users_order"."status" FROM "users_order" INNER JOIN "users_order_items_detected" ON ("users_order"."id" = "users_order_items_detected"."order_id") WHERE "users_order_items_detected"."detecteditem_id" IS NOT NULL; args=(); alias=default
+DEBUG 2025-03-07 01:14:29,758 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 21:44:29.756270' AND "django_session"."session_key" = '44rmcv7tpraft8uxpiuc8mzj2pdafv3g') LIMIT 21; args=('2025-03-06 21:44:29.756270', '44rmcv7tpraft8uxpiuc8mzj2pdafv3g'); alias=default
+DEBUG 2025-03-07 01:14:29,759 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2025-03-07 01:14:29,761 utils (0.000) SELECT "users_mover"."id", "users_mover"."user_id", "users_mover"."full_name", "users_mover"."phone", "users_mover"."vehicle_type", "users_mover"."mover_type", "users_mover"."location", "users_mover"."payment_info", "users_mover"."driving_license", "users_mover"."carrying_capacity", "users_mover"."identification_id", "users_mover"."has_vehicle", "users_mover"."has_mover_certification", "users_mover"."mover_certification_document" FROM "users_mover" WHERE "users_mover"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2025-03-07 01:14:29,764 utils (0.000) SELECT "users_customer"."id", "users_customer"."user_id", "users_customer"."full_name", "users_customer"."phone", "users_customer"."profile_photo" FROM "users_customer" WHERE "users_customer"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2025-03-07 01:14:29,764 base Exception while resolving variable 'customer' in template 'users/edit_profile.html'.
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 883, in _resolve_lookup
+    current = current[bit]
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\utils\functional.py", line 253, in inner
+    return func(_wrapped, *args)
+TypeError: 'CustomUser' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\base.py", line 893, in _resolve_lookup
+    current = getattr(current, bit)
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\utils\functional.py", line 253, in inner
+    return func(_wrapped, *args)
+  File "C:\Users\ELITE\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\fields\related_descriptors.py", line 531, in __get__
+    raise self.RelatedObjectDoesNotExist(
+users.models.CustomUser.customer.RelatedObjectDoesNotExist: CustomUser has no customer.
+DEBUG 2025-03-07 01:14:45,991 utils (0.000) SELECT "django_session"."session_key", "django_session"."session_data", "django_session"."expire_date" FROM "django_session" WHERE ("django_session"."expire_date" > '2025-03-06 21:44:45.988130' AND "django_session"."session_key" = '44rmcv7tpraft8uxpiuc8mzj2pdafv3g') LIMIT 21; args=('2025-03-06 21:44:45.988130', '44rmcv7tpraft8uxpiuc8mzj2pdafv3g'); alias=default
+DEBUG 2025-03-07 01:14:45,992 utils (0.000) SELECT "users_customuser"."id", "users_customuser"."password", "users_customuser"."last_login", "users_customuser"."is_superuser", "users_customuser"."email", "users_customuser"."full_name", "users_customuser"."phone", "users_customuser"."profile_photo", "users_customuser"."is_active", "users_customuser"."is_staff" FROM "users_customuser" WHERE "users_customuser"."id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2025-03-07 01:14:45,993 utils (0.000) SELECT "users_mover"."id", "users_mover"."user_id", "users_mover"."full_name", "users_mover"."phone", "users_mover"."vehicle_type", "users_mover"."mover_type", "users_mover"."location", "users_mover"."payment_info", "users_mover"."driving_license", "users_mover"."carrying_capacity", "users_mover"."identification_id", "users_mover"."has_vehicle", "users_mover"."has_mover_certification", "users_mover"."mover_certification_document" FROM "users_mover" WHERE "users_mover"."user_id" = 2 LIMIT 21; args=(2,); alias=default
+DEBUG 2025-03-07 01:14:45,994 utils (0.000) SELECT DISTINCT "users_order"."id", "users_order"."customer_id", "users_order"."origin", "users_order"."destination", "users_order"."origin_floor", "users_order"."destination_floor", "users_order"."has_elevator", "users_order"."need_pro_mover", "users_order"."need_box_packer", "users_order"."move_date", "users_order"."origin_location", "users_order"."destination_location", "users_order"."total_volume", "users_order"."total_weight", "users_order"."status" FROM "users_order" INNER JOIN "users_order_items_detected" ON ("users_order"."id" = "users_order_items_detected"."order_id") WHERE "users_order_items_detected"."detecteditem_id" IS NOT NULL; args=(); alias=default

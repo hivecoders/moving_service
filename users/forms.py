@@ -40,6 +40,32 @@ class CustomerRegistrationForm(UserCreationForm):
             raise forms.ValidationError("This email is already taken. Please choose a different one.")
         return email
 
+# Customer Profile Form (For Editing)
+class CustomerProfileForm(forms.ModelForm):
+    new_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter new password'}),
+        required=False
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm new password'}),
+        required=False
+    )
+
+    class Meta:
+        model = Customer
+        fields = ['phone', 'profile_photo']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password = cleaned_data.get("new_password")
+        confirm_password = cleaned_data.get("confirm_password")
+
+        if new_password or confirm_password:
+            if new_password != confirm_password:
+                raise forms.ValidationError("Passwords do not match. Please try again.")
+
+        return cleaned_data
+
 # Mover Registration Form
 class MoverRegistrationForm(UserCreationForm):
     full_name = forms.CharField(widget=forms.TextInput(attrs={
@@ -113,6 +139,37 @@ class MoverRegistrationForm(UserCreationForm):
             raise forms.ValidationError("This email is already taken. Please choose a different one.")
         return email
 
+
+# Mover Profile Form (For Editing)
+class MoverProfileForm(forms.ModelForm):
+    new_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter new password'}),
+        required=False
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm new password'}),
+        required=False
+    )
+
+    class Meta:
+        model = Mover
+        fields = [
+            'phone', 'identification_id', 'has_vehicle',
+            'vehicle_type', 'mover_type', 'payment_info', 'driving_license',
+            'carrying_capacity', 'has_mover_certification', 'mover_certification_document'
+        ]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password = cleaned_data.get("new_password")
+        confirm_password = cleaned_data.get("confirm_password")
+
+        if new_password or confirm_password:
+            if new_password != confirm_password:
+                raise forms.ValidationError("Passwords do not match. Please try again.")
+
+        return cleaned_data
+
 # Custom User Login Form
 class CustomUserLoginForm(AuthenticationForm):
     username = forms.CharField(widget=forms.TextInput(attrs={
@@ -139,38 +196,53 @@ class CustomUserLoginForm(AuthenticationForm):
                 raise forms.ValidationError("Invalid email or password.")
         return cleaned_data
 
+
 # Order Form
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
         fields = [
             'origin', 'destination', 'origin_floor', 'destination_floor',
-            'has_elevator', 'need_pro_mover', 'need_box_packer', 
+            'has_elevator', 'need_pro_mover', 'need_box_packer',
             'move_date', 'origin_location', 'destination_location',
             'total_volume', 'total_weight'
         ]
 
+
 # Photo FormSet
 PhotoFormSet = modelformset_factory(Photo, fields=('image',), extra=1)
 
-# Mover Profile Form
-class MoverProfileForm(forms.ModelForm):
-    class Meta:
-        model = Mover
-        fields = [
-            'full_name', 'phone', 'identification_id', 'has_vehicle', 
-            'vehicle_type', 'mover_type', 'payment_info', 'driving_license',
-            'carrying_capacity', 'has_mover_certification', 'mover_certification_document'
-        ]
-
-# Customer Profile Form
-class CustomerProfileForm(forms.ModelForm):
-    class Meta:
-        model = Customer
-        fields = ['full_name', 'phone', 'profile_photo']
 
 # Photo Upload Form
 class PhotoUploadForm(forms.ModelForm):
     class Meta:
         model = Photo
         fields = ['image']
+
+
+# edit form
+class UserProfileForm(forms.ModelForm):
+    profile_photo = forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
+    new_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter new password'}),
+        required=False
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm new password'}),
+        required=False
+    )
+
+    class Meta:
+        model = CustomUser
+        fields = ['profile_photo']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password = cleaned_data.get("new_password")
+        confirm_password = cleaned_data.get("confirm_password")
+
+        if new_password or confirm_password:
+            if new_password != confirm_password:
+                raise forms.ValidationError("Passwords do not match. Please try again.")
+
+        return cleaned_data
