@@ -123,35 +123,34 @@
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
-    
-        var geocoder = L.Control.geocoder({
-            defaultMarkGeocode: false
-        }).on('markgeocode', function(e) {
-            var latlng = e.geocode.center;
-            if (marker) map.removeLayer(marker);
-            marker = L.marker(latlng).addTo(map);
-            document.getElementById(inputId).value = `${latlng.lat}, ${latlng.lng}`;
+
+        var geocoder = L.Control.Geocoder.nominatim();
+        L.Control.geocoder({
+            query: '',
+            placeholder: placeholderText,
+            collapsed: false,
+            geocoder: geocoder
         }).addTo(map);
-    
+
         var marker;
         function onLocationSelected(latlng) {
             if (marker) map.removeLayer(marker);
             marker = L.marker(latlng).addTo(map);
             document.getElementById(inputId).value = `${latlng.lat}, ${latlng.lng}`;
         }
-    
+
         map.on('click', function(e) {
             onLocationSelected(e.latlng);
         });
-    }
-    
-    document.addEventListener('DOMContentLoaded', function () {
-        setTimeout(function() {
-            setupMap('origin_map_canvas', 'origin_location', 'Click to select origin location');
-            setupMap('destination_map_canvas', 'destination_location', 'Click to select destination location');
-        }, 500);
-    });
-    
-</script>
 
+        geocoder.on('select', function(event) {
+            onLocationSelected(event.latlng);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        setupMap('origin_map_canvas', 'origin_location', 'Click to select origin location');
+        setupMap('destination_map_canvas', 'destination_location', 'Click to select destination location');
+    });
+</script>
 {% endblock %}
