@@ -107,6 +107,7 @@ class Order(models.Model):
     need_pro_mover = models.BooleanField(default=False)
     need_box_packer = models.BooleanField(default=False)
     move_date = models.DateTimeField()
+    move_time = models.TimeField(null=True, blank=True) 
     origin_location = models.CharField(max_length=100)
     destination_location = models.CharField(max_length=100)
     total_volume = models.FloatField(default=0)

@@ -131,7 +131,6 @@ def logout_view(request):
     logout(request)
     messages.success(request, "You have been logged out.")
     return redirect('login')
-
 # Order Creation
 @login_required
 def create_order(request):
@@ -139,20 +138,30 @@ def create_order(request):
     if request.method == 'POST':
         order_form = OrderForm(request.POST)
         photo_form = PhotoUploadForm(request.POST, request.FILES)
+        
         if order_form.is_valid() and photo_form.is_valid():
-            order = order_form.save()
+            order = order_form.save(commit=False)
+           
+            order.move_time = request.POST.get('move_time')
+
+            order.save()
+
             photo = photo_form.save(commit=False)
             photo.order = order
             photo.save()
+
             detect_objects(photo.image.path, order)
+
             messages.success(request, "Order successfully created!")
             logger.info(f"Order {order.id} created successfully")
             return redirect('customer_dashboard')
         else:
             logger.error(f"Order creation failed: {order_form.errors} {photo_form.errors}")
+    
     else:
         order_form = OrderForm()
         photo_form = PhotoUploadForm()
+
     return render(request, 'users/create_order.html', {'order_form': order_form, 'photo_form': photo_form})
 
 # Object Detection

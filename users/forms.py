@@ -10,23 +10,15 @@ logger = logging.getLogger(__name__)
 # Customer Registration Form
 class CustomerRegistrationForm(UserCreationForm):
     email = forms.EmailField(widget=forms.EmailInput(attrs={
-        'class': 'form-control',
-        'placeholder': 'Enter your email',
-        'required': 'required',
+        'class': 'form-control', 'placeholder': 'Enter your email', 'required': 'required',
     }))
     full_name = forms.CharField(widget=forms.TextInput(attrs={
-        'class': 'form-control',
-        'placeholder': 'Enter your full name',
-        'required': 'required',
+        'class': 'form-control', 'placeholder': 'Enter your full name', 'required': 'required',
     }))
     phone = forms.CharField(widget=forms.TextInput(attrs={
-        'class': 'form-control',
-        'placeholder': 'Enter your phone number',
-        'required': 'required',
+        'class': 'form-control', 'placeholder': 'Enter your phone number', 'required': 'required',
     }))
-    profile_photo = forms.ImageField(widget=forms.FileInput(attrs={
-        'class': 'form-control',
-    }), required=False)
+    profile_photo = forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
 
     class Meta:
         model = CustomUser
@@ -34,72 +26,27 @@ class CustomerRegistrationForm(UserCreationForm):
 
     def clean_email(self):
         email = self.cleaned_data.get('email').lower()
-        logger.debug(f"Checking email: {email}")
         if CustomUser.objects.filter(email=email).exists():
-            logger.warning(f"Email {email} already exists!")
-            raise forms.ValidationError("This email is already taken. Please choose a different one.")
+            raise forms.ValidationError("This email is already taken.")
         return email
 
 # Mover Registration Form
 class MoverRegistrationForm(UserCreationForm):
-    full_name = forms.CharField(widget=forms.TextInput(attrs={
-        'class': 'form-control',
-        'placeholder': 'Enter your full name',
-        'required': 'required',
-    }))
-    phone = forms.CharField(widget=forms.TextInput(attrs={
-        'class': 'form-control',
-        'placeholder': 'Enter your phone number',
-        'required': 'required',
-    }))
-    email = forms.EmailField(widget=forms.EmailInput(attrs={
-        'class': 'form-control',
-        'placeholder': 'Enter your email',
-        'required': 'required',
-    }))
-    profile_photo = forms.ImageField(widget=forms.FileInput(attrs={
-        'class': 'form-control',
-    }), required=False)
-    identification_id = forms.CharField(widget=forms.TextInput(attrs={
-        'class': 'form-control',
-        'placeholder': 'Passport, Work/Study Permit, SIN',
-        'required': 'required',
-    }))
-    has_vehicle = forms.ChoiceField(choices=[('Yes', 'Yes'), ('No', 'No')], widget=forms.Select(attrs={
-        'class': 'form-control',
-    }))
-    vehicle_type = forms.ChoiceField(choices=[('Car', 'Car'), ('Small Van', 'Small Van'), ('Large Van', 'Large Van')], required=False, widget=forms.Select(attrs={
-        'class': 'form-control',
-    }))
+    full_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your full name', 'required': 'required'}))
+    phone = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your phone number', 'required': 'required'}))
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter your email', 'required': 'required'}))
+    profile_photo = forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
+    identification_id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Passport, Work/Study Permit, SIN', 'required': 'required'}))
+    has_vehicle = forms.ChoiceField(choices=[('Yes', 'Yes'), ('No', 'No')], widget=forms.Select(attrs={'class': 'form-control'}))
+    vehicle_type = forms.ChoiceField(choices=[('Car', 'Car'), ('Small Van', 'Small Van'), ('Large Van', 'Large Van')], required=False, widget=forms.Select(attrs={'class': 'form-control'}))
     mover_type = forms.ChoiceField(choices=[
-        ('Pro Mover', 'Professional Mover'),
-        ('Mover', 'Simple Mover'),
-        ('Box Packer', 'Box Packer'),
-        ('Driver with Help', 'Driver with Help'),
-        ('Driver without Help', 'Driver without Help')
-    ], widget=forms.Select(attrs={
-        'class': 'form-control',
-    }))
-    payment_info = forms.CharField(widget=forms.TextInput(attrs={
-        'class': 'form-control',
-        'placeholder': 'Enter your bank account details',
-        'required': 'required',
-    }))
-    driving_license = forms.ImageField(widget=forms.FileInput(attrs={
-        'class': 'form-control',
-    }), required=False)
-    carrying_capacity = forms.IntegerField(widget=forms.NumberInput(attrs={
-        'class': 'form-control',
-        'placeholder': 'Carrying Capacity (kg)',
-    }), required=False)
-    has_mover_certification = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={
-        'class': 'form-check-input',
-        'id': 'certification_toggle'
-    }))
-    mover_certification_document = forms.ImageField(widget=forms.FileInput(attrs={
-        'class': 'form-control',
-        'id': 'certification_document'
-    }), required=False)
+        ('Pro Mover', 'Professional Mover'), ('Mover', 'Simple Mover'), ('Box Packer', 'Box Packer'), ('Driver with Help', 'Driver with Help'), ('Driver without Help', 'Driver without Help')
+    ], widget=forms.Select(attrs={'class': 'form-control'}))
+    payment_info = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Bank account details', 'required': 'required'}))
+    driving_license = forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
+    carrying_capacity = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Carrying Capacity (kg)'}), required=False)
+    has_mover_certification = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
+    mover_certification_document = forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
 
     class Meta:
         model = CustomUser
@@ -107,48 +54,44 @@ class MoverRegistrationForm(UserCreationForm):
 
     def clean_email(self):
         email = self.cleaned_data.get('email').lower()
-        logger.debug(f"Checking email: {email}")
         if CustomUser.objects.filter(email=email).exists():
-            logger.warning(f"Email {email} already exists!")
-            raise forms.ValidationError("This email is already taken. Please choose a different one.")
+            raise forms.ValidationError("This email is already taken.")
         return email
 
 # Custom User Login Form
 class CustomUserLoginForm(AuthenticationForm):
-    username = forms.CharField(widget=forms.TextInput(attrs={
-        'class': 'form-control',
-        'placeholder': 'Enter your email',
-        'required': 'required',
-    }))
-
-    password = forms.CharField(widget=forms.PasswordInput(attrs={
-        'class': 'form-control',
-        'placeholder': 'Enter your password',
-        'required': 'required',
-    }))
+    username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your email', 'required': 'required'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter your password', 'required': 'required'}))
 
     def clean(self):
         cleaned_data = super().clean()
         email = cleaned_data.get("username")
         password = cleaned_data.get("password")
-        logger.debug(f"Attempting login with email: {email}")
         if email and password:
             self.user_cache = authenticate(email=email, password=password)
             if self.user_cache is None:
-                logger.error(f"Authentication failed for: {email}")
                 raise forms.ValidationError("Invalid email or password.")
         return cleaned_data
 
-# Order Form
+# Order Form - Improved and Complete
 class OrderForm(forms.ModelForm):
+    move_date = forms.DateField(widget=forms.TextInput(attrs={'class': 'form-control datepicker', 'placeholder': 'Select a date', 'autocomplete': 'off'}))
+    move_time = forms.TimeField(widget=forms.TextInput(attrs={'class': 'form-control timepicker', 'placeholder': 'Select a time', 'autocomplete': 'off'}))
+    has_elevator = forms.ChoiceField(choices=[(True, 'Yes'), (False, 'No')], widget=forms.Select(attrs={'class': 'form-control'}))
+    need_pro_mover = forms.ChoiceField(choices=[(True, 'Yes'), (False, 'No')], widget=forms.Select(attrs={'class': 'form-control'}))
+    need_box_packer = forms.ChoiceField(choices=[(True, 'Yes'), (False, 'No')], widget=forms.Select(attrs={'class': 'form-control'}))
+
     class Meta:
         model = Order
-        fields = [
-            'origin', 'destination', 'origin_floor', 'destination_floor',
-            'has_elevator', 'need_pro_mover', 'need_box_packer', 
-            'move_date', 'origin_location', 'destination_location',
-            'total_volume', 'total_weight'
-        ]
+        fields = ['origin', 'destination', 'origin_floor', 'destination_floor', 'has_elevator', 'need_pro_mover', 'need_box_packer', 'move_date', 'move_time', 'origin_location', 'destination_location']
+        widgets = {
+            'origin': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Origin Address'}),
+            'destination': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Destination Address'}),
+            'origin_floor': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Origin Floor'}),
+            'destination_floor': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Destination Floor'}),
+            'origin_location': forms.HiddenInput(),
+            'destination_location': forms.HiddenInput(),
+        }
 
 # Photo FormSet
 PhotoFormSet = modelformset_factory(Photo, fields=('image',), extra=1)
@@ -157,11 +100,7 @@ PhotoFormSet = modelformset_factory(Photo, fields=('image',), extra=1)
 class MoverProfileForm(forms.ModelForm):
     class Meta:
         model = Mover
-        fields = [
-            'full_name', 'phone', 'identification_id', 'has_vehicle', 
-            'vehicle_type', 'mover_type', 'payment_info', 'driving_license',
-            'carrying_capacity', 'has_mover_certification', 'mover_certification_document'
-        ]
+        fields = ['full_name', 'phone', 'identification_id', 'has_vehicle', 'vehicle_type', 'mover_type', 'payment_info', 'driving_license', 'carrying_capacity', 'has_mover_certification', 'mover_certification_document']
 
 # Customer Profile Form
 class CustomerProfileForm(forms.ModelForm):

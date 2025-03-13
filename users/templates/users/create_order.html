@@ -12,70 +12,58 @@
                     <h4><i class="fas fa-plus-circle"></i> Create Order</h4>
                 </div>
                 <div class="card-body">
-                    <form method="POST" enctype="multipart/form-data">
+                    <form method="POST">
                         {% csrf_token %}
 
-                        <!-- Origin Selection -->
                         <h5 class="text-center">Select Origin</h5>
-                        <div id="origin_map_canvas" style="height: 400px; margin-bottom: 10px;"></div>
-                        <input type="hidden" id="origin_location" name="origin_location">
+                        <div id="origin_map_canvas" style="height: 400px;"></div>
+                        {{ order_form.origin_location }}
 
                         <div class="mb-3">
-                            <label for="id_origin" class="form-label">Origin Address</label>
+                            <label class="form-label">Origin Address</label>
                             {{ order_form.origin }}
                         </div>
                         <div class="mb-3">
-                            <label for="id_origin_floor" class="form-label">Origin Floor</label>
+                            <label class="form-label">Origin Floor</label>
                             {{ order_form.origin_floor }}
                         </div>
 
-                        <!-- Destination Selection -->
                         <h5 class="text-center">Select Destination</h5>
-                        <div id="destination_map_canvas" style="height: 400px; margin-bottom: 10px;"></div>
-                        <input type="hidden" id="destination_location" name="destination_location">
+                        <div id="destination_map_canvas" style="height: 400px;"></div>
+                        {{ order_form.destination_location }}
 
                         <div class="mb-3">
-                            <label for="id_destination" class="form-label">Destination Address</label>
+                            <label class="form-label">Destination Address</label>
                             {{ order_form.destination }}
                         </div>
                         <div class="mb-3">
-                            <label for="id_destination_floor" class="form-label">Destination Floor</label>
+                            <label class="form-label">Destination Floor</label>
                             {{ order_form.destination_floor }}
                         </div>
 
                         <div class="mb-3">
-                            <label for="id_move_date" class="form-label">Move Date</label>
+                            <label class="form-label">Move Date</label>
                             {{ order_form.move_date }}
                         </div>
 
                         <div class="mb-3">
-                            <label for="id_has_elevator" class="form-label">Elevator Available?</label>
+                            <label class="form-label">Move Time</label>
+                            {{ order_form.move_time }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Elevator Available?</label>
                             {{ order_form.has_elevator }}
                         </div>
 
                         <div class="mb-3">
-                            <label for="id_need_pro_mover" class="form-label">Need Professional Mover?</label>
+                            <label class="form-label">Need Professional Mover?</label>
                             {{ order_form.need_pro_mover }}
                         </div>
 
                         <div class="mb-3">
-                            <label for="id_need_box_packer" class="form-label">Need Box Packer?</label>
+                            <label class="form-label">Need Box Packer?</label>
                             {{ order_form.need_box_packer }}
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="id_total_volume" class="form-label">Total Volume (m³)</label>
-                            {{ order_form.total_volume }}
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="id_total_weight" class="form-label">Total Weight (kg)</label>
-                            {{ order_form.total_weight }}
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="id_image" class="form-label">Upload Photos</label>
-                            <input type="file" name="image" id="id_image" class="form-control" multiple>
                         </div>
 
                         {% if order_form.errors %}
@@ -94,7 +82,7 @@
                         {% endif %}
 
                         <button type="submit" class="btn btn-success w-100">
-                            <i class="fas fa-check-circle"></i> Submit Order
+                            <i class="fas fa-check-circle"></i> Next Step
                         </button>
                     </form>
 
@@ -113,44 +101,47 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<!-- Leaflet and Geocoder Scripts -->
+<!-- Leaflet and Geocoder -->
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
 <script>
-    function setupMap(mapId, inputId, placeholderText) {
+document.addEventListener('DOMContentLoaded', function() {
+    function setupMap(mapId, inputId) {
         var map = L.map(mapId).setView([51.505, -0.09], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-
-        var geocoder = L.Control.Geocoder.nominatim();
-        L.Control.geocoder({
-            query: '',
-            placeholder: placeholderText,
-            collapsed: false,
-            geocoder: geocoder
-        }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
         var marker;
-        function onLocationSelected(latlng) {
-            if (marker) map.removeLayer(marker);
-            marker = L.marker(latlng).addTo(map);
-            document.getElementById(inputId).value = `${latlng.lat}, ${latlng.lng}`;
-        }
+        var geocoder = L.Control.geocoder({defaultMarkGeocode: false})
+            .on('markgeocode', function(e) {
+                var latlng = e.geocode.center;
+                if (marker) map.removeLayer(marker);
+                marker = L.marker(latlng).addTo(map);
+                document.getElementById(inputId).value = `${latlng.lat}, ${latlng.lng}`;
+            }).addTo(map);
 
         map.on('click', function(e) {
-            onLocationSelected(e.latlng);
-        });
-
-        geocoder.on('select', function(event) {
-            onLocationSelected(event.latlng);
+            if (marker) map.removeLayer(marker);
+            marker = L.marker(e.latlng).addTo(map);
+            document.getElementById(inputId).value = `${e.latlng.lat}, ${e.latlng.lng}`;
         });
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        setupMap('origin_map_canvas', 'origin_location', 'Click to select origin location');
-        setupMap('destination_map_canvas', 'destination_location', 'Click to select destination location');
+    setupMap('origin_map_canvas', 'id_origin_location');
+    setupMap('destination_map_canvas', 'id_destination_location');
+
+    // Initialize Flatpickr Date & Time picker
+    flatpickr("#id_move_date", {
+        dateFormat: "Y-m-d",
+        minDate: "today"
     });
+
+    flatpickr("#id_move_time", {
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i",
+        time_24hr: true
+    });
+});
 </script>
 {% endblock %}
