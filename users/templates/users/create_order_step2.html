@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Step 2: Upload Photos{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4><i class="fas fa-camera"></i> Upload Photos</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data" id="photo-upload-form">
+                        {% csrf_token %}
+
+                        <!-- File Upload Input -->
+                        <div class="mb-3">
+                            <label class="form-label">Select Photos</label>
+                            <input type="file" name="images" id="image-upload" class="form-control" multiple accept="image/*">
+                        </div>
+
+                        <!-- Preview Gallery -->
+                        <div class="mb-3">
+                            <h5>Preview:</h5>
+                            <div id="image-preview" class="d-flex flex-wrap border p-2" style="min-height: 120px; background-color: #f8f9fa; border-radius: 10px;"></div>
+                        </div>
+
+                        <!-- Loading Message -->
+                        <div id="loading-message" class="alert alert-info text-center d-none">
+                            <i class="fas fa-spinner fa-spin"></i> Processing images, please wait...
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-upload"></i> Upload & Process
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.getElementById('image-upload').addEventListener('change', function(event) {
+    let previewContainer = document.getElementById('image-preview');
+    previewContainer.innerHTML = '';
+
+    for (let file of event.target.files) {
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            let imgElement = document.createElement('img');
+            imgElement.src = e.target.result;
+            imgElement.style.width = '120px';
+            imgElement.style.margin = '5px';
+            imgElement.classList.add('rounded', 'shadow-sm', 'border');
+            previewContainer.appendChild(imgElement);
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Show loading message on submit
+document.getElementById('photo-upload-form').addEventListener('submit', function() {
+    document.getElementById('loading-message').classList.remove('d-none');
+});
+</script>
+{% endblock %}

@@ -37,11 +37,11 @@ class MoverRegistrationForm(UserCreationForm):
     email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter your email', 'required': 'required'}))
     profile_photo = forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
     identification_id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Passport, Work/Study Permit, SIN', 'required': 'required'}))
-    has_vehicle = forms.ChoiceField(choices=[('Yes', 'Yes'), ('No', 'No')], widget=forms.Select(attrs={'class': 'form-control'}))
-    vehicle_type = forms.ChoiceField(choices=[('Car', 'Car'), ('Small Van', 'Small Van'), ('Large Van', 'Large Van')], required=False, widget=forms.Select(attrs={'class': 'form-control'}))
+    has_vehicle = forms.ChoiceField(choices=[('Yes', 'Yes'), ('No', 'No')], widget=forms.Select(attrs={'class': 'form-select'}))
+    vehicle_type = forms.ChoiceField(choices=[('Car', 'Car'), ('Small Van', 'Small Van'), ('Large Van', 'Large Van')], required=False, widget=forms.Select(attrs={'class': 'form-select'}))
     mover_type = forms.ChoiceField(choices=[
         ('Pro Mover', 'Professional Mover'), ('Mover', 'Simple Mover'), ('Box Packer', 'Box Packer'), ('Driver with Help', 'Driver with Help'), ('Driver without Help', 'Driver without Help')
-    ], widget=forms.Select(attrs={'class': 'form-control'}))
+    ], widget=forms.Select(attrs={'class': 'form-select'}))
     payment_info = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Bank account details', 'required': 'required'}))
     driving_license = forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
     carrying_capacity = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Carrying Capacity (kg)'}), required=False)
@@ -73,17 +73,31 @@ class CustomUserLoginForm(AuthenticationForm):
                 raise forms.ValidationError("Invalid email or password.")
         return cleaned_data
 
-# Order Form - Improved and Complete
+# Order Form 
 class OrderForm(forms.ModelForm):
     move_date = forms.DateField(widget=forms.TextInput(attrs={'class': 'form-control datepicker', 'placeholder': 'Select a date', 'autocomplete': 'off'}))
     move_time = forms.TimeField(widget=forms.TextInput(attrs={'class': 'form-control timepicker', 'placeholder': 'Select a time', 'autocomplete': 'off'}))
-    has_elevator = forms.ChoiceField(choices=[(True, 'Yes'), (False, 'No')], widget=forms.Select(attrs={'class': 'form-control'}))
-    need_pro_mover = forms.ChoiceField(choices=[(True, 'Yes'), (False, 'No')], widget=forms.Select(attrs={'class': 'form-control'}))
-    need_box_packer = forms.ChoiceField(choices=[(True, 'Yes'), (False, 'No')], widget=forms.Select(attrs={'class': 'form-control'}))
+
+    has_elevator = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    need_pro_mover = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    need_box_packer = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
 
     class Meta:
         model = Order
-        fields = ['origin', 'destination', 'origin_floor', 'destination_floor', 'has_elevator', 'need_pro_mover', 'need_box_packer', 'move_date', 'move_time', 'origin_location', 'destination_location']
+        fields = [
+            'origin', 'destination', 'origin_floor', 'destination_floor',
+            'has_elevator', 'need_pro_mover', 'need_box_packer',
+            'move_date', 'move_time', 'origin_location', 'destination_location'
+        ]
         widgets = {
             'origin': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Origin Address'}),
             'destination': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Destination Address'}),
@@ -93,8 +107,18 @@ class OrderForm(forms.ModelForm):
             'destination_location': forms.HiddenInput(),
         }
 
-# Photo FormSet
-PhotoFormSet = modelformset_factory(Photo, fields=('image',), extra=1)
+# Photo Upload Form
+class PhotoUploadForm(forms.ModelForm):
+    class Meta:
+        model = Photo
+        fields = ['image']
+
+PhotoFormSet = modelformset_factory(
+    Photo,
+    form=PhotoUploadForm,
+    extra=0,  
+    can_delete=True
+)
 
 # Mover Profile Form
 class MoverProfileForm(forms.ModelForm):
@@ -107,9 +131,3 @@ class CustomerProfileForm(forms.ModelForm):
     class Meta:
         model = Customer
         fields = ['full_name', 'phone', 'profile_photo']
-
-# Photo Upload Form
-class PhotoUploadForm(forms.ModelForm):
-    class Meta:
-        model = Photo
-        fields = ['image']

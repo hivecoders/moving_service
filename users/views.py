@@ -28,6 +28,106 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 def home(request):
     logger.info("Rendering home page")
     return render(request, 'users/home.html')
+# Order Creation
+@login_required
+def create_order(request):
+    logger.info("Creating a new order (step 1)")
+    if request.method == 'POST':
+        order_form = OrderForm(request.POST)
+
+        if order_form.is_valid():
+            order = order_form.save(commit=False)
+            order.customer = request.user.customer
+            order.status = "Pending"
+            
+            order.has_elevator = request.POST.get('has_elevator') == 'on'
+            order.need_pro_mover = request.POST.get('need_pro_mover') == 'on'
+            order.need_box_packer = request.POST.get('need_box_packer') == 'on'
+            order.save()
+
+            request.session['order_id'] = order.id
+            messages.success(request, "Order details saved. Proceed to upload photos.")
+            logger.info(f"Order {order.id} created (step 1)")
+            return redirect('create_order_step2')
+        else:
+            logger.error(f"Order creation failed: {order_form.errors}")
+            messages.error(request, "Please correct the errors below.")
+    else:
+        order_form = OrderForm()
+
+    return render(request, 'users/create_order.html', {'order_form': order_form})
+
+## **create_order_step2**
+@login_required
+def create_order_step2(request):
+    order_id = request.session.get('order_id')
+
+    if not order_id:
+        messages.error(request, "No order found. Please create an order first.")
+        return redirect('create_order')
+
+    order = get_object_or_404(Order, id=order_id)
+    detected_items = request.session.get('detected_items', [])
+
+    if request.method == 'POST':
+        selected_items = request.POST.getlist('selected_items')
+        manual_items = request.POST.getlist('manual_items')
+        vehicle_type = request.POST.get('vehicle_type')
+        images = request.FILES.getlist('images')
+
+        total_volume, total_weight = 0.0, 0.0
+
+        # ذخیره تصاویر در مدل `Photo`
+        for image in images:
+            photo = Photo.objects.create(order=order, image=image)
+
+            # پردازش تصویر با YOLO
+            detected_objects = detect_objects(photo.image.path, order)
+
+            # ذخیره اشیای تشخیص داده‌شده
+            for obj in detected_objects:
+                detected_item = DetectedItem.objects.create(
+                    order=order,
+                    item_class=obj["item"],
+                    volume=obj["volume"],
+                    weight=obj["weight"],
+                    confidence=obj.get("confidence", 1.0)
+                )
+                total_volume += obj["volume"]
+                total_weight += obj["weight"]
+
+        
+        for item in detected_items:
+            if item['item'] in selected_items:
+                DetectedItem.objects.create(
+                    order=order,
+                    item_class=item['item'],
+                    volume=item['volume'],
+                    weight=item['weight'],
+                    confidence=1.0
+                )
+                total_volume += item['volume']
+                total_weight += item['weight']
+
+        for item in manual_items:
+            DetectedItem.objects.create(
+                order=order,
+                item_class=item,
+                volume=0,
+                weight=0,
+                confidence=1.0
+            )
+
+        order.total_volume = total_volume
+        order.total_weight = total_weight
+        order.vehicle_type = vehicle_type
+        order.save()
+
+        messages.success(request, "Order items added successfully!")
+        logger.info(f"Order {order.id} updated (step 2)")
+        return redirect('customer_dashboard')
+
+    return render(request, 'users/create_order_step2.html', {'detected_items': detected_items})
 
 # User Authentication & Signup
 def login_view(request):
@@ -131,44 +231,14 @@ def logout_view(request):
     logout(request)
     messages.success(request, "You have been logged out.")
     return redirect('login')
-# Order Creation
-@login_required
-def create_order(request):
-    logger.info("Creating a new order")
-    if request.method == 'POST':
-        order_form = OrderForm(request.POST)
-        photo_form = PhotoUploadForm(request.POST, request.FILES)
-        
-        if order_form.is_valid() and photo_form.is_valid():
-            order = order_form.save(commit=False)
-           
-            order.move_time = request.POST.get('move_time')
 
-            order.save()
 
-            photo = photo_form.save(commit=False)
-            photo.order = order
-            photo.save()
-
-            detect_objects(photo.image.path, order)
-
-            messages.success(request, "Order successfully created!")
-            logger.info(f"Order {order.id} created successfully")
-            return redirect('customer_dashboard')
-        else:
-            logger.error(f"Order creation failed: {order_form.errors} {photo_form.errors}")
-    
-    else:
-        order_form = OrderForm()
-        photo_form = PhotoUploadForm()
-
-    return render(request, 'users/create_order.html', {'order_form': order_form, 'photo_form': photo_form})
 
 # Object Detection
 def detect_objects(image_path, order):
     logger.info(f"Processing image for order {order.id}")
     results = yolo_model(image_path)
-    total_volume, total_weight = 0.0, 0.0
+    detected_items = []
 
     for result in results:
         for box in result.boxes.data:
@@ -179,9 +249,7 @@ def detect_objects(image_path, order):
             volume = item_data["volume"]
             weight = item_data["weight"]
 
-            logger.info(f"Detected {item_name} with confidence {confidence}")
-
-            DetectedItem.objects.create(
+            detected_item = DetectedItem.objects.create(
                 order=order,
                 item_class=item_name,
                 confidence=confidence,
@@ -195,12 +263,11 @@ def detect_objects(image_path, order):
                 weight=weight
             )
 
-            total_volume += volume
-            total_weight += weight
+            detected_items.append({"item": item_name, "volume": volume, "weight": weight})
 
-    order.total_volume, order.total_weight = total_volume, total_weight
-    order.save()
-    logger.info(f"Updated order {order.id} with volume {total_volume} and weight {total_weight}")
+    return detected_items
+
+
 
 # Customer Dashboard
 @login_required
