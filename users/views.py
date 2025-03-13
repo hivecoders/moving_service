@@ -1,3 +1,4 @@
+import os
 import logging
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
@@ -6,6 +7,8 @@ from django.http import JsonResponse, HttpResponse
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from geopy.distance import geodesic
+import cv2
+import numpy as np
 from ultralytics import YOLO
 import stripe
 from .models import Customer, Mover, Order, DetectedItem, Photo, CustomUser
@@ -19,7 +22,7 @@ from .forms import (
 logger = logging.getLogger(__name__)
 
 # Load YOLO model
-yolo_model = YOLO("yolov8l.pt")
+yolo_model = YOLO("yolov8x.pt")
 
 # Stripe Configuration
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -39,7 +42,7 @@ def create_order(request):
             order = order_form.save(commit=False)
             order.customer = request.user.customer
             order.status = "Pending"
-            
+
             order.has_elevator = request.POST.get('has_elevator') == 'on'
             order.need_pro_mover = request.POST.get('need_pro_mover') == 'on'
             order.need_box_packer = request.POST.get('need_box_packer') == 'on'
@@ -68,7 +71,7 @@ def create_order_step2(request):
 
     order = get_object_or_404(Order, id=order_id)
     detected_items = request.session.get('detected_items', [])
-
+    
     if request.method == 'POST':
         selected_items = request.POST.getlist('selected_items')
         manual_items = request.POST.getlist('manual_items')
@@ -77,38 +80,40 @@ def create_order_step2(request):
 
         total_volume, total_weight = 0.0, 0.0
 
-        # ذخیره تصاویر در مدل `Photo`
         for image in images:
             photo = Photo.objects.create(order=order, image=image)
 
-            # پردازش تصویر با YOLO
+            
             detected_objects = detect_objects(photo.image.path, order)
 
-            # ذخیره اشیای تشخیص داده‌شده
+            
             for obj in detected_objects:
                 detected_item = DetectedItem.objects.create(
                     order=order,
                     item_class=obj["item"],
                     volume=obj["volume"],
                     weight=obj["weight"],
-                    confidence=obj.get("confidence", 1.0)
+                    confidence=obj.get("confidence", 1.0),
+                    bbox=obj["bbox"]
                 )
                 total_volume += obj["volume"]
                 total_weight += obj["weight"]
 
         
-        for item in detected_items:
-            if item['item'] in selected_items:
+        for item in selected_items:
+            if item in VOLUME_WEIGHT_ESTIMATES:
+                item_data = VOLUME_WEIGHT_ESTIMATES[item]
                 DetectedItem.objects.create(
                     order=order,
-                    item_class=item['item'],
-                    volume=item['volume'],
-                    weight=item['weight'],
+                    item_class=item,
+                    volume=item_data["volume"],
+                    weight=item_data["weight"],
                     confidence=1.0
                 )
-                total_volume += item['volume']
-                total_weight += item['weight']
+                total_volume += item_data["volume"]
+                total_weight += item_data["weight"]
 
+        
         for item in manual_items:
             DetectedItem.objects.create(
                 order=order,
@@ -127,7 +132,17 @@ def create_order_step2(request):
         logger.info(f"Order {order.id} updated (step 2)")
         return redirect('customer_dashboard')
 
-    return render(request, 'users/create_order_step2.html', {'detected_items': detected_items})
+    
+    item_list = list(VOLUME_WEIGHT_ESTIMATES.keys())
+    detected_items = DetectedItem.objects.filter(order=order)
+    photos = Photo.objects.filter(order=order)
+
+    return render(request, 'users/create_order_step2.html', {
+        'detected_items': detected_items,
+        'item_list': item_list,
+        'photos': photos
+    })
+
 
 # User Authentication & Signup
 def login_view(request):
@@ -235,37 +250,58 @@ def logout_view(request):
 
 
 # Object Detection
+import cv2
+import numpy as np
+from ultralytics import YOLO
+
+# YOLOv8x
+yolo_model = YOLO("yolov8x.pt")
+
 def detect_objects(image_path, order):
     logger.info(f"Processing image for order {order.id}")
-    results = yolo_model(image_path)
-    detected_items = []
 
+    image = cv2.imread(image_path)
+    results = yolo_model(image_path)  #YOLO
+
+    detected_items = []
     for result in results:
         for box in result.boxes.data:
-            item_name = result.names[int(box.cls.item())]
-            confidence = float(box.conf.item())
+            if len(box) < 5:
+                continue  
+
+            class_id = int(box[5].item())  
+            item_name = result.names[class_id]
+            confidence = float(box[4].item())  # YOLO
 
             item_data = VOLUME_WEIGHT_ESTIMATES.get(item_name, {"volume": 0.5, "weight": 10.0})
             volume = item_data["volume"]
             weight = item_data["weight"]
 
+            x1, y1, x2, y2 = map(int, box[:4].tolist())
+
+            # save in database
             detected_item = DetectedItem.objects.create(
                 order=order,
                 item_class=item_name,
                 confidence=confidence,
-                bbox={
-                    'x1': float(box.xyxy[0].item()),
-                    'y1': float(box.xyxy[1].item()),
-                    'x2': float(box.xyxy[2].item()),
-                    'y2': float(box.xyxy[3].item())
-                },
+                bbox={'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2},
                 volume=volume,
                 weight=weight
             )
 
             detected_items.append({"item": item_name, "volume": volume, "weight": weight})
 
-    return detected_items
+            # mark
+            cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            cv2.putText(image, f"{item_name} ({confidence:.2f})", (x1, y1 - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
+    # save
+    processed_image_path = image_path.replace(".jpg", "_processed.jpg")
+    cv2.imwrite(processed_image_path, image)
+
+    return detected_items, processed_image_path
+
 
 
 
