@@ -14,8 +14,12 @@
                 <div class="card-body">
                     <form method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
+                        <input type="file" name="images" multiple>
+                        <button type="submit">Upload</button>
+                    </form>
 
-                        <!-- نمایش عکس پردازش‌شده -->
+
+                        <!-- View processed photo-->
                         {% if processed_image_path %}
                         <div class="text-center mb-3">
                             <h5>Processed Image:</h5>
@@ -23,7 +27,7 @@
                         </div>
                         {% endif %}
 
-                        <!-- نمایش اشیاء تشخیص داده‌شده -->
+                        <!-- Display detected objects-->
                         <div class="mb-4">
                             <h5>Detected Items:</h5>
                             {% if detected_items %}
@@ -40,7 +44,7 @@
                             {% endif %}
                         </div>
 
-                        <!-- افزودن آیتم از لیست -->
+                        <!-- Add item from list-->
                         <div class="mb-4">
                             <h5>Add Item from List:</h5>
                             <select name="preset_items" class="form-select">
@@ -51,13 +55,13 @@
                             </select>
                         </div>
 
-                        <!-- افزودن آیتم دستی -->
+                        <!-- Add item manually-->
                         <div class="mb-4">
                             <h5>Add Manual Item:</h5>
                             <input type="text" name="manual_items" class="form-control" placeholder="Enter item name">
                         </div>
 
-                        <!-- انتخاب نوع وسیله نقلیه -->
+                        <!-- Select vehicle typeه -->
                         <div class="mb-4">
                             <h5>Select Vehicle:</h5>
                             <select name="vehicle_type" class="form-select">

@@ -1,4 +1,5 @@
 from django.urls import path
+from users import views
 from . import views
 
 urlpatterns = [
@@ -14,8 +15,11 @@ urlpatterns = [
     path('register/mover/', views.register_mover, name='register_mover'),
 
     # Dashboard URLs (Separate for Customer & Mover)
+
+    
     path('dashboard/customer/', views.customer_dashboard, name='customer_dashboard'),
     path('dashboard/mover/', views.mover_dashboard, name='mover_dashboard'),
+
 
     # Order Related URLs
     path('create_order/', views.create_order, name='create_order'),
