@@ -11,12 +11,9 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 import stripe
-from users.utils.yolo_detector import detect_objects
 from .models import Customer, Mover, Order, DetectedItem, Photo, CustomUser
 from utils.volume_weight_estimates import VOLUME_WEIGHT_ESTIMATES
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login
-
 from .forms import (
     MoverRegistrationForm, CustomerRegistrationForm, CustomUserLoginForm, 
     OrderForm, PhotoFormSet, MoverProfileForm, CustomerProfileForm, PhotoUploadForm
@@ -25,7 +22,7 @@ from .forms import (
 logger = logging.getLogger(__name__)
 
 # Load YOLO model
-model = YOLO("yolov8x.pt")
+yolo_model = YOLO("yolov8x.pt")
 
 # Stripe Configuration
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -78,62 +75,53 @@ def create_order_step2(request):
     if request.method == 'POST':
         selected_items = request.POST.getlist('selected_items')
         manual_items = request.POST.getlist('manual_items')
-        preset_item = request.POST.get('preset_items')
         vehicle_type = request.POST.get('vehicle_type')
         images = request.FILES.getlist('images')
-        
 
         total_volume, total_weight = 0.0, 0.0
-        processed_image_path = None
-
-        detected_items_list = []
 
         for image in images:
             photo = Photo.objects.create(order=order, image=image)
+
+            
             detected_objects = detect_objects(photo.image.path, order)
 
-
-            detected_objects, processed_image_path = detect_objects(photo.image.path, order)                     
-                    
+            
             for obj in detected_objects:
-                DetectedItem.objects.create(
+                detected_item = DetectedItem.objects.create(
                     order=order,
-                    item_class=item['item'],
-                    volume=item['volume'],
-                    weight=item['weight'],
-                    confidence=1.0, 
-                    bbbox={}
+                    item_class=obj["item"],
+                    volume=obj["volume"],
+                    weight=obj["weight"],
+                    confidence=obj.get("confidence", 1.0),
+                    bbox=obj["bbox"]
                 )
-                total_volume += item['volume']
-                total_weight += item['weight']
+                total_volume += obj["volume"]
+                total_weight += obj["weight"]
 
         
-        for item in detected_items:
-            if item['item'] in selected_items:
+        for item in selected_items:
+            if item in VOLUME_WEIGHT_ESTIMATES:
                 item_data = VOLUME_WEIGHT_ESTIMATES[item]
                 DetectedItem.objects.create(
-                order=order,
-                item_class=item['item'],
-                volume=item['volume'],
-                weight=item['weight'],
-                confidence=1.0,  # ✅
-                bbox={}  # 
+                    order=order,
+                    item_class=item,
+                    volume=item_data["volume"],
+                    weight=item_data["weight"],
+                    confidence=1.0
                 )
-  
-                
                 total_volume += item_data["volume"]
                 total_weight += item_data["weight"]
 
         
         for item in manual_items:
-            DetectedItem.objects.createDetectedItem.objects.create(
-    order=order,
-    item_class=item['item'],
-    volume=item['volume'],
-    weight=item['weight'],
-    confidence=1.0,  # ✅ 
-    bbox={}  # 
-)
+            DetectedItem.objects.create(
+                order=order,
+                item_class=item,
+                volume=0,
+                weight=0,
+                confidence=1.0
+            )
 
         order.total_volume = total_volume
         order.total_weight = total_weight
@@ -149,20 +137,12 @@ def create_order_step2(request):
     detected_items = DetectedItem.objects.filter(order=order)
     photos = Photo.objects.filter(order=order)
 
-    vehicle_choices = [
-    ("Car", "Car"),
-    ("Small Van", "Small Van"),
-    ("Large Van", "Large Van"),
-]
-
     return render(request, 'users/create_order_step2.html', {
-    'order': order,
-    'detected_items': detected_items,
-    'item_list': item_list,
-    'vehicle_choices': vehicle_choices,
-    'photos': photos,  
-    'processed_image_path': detected_items.first().order.photo_set.first().image.url if detected_items.exists() else None
-})
+        'detected_items': detected_items,
+        'item_list': item_list,
+        'photos': photos
+    })
+
 
 # User Authentication & Signup
 def login_view(request):
@@ -175,19 +155,15 @@ def login_view(request):
 
 
         if form.is_valid():
-            email = form.cleaned_data.get('username').strip().lower()
+            email = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
 
             if email:
                 email = email.lower()  # to lower letter
                 logger.debug(f"Authenticating user: {email}")
-                
-  
-  
-            
 
             # `username` to `email` change
-                user = authenticate(request, username=email, password=password)
+            user = authenticate(request, username=email, password=password)
 
             if user is not None:
                 login(request, user)
@@ -279,20 +255,13 @@ import numpy as np
 from ultralytics import YOLO
 
 # YOLOv8x
-model = YOLO("yolov8x.pt")
+yolo_model = YOLO("yolov8x.pt")
 
 def detect_objects(image_path, order):
-    global model
-    if model is None:
-          model = YOLO("yolov8n.pt")
     logger.info(f"Processing image for order {order.id}")
 
     image = cv2.imread(image_path)
-    results = model.predict(image_path)
-    for item in results:
-        model = YOLO("yolov8x.pt") 
-    return results
-    results = model(image_path)  #YOLO
+    results = yolo_model(image_path)  #YOLO
 
     detected_items = []
     for result in results:
@@ -307,27 +276,20 @@ def detect_objects(image_path, order):
             item_data = VOLUME_WEIGHT_ESTIMATES.get(item_name, {"volume": 0.5, "weight": 10.0})
             volume = item_data["volume"]
             weight = item_data["weight"]
+
             x1, y1, x2, y2 = map(int, box[:4].tolist())
-            detected_item = results.objects if hasattr(results, "objects") else []
-            if not detected_item:
-                print("No objects detected in the image.")
-                return []
-            
-        for item in detected_item:
-            print(f"Detected: {item}")
+
             # save in database
             detected_item = DetectedItem.objects.create(
                 order=order,
-                item_class=item,
-                 volume=VOLUME_WEIGHT_ESTIMATES.get(item, {"volume": 0.5})["volume"],
-                 weight=VOLUME_WEIGHT_ESTIMATES.get(item, {"weight": 10.0})["weight"],
+                item_class=item_name,
                 confidence=confidence,
                 bbox={'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2},
-                
+                volume=volume,
+                weight=weight
             )
 
             detected_items.append({"item": item_name, "volume": volume, "weight": weight})
-            detected_items_list.append(detected_item)
 
             # mark
             cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)

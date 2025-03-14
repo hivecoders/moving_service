@@ -3,10 +3,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from users import views
-urlpatterns = [
-    path('dashboard/customer/', views.customer_dashboard, name='customer_dashboard'),
-    path('dashboard/mover/', views.mover_dashboard, name='mover_dashboard'),
-]
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),  #login, logout
