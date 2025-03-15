@@ -16,7 +16,7 @@ from utils.volume_weight_estimates import VOLUME_WEIGHT_ESTIMATES
 from django.contrib.auth.decorators import login_required
 from .forms import (
     MoverRegistrationForm, CustomerRegistrationForm, CustomUserLoginForm, 
-    OrderForm, PhotoFormSet, MoverProfileForm, CustomerProfileForm, PhotoUploadForm
+    OrderForm, PhotoFormSet, MoverProfileForm, CustomerProfileForm, UserProfileForm , PhotoUploadForm
 )
 
 logger = logging.getLogger(__name__)
@@ -451,3 +451,48 @@ def edit_profile(request):
     return render(request, 'users/edit_profile.html', {'form': form})
 
 
+# Edit profile
+@login_required
+def edit_profile(request):
+    logger.info("Editing profile for user: %s", request.user)
+
+    user_form = UserProfileForm(request.POST or None, request.FILES or None, instance=request.user)
+
+    if hasattr(request.user, 'customer'):
+        user_type = 'customer'
+        profile_form = CustomerProfileForm(request.POST or None, request.FILES or None, instance=request.user.customer)
+        dashboard_redirect = 'customer_dashboard'
+
+    elif hasattr(request.user, 'mover'):
+        user_type = 'mover'
+        profile_form = MoverProfileForm(request.POST or None, request.FILES or None, instance=request.user.mover)
+        dashboard_redirect = 'mover_dashboard'
+
+    else:
+        messages.error(request, "Access denied.")
+        return redirect('home')
+
+    if request.method == 'POST':
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+
+            
+            new_password = user_form.cleaned_data.get('new_password')
+            confirm_password = user_form.cleaned_data.get('confirm_password')
+
+            if new_password and confirm_password and new_password == confirm_password:
+                request.user.set_password(new_password)
+                request.user.save()
+                messages.success(request, "Profile and password updated successfully! Please log in again.")
+                logout(request)
+                return redirect('login')
+
+            messages.success(request, "Profile updated successfully!")
+            return redirect(dashboard_redirect)
+
+    return render(request, 'users/edit_profile.html', {
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'user_type': user_type
+    })

@@ -131,3 +131,85 @@ class CustomerProfileForm(forms.ModelForm):
     class Meta:
         model = Customer
         fields = ['full_name', 'phone', 'profile_photo']
+
+ # Customer Profile Form (For Editing)
+class CustomerProfileForm(forms.ModelForm):
+    new_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter new password'}),
+        required=False
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm new password'}),
+        required=False
+    )
+
+    class Meta:
+        model = Customer
+        fields = ['phone', 'profile_photo']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password = cleaned_data.get("new_password")
+        confirm_password = cleaned_data.get("confirm_password")
+
+        if new_password or confirm_password:
+            if new_password != confirm_password:
+                raise forms.ValidationError("Passwords do not match. Please try again.")
+
+        return cleaned_data
+
+ # Mover Profile Form (For Editing)
+class MoverProfileForm(forms.ModelForm):
+    new_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter new password'}),
+        required=False
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm new password'}),
+        required=False
+    )
+
+    class Meta:
+        model = Mover
+        fields = [
+            'phone', 'identification_id', 'has_vehicle',
+            'vehicle_type', 'mover_type', 'payment_info', 'driving_license',
+            'carrying_capacity', 'has_mover_certification', 'mover_certification_document'
+        ]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password = cleaned_data.get("new_password")
+        confirm_password = cleaned_data.get("confirm_password")
+
+        if new_password or confirm_password:
+            if new_password != confirm_password:
+                raise forms.ValidationError("Passwords do not match. Please try again.")
+
+        return cleaned_data
+      # edit form
+class UserProfileForm(forms.ModelForm):
+    profile_photo = forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
+    new_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter new password'}),
+        required=False
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm new password'}),
+        required=False
+    )
+
+    class Meta:
+        model = CustomUser
+        fields = ['profile_photo']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password = cleaned_data.get("new_password")
+        confirm_password = cleaned_data.get("confirm_password")
+
+        if new_password or confirm_password:
+            if new_password != confirm_password:
+                raise forms.ValidationError("Passwords do not match. Please try again.")
+
+        return cleaned_data

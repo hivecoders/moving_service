@@ -23,7 +23,7 @@ urlpatterns = [
     path('order_details/<int:order_id>/', views.order_details, name='order_details'),
     path('nearest_movers/<int:order_id>/', views.nearest_movers, name='nearest_movers'),
 
-    # Profile Management
+    #  edit profile
     path('edit_profile/', views.edit_profile, name='edit_profile'),
 
     # Payment Processing
