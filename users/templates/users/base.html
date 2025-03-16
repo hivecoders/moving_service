@@ -86,9 +86,12 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
+            
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
+
                     {% if user.is_authenticated %}
+                        
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'customer_dashboard' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
                         </li>
@@ -102,7 +105,14 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register_customer' %}"><i class="fas fa-user-plus"></i> Register as Customer</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register_mover' %}"><i class="fas fa-truck"></i> Register as Mover</a>
+                        </li>
                     {% endif %}
+                    
                 </ul>
             </div>
         </div>

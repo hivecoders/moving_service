@@ -105,8 +105,8 @@ class Order(models.Model):
     total_weight = models.FloatField(default=0)
     items_detected = models.ManyToManyField("DetectedItem", blank=True, related_name="orders")
     status = models.CharField(max_length=20, default="Pending")
-    created_at = models.DateTimeField(auto_now_add=True)  
-
+    created_at = models.DateTimeField(default=now)
+    
     def __str__(self):
         return f"Order #{self.id} by {self.customer.user.email}"
 

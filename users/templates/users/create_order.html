@@ -116,6 +116,7 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+
     function setupMap(mapId, inputId) {
         var mapElement = document.getElementById(mapId);
         if (!mapElement) {
@@ -123,15 +124,20 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
-        var defaultLocation = [45.5017, -73.5673]; // Montreal, Canada
+        // مقدار پیش‌فرض: مونترال، کانادا
+        var defaultLocation = [45.5017, -73.5673]; 
+
+        // مقداردهی نقشه با مقدار پیش‌فرض مونترال
         var map = L.map(mapId).setView(defaultLocation, 12);
 
+        // اضافه کردن کاشی‌های نقشه
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
         var marker;
-ٍ
+
+        // اضافه کردن Geocoder برای جستجوی آدرس
         var geocoder = L.Control.geocoder({
             defaultMarkGeocode: false
         }).on("markgeocode", function(e) {
@@ -141,6 +147,7 @@ document.addEventListener("DOMContentLoaded", function() {
             document.getElementById(inputId).value = `${latlng.lat}, ${latlng.lng}`;
         }).addTo(map);
 
+        // رویداد کلیک روی نقشه برای انتخاب مکان
         map.on("click", function(e) {
             if (marker) map.removeLayer(marker);
             marker = L.marker(e.latlng).addTo(map);
@@ -148,9 +155,11 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    // مقداردهی اولیه نقشه برای مبدا و مقصد
     setupMap("origin_map_canvas", "id_origin_location");
     setupMap("destination_map_canvas", "id_destination_location");
 
+    // مقداردهی فیلدهای تاریخ و زمان با استفاده از Flatpickr
     flatpickr("#id_move_date", {
         dateFormat: "Y-m-d",
         minDate: "today"
