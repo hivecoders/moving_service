@@ -66,6 +66,10 @@
             border-color: #007bff;
             box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
         }
+        #map {
+            height: 400px;
+            border-radius: 10px;
+        }
     </style>
 
     {% block extra_head %}{% endblock %}
@@ -98,12 +102,6 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'register_customer' %}"><i class="fas fa-user-plus"></i> Register as Customer</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'register_mover' %}"><i class="fas fa-truck"></i> Register as Mover</a>
-                        </li>
                     {% endif %}
                 </ul>
             </div>
@@ -116,11 +114,8 @@
     </div>
 
     <!-- Footer -->
-    <footer>
-        <footer class="bg-dark text-white text-center py-3 mt-auto"> 
-            <p>&copy; 2025 Moving Companion | Designed with <i class="fas fa-heart text-danger"></i> group 3 </p>
-            <p><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
-            
+    <footer class="bg-dark text-white text-center py-3 mt-auto">
+        <p>&copy; 2025 Moving Companion | Designed with <i class="fas fa-heart text-danger"></i> by Group 3</p>
     </footer>
 
     <!-- Scripts -->
@@ -132,6 +127,45 @@
 
     <!-- Flatpickr JS for Datepicker & Timepicker -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('.datepicker').flatpickr({
+                dateFormat: "Y-m-d"
+            });
+
+            $('.timepicker').flatpickr({
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: "H:i",
+                time_24hr: true
+            });
+
+          
+            $('.form-select').each(function() {
+                $(this).val($(this).find("option[selected]").val());
+            });
+        });
+
+        function initMap() {
+            default_location = {"lat": 45.5017, "lng": -73.5673}  # Montreal, Canada
+            context["default_location"] = default_location
+            
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            var marker = L.marker([defaultLocation.lat, defaultLocation.lng], { draggable: true }).addTo(map);
+
+            marker.on('dragend', function(event) {
+                var position = marker.getLatLng();
+                document.getElementById("latitude").value = position.lat;
+                document.getElementById("longitude").value = position.lng;
+            });
+        }
+        window.onload = initMap;
+    </script>
 
     {% block extra_scripts %}{% endblock %}
 </body>

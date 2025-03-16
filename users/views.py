@@ -19,30 +19,27 @@ from .forms import (
     OrderForm, PhotoFormSet, MoverProfileForm, CustomerProfileForm, UserProfileForm , PhotoUploadForm
 )
 
+
 logger = logging.getLogger(__name__)
 
 # Load YOLO model
 yolo_model = YOLO("yolov8x.pt")
 
-# Stripe Configuration
-stripe.api_key = settings.STRIPE_SECRET_KEY
-
 # Home Page View
 def home(request):
     logger.info("Rendering home page")
     return render(request, 'users/home.html')
+
 # Order Creation
 @login_required
 def create_order(request):
     logger.info("Creating a new order (step 1)")
     if request.method == 'POST':
         order_form = OrderForm(request.POST)
-
         if order_form.is_valid():
             order = order_form.save(commit=False)
             order.customer = request.user.customer
             order.status = "Pending"
-
             order.has_elevator = request.POST.get('has_elevator') == 'on'
             order.need_pro_mover = request.POST.get('need_pro_mover') == 'on'
             order.need_box_packer = request.POST.get('need_box_packer') == 'on'
@@ -53,25 +50,26 @@ def create_order(request):
             logger.info(f"Order {order.id} created (step 1)")
             return redirect('create_order_step2')
         else:
-            logger.error(f"Order creation failed: {order_form.errors}")
             messages.error(request, "Please correct the errors below.")
     else:
         order_form = OrderForm()
 
     return render(request, 'users/create_order.html', {'order_form': order_form})
 
-## **create_order_step2**
+# Create Order Step 2
 @login_required
 def create_order_step2(request):
     order_id = request.session.get('order_id')
-
     if not order_id:
         messages.error(request, "No order found. Please create an order first.")
         return redirect('create_order')
 
     order = get_object_or_404(Order, id=order_id)
-    detected_items = request.session.get('detected_items', [])
+
+    item_list = {item: {"volume": data["volume"], "weight": data["weight"]} for item, data in VOLUME_WEIGHT_ESTIMATES.items()}
     
+    vehicle_choices = Mover.objects.values_list('vehicle_type', flat=True).distinct()
+
     if request.method == 'POST':
         selected_items = request.POST.getlist('selected_items')
         manual_items = request.POST.getlist('manual_items')
@@ -82,24 +80,20 @@ def create_order_step2(request):
 
         for image in images:
             photo = Photo.objects.create(order=order, image=image)
+            detected_objects, processed_image_path = detect_objects(photo.image.path, order)
 
-            
-            detected_objects = detect_objects(photo.image.path, order)
-
-            
             for obj in detected_objects:
-                detected_item = DetectedItem.objects.create(
+                DetectedItem.objects.create(
                     order=order,
                     item_class=obj["item"],
                     volume=obj["volume"],
                     weight=obj["weight"],
-                    confidence=obj.get("confidence", 1.0),
-                    bbox=obj["bbox"]
+                    confidence=obj["confidence"],
+                    bbox=obj.get("bbox", {})
                 )
                 total_volume += obj["volume"]
                 total_weight += obj["weight"]
 
-        
         for item in selected_items:
             if item in VOLUME_WEIGHT_ESTIMATES:
                 item_data = VOLUME_WEIGHT_ESTIMATES[item]
@@ -113,7 +107,6 @@ def create_order_step2(request):
                 total_volume += item_data["volume"]
                 total_weight += item_data["weight"]
 
-        
         for item in manual_items:
             DetectedItem.objects.create(
                 order=order,
@@ -129,20 +122,85 @@ def create_order_step2(request):
         order.save()
 
         messages.success(request, "Order items added successfully!")
-        logger.info(f"Order {order.id} updated (step 2)")
         return redirect('customer_dashboard')
 
-    
-    item_list = list(VOLUME_WEIGHT_ESTIMATES.keys())
     detected_items = DetectedItem.objects.filter(order=order)
     photos = Photo.objects.filter(order=order)
 
     return render(request, 'users/create_order_step2.html', {
         'detected_items': detected_items,
         'item_list': item_list,
-        'photos': photos
+        'photos': photos,
+        'vehicle_choices': vehicle_choices
     })
 
+
+
+def detect_objects(image_path, order):
+    """ پردازش تصویر برای شناسایی اشیاء با استفاده از YOLO """
+    logger.info(f"🔍 پردازش تصویر برای سفارش {order.id}")
+
+    
+    image = cv2.imread(image_path)
+    if image is None:
+        logger.error(f"❌ تصویر پیدا نشد: {image_path}")
+        return [], image_path
+
+    # اجرای YOLO
+    results = yolo_model(image_path)
+
+    detected_items = []
+    for result in results:
+        for box in result.boxes.data:
+            if len(box) < 6:
+                logger.warning("⚠️ باکس شناسایی نامعتبر، رد شد.")
+                continue  
+
+            try:
+               
+                x1, y1, x2, y2, confidence, class_id = box[:6]
+                class_id = int(class_id.item())
+                item_name = result.names[class_id]
+                confidence = float(confidence.item())
+
+                item_data = VOLUME_WEIGHT_ESTIMATES.get(item_name, {"volume": 0.5, "weight": 10.0})
+                volume = item_data["volume"]
+                weight = item_data["weight"]
+
+                DetectedItem.objects.create(
+                    order=order,
+                    item_class=item_name,
+                    confidence=confidence,
+                    bbox={'x1': int(x1), 'y1': int(y1), 'x2': int(x2), 'y2': int(y2)},
+                    volume=volume,
+                    weight=weight
+                )
+
+                detected_items.append({
+                    "item": item_name, 
+                    "confidence": confidence,
+                    "volume": volume, 
+                    "weight": weight
+                })
+
+                cv2.rectangle(image, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
+                cv2.putText(image, f"{item_name} ({confidence:.2f})", 
+                            (int(x1), int(y1) - 10), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, 
+                            (0, 255, 0), 2)
+
+            except Exception as e:
+                logger.error(f"❌ خطا در پردازش شیء: {e}")
+
+    processed_image_path = image_path.replace(".jpg", "_processed.jpg")
+    cv2.imwrite(processed_image_path, image)
+
+    logger.info(f"✅ پردازش انجام شد. تصویر ذخیره شد: {processed_image_path}")
+    return detected_items, processed_image_path
+
+
+# Stripe Configuration
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 # User Authentication & Signup
 def login_view(request):
@@ -249,61 +307,6 @@ def logout_view(request):
 
 
 
-# Object Detection
-import cv2
-import numpy as np
-from ultralytics import YOLO
-
-# YOLOv8x
-yolo_model = YOLO("yolov8x.pt")
-
-def detect_objects(image_path, order):
-    logger.info(f"Processing image for order {order.id}")
-
-    image = cv2.imread(image_path)
-    results = yolo_model(image_path)  #YOLO
-
-    detected_items = []
-    for result in results:
-        for box in result.boxes.data:
-            if len(box) < 5:
-                continue  
-
-            class_id = int(box[5].item())  
-            item_name = result.names[class_id]
-            confidence = float(box[4].item())  # YOLO
-
-            item_data = VOLUME_WEIGHT_ESTIMATES.get(item_name, {"volume": 0.5, "weight": 10.0})
-            volume = item_data["volume"]
-            weight = item_data["weight"]
-
-            x1, y1, x2, y2 = map(int, box[:4].tolist())
-
-            # save in database
-            detected_item = DetectedItem.objects.create(
-                order=order,
-                item_class=item_name,
-                confidence=confidence,
-                bbox={'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2},
-                volume=volume,
-                weight=weight
-            )
-
-            detected_items.append({"item": item_name, "volume": volume, "weight": weight})
-
-            # mark
-            cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
-            cv2.putText(image, f"{item_name} ({confidence:.2f})", (x1, y1 - 10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-
-    # save
-    processed_image_path = image_path.replace(".jpg", "_processed.jpg")
-    cv2.imwrite(processed_image_path, image)
-
-    return detected_items, processed_image_path
-
-
-
 
 # Customer Dashboard
 @login_required
@@ -349,9 +352,23 @@ def reject_order(request, order_id):
 # Order Details View
 @login_required
 def order_details(request, order_id):
-    logger.info("Fetching order details for order: %s", order_id)
     order = get_object_or_404(Order, id=order_id)
-    return render(request, 'users/order_details.html', {'order': order})
+    
+    photos = Photo.objects.filter(order=order)
+    
+    detected_items = DetectedItem.objects.filter(order=order)
+
+    return render(request, 'users/order_details.html', {
+        'order': order,
+        'photos': photos,
+        'detected_items': detected_items,
+        'origin_lat': order.origin_lat,
+        'origin_lng': order.origin_lng,
+        'destination_lat': order.destination_lat,
+        'destination_lng': order.destination_lng
+    })
+
+
 
 # Movers & Proximity Logic
 def nearest_movers(request, order_id):

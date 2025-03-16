@@ -158,61 +158,43 @@
     </div>
 </div>
 {% endblock %}
-
 {% block extra_scripts %}
-<!-- Leaflet and Geocoder Scripts -->
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
 <script>
-    function initMap() {
-        var map = L.map('location_map_canvas').setView([51.505, -0.09], 13);
+document.addEventListener('DOMContentLoaded', function() {
+    var defaultLocation = [45.5017, -73.5673]; // Montreal, Canada
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-
-        var marker;
-
-        function onLocationSelected(latlng) {
-            if (marker) {
-                map.removeLayer(marker);
-            }
-            marker = L.marker(latlng).addTo(map);
-            document.getElementById('location_map').value = `${latlng.lat}, ${latlng.lng}`;
-        }
-
-        map.on('click', function(e) {
-            onLocationSelected(e.latlng);
-        });
+    var mapElement = document.getElementById("location_map_canvas");
+    if (!mapElement) {
+        console.error("Map container not found: location_map_canvas");
+        return;
     }
 
-    document.addEventListener('DOMContentLoaded', initMap);
+    var map = L.map("location_map_canvas").setView(defaultLocation, 12);
 
-    // Toggle vehicle fields based on selection
-    document.addEventListener('DOMContentLoaded', function() {
-        var hasVehicleField = document.getElementById('id_has_vehicle');
-        var vehicleFields = document.getElementById('vehicleFields');
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
 
-        function toggleVehicleFields() {
-            vehicleFields.style.display = hasVehicleField.value === 'Yes' ? 'block' : 'none';
-        }
+    var marker;
 
-        hasVehicleField.addEventListener('change', toggleVehicleFields);
-        toggleVehicleFields(); 
+    function onLocationSelected(latlng) {
+        if (marker) map.removeLayer(marker);
+        marker = L.marker(latlng).addTo(map);
+        document.getElementById("location_map").value = `${latlng.lat}, ${latlng.lng}`;
+    }
+
+    map.on("click", function(e) {
+        onLocationSelected(e.latlng);
     });
 
-    // Toggle Pro Mover certification field
-    document.addEventListener('DOMContentLoaded', function () {
-        var moverTypeField = document.getElementById('id_mover_type');
-        var certificationField = document.getElementById('certificationField');
-
-        function toggleCertificationField() {
-            certificationField.style.display = moverTypeField.value === 'Pro Mover' ? 'block' : 'none';
-        }
-
-        moverTypeField.addEventListener('change', toggleCertificationField);
-        toggleCertificationField();
-    });
+    L.Control.geocoder({
+        defaultMarkGeocode: false
+    }).on("markgeocode", function(e) {
+        onLocationSelected(e.geocode.center);
+    }).addTo(map);
+});
 </script>
 {% endblock %}

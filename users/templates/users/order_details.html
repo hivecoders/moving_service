@@ -1,0 +1,138 @@
+{% extends "users/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">📦 Order Details</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="text-muted">Order ID:</h5>
+                    <p class="fw-bold">{{ order.id }}</p>
+                    
+                    <h5 class="text-muted">Customer:</h5>
+                    <p class="fw-bold">{{ order.customer.user.full_name }}</p>
+
+                    <h5 class="text-muted">Move Date:</h5>
+                    <p class="fw-bold">{{ order.move_date }}</p>
+
+                    <h5 class="text-muted">Move Time:</h5>
+                    <p class="fw-bold">{{ order.move_time|default:"Not Specified" }}</p>
+                </div>
+                <div class="col-md-6">
+                    <h5 class="text-muted">Origin:</h5>
+                    <p class="fw-bold"><i class="fas fa-map-marker-alt text-danger"></i> {{ order.origin }}</p>
+
+                    <h5 class="text-muted">Destination:</h5>
+                    <p class="fw-bold"><i class="fas fa-map-marker-alt text-success"></i> {{ order.destination }}</p>
+
+                    <h5 class="text-muted">Vehicle Type:</h5>
+                    <p class="fw-bold">{{ order.vehicle_type|default:"Not Specified" }}</p>
+
+                    <h5 class="text-muted">Status:</h5>
+                    <span class="badge 
+                        {% if order.status == 'Pending' %}bg-warning
+                        {% elif order.status == 'Accepted' %}bg-success
+                        {% elif order.status == 'Rejected' %}bg-danger
+                        {% else %}bg-secondary{% endif %}">{{ order.status }}
+                    </span>
+
+                    <h5 class="text-muted mt-3">Created At:</h5>
+                    <p class="fw-bold">{{ order.created_at }}</p>
+                </div>
+            </div>
+
+            <hr>
+
+            <!--  Display Google Map -->
+            <h4 class="mt-4">📍 Route Map</h4>
+            <div id="map" style="width: 100%; height: 400px;"></div>
+
+            <hr>
+
+            <!--  Display Uploaded Photos -->
+            <h4 class="mt-4">📸 Uploaded Photos</h4>
+            <div class="row">
+                {% for photo in photos %}
+                    <div class="col-md-4 mb-3">
+                        <img src="{{ photo.image.url }}" class="img-fluid rounded shadow" alt="Uploaded Photo">
+                    </div>
+                {% empty %}
+                    <p class="text-muted">No photos uploaded.</p>
+                {% endfor %}
+            </div>
+
+            <hr>
+
+            <!--  Display Detected Items -->
+            <h4 class="mt-4">🔍 Detected Items</h4>
+            {% if detected_items %}
+                <table class="table table-bordered">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Item</th>
+                            <th>Confidence</th>
+                            <th>Volume</th>
+                            <th>Weight</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in detected_items %}
+                        <tr>
+                            <td>{{ item.item_class }}</td>
+                            <td>{{ item.confidence|floatformat:2 }}%</td>
+                            <td>{{ item.volume }} m³</td>
+                            <td>{{ item.weight }} kg</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="text-muted">No detected items available.</p>
+            {% endif %}
+            <h4 class="mt-4">📦 Total Volume & Weight</h4>
+            <p class="fw-bold">Total Volume: {{ order.total_volume }} m³</p>
+            <p class="fw-bold">Total Weight: {{ order.total_weight }} kg</p>
+            
+        </div>
+        <div class="card-footer text-end">
+            <a href="{% url 'customer_dashboard' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<!--  Google Maps API -->
+<script>
+    function initMap() {
+        var defaultLocation = { lat: 49.2827, lng: -123.1207 };
+        var origin = { lat: {{ order.origin_lat }}, lng: {{ order.origin_lng }} };
+        var destination = { lat: {{ order.destination_lat }}, lng: {{ order.destination_lng }} };
+
+        var map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 10,
+            center: origin
+        });
+
+        var directionsService = new google.maps.DirectionsService();
+        var directionsRenderer = new google.maps.DirectionsRenderer();
+        directionsRenderer.setMap(map);
+
+        var request = {
+            origin: origin,
+            destination: destination,
+            travelMode: 'DRIVING'
+        };
+
+        directionsService.route(request, function(result, status) {
+            if (status == 'OK') {
+                directionsRenderer.setDirections(result);
+            }
+        });
+    }
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap"></script>
+{% endblock %}

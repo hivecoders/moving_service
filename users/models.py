@@ -1,13 +1,13 @@
 import logging
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.utils.timezone import now
 
 logger = logging.getLogger(__name__)
 
 # Custom User Manager
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
-        """Creates and returns a user with an email and password."""
         if not email:
             raise ValueError("The Email field must be set")
         email = self.normalize_email(email).lower()
@@ -16,14 +16,11 @@ class CustomUserManager(BaseUserManager):
         if password:
             user.set_password(password)
         user.save(using=self._db)
-        logger.info(f"User {email} created successfully")
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
-        """Creates and returns a superuser with admin privileges."""
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
-        logger.info(f"Creating superuser with email: {email}")
         return self.create_user(email, password, **extra_fields)
 
 # Custom User Model
@@ -49,11 +46,6 @@ class Customer(models.Model):
     full_name = models.CharField(max_length=100)
     phone = models.CharField(max_length=15, default="0000000000")
     profile_photo = models.ImageField(upload_to="profile_photos/", null=True, blank=True)
-
-    def save(self, *args, **kwargs):
-        logger.info(f"Saving customer: {self.user.email}")
-        super().save(*args, **kwargs)
-        logger.info(f"Customer {self.user.email} saved successfully")
 
     def __str__(self):
         return f"Customer: {self.user.full_name} - {self.user.email}"
@@ -88,17 +80,12 @@ class Mover(models.Model):
     has_mover_certification = models.BooleanField(default=False)
     mover_certification_document = models.ImageField(upload_to="certifications/", null=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        logger.info(f"Saving mover: {self.user.email}")
-        super().save(*args, **kwargs)
-        logger.info(f"Mover {self.user.email} saved successfully")
-
     def __str__(self):
         return f"Mover: {self.user.full_name} - {self.user.email}"
 
 # Order Model
 class Order(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="customer_orders")
     origin = models.CharField(max_length=100)
     destination = models.CharField(max_length=100)
     origin_floor = models.IntegerField(null=True, blank=True)
@@ -106,19 +93,19 @@ class Order(models.Model):
     has_elevator = models.BooleanField(default=False)
     need_pro_mover = models.BooleanField(default=False)
     need_box_packer = models.BooleanField(default=False)
-    move_date = models.DateTimeField()
-    move_time = models.TimeField(null=True, blank=True) 
+    move_date = models.DateField()
+    move_time = models.TimeField(null=True, blank=True)
     origin_location = models.CharField(max_length=100)
     destination_location = models.CharField(max_length=100)
+    origin_lat = models.FloatField(null=True, blank=True) 
+    origin_lng = models.FloatField(null=True, blank=True)  
+    destination_lat = models.FloatField(null=True, blank=True) 
+    destination_lng = models.FloatField(null=True, blank=True)
     total_volume = models.FloatField(default=0)
     total_weight = models.FloatField(default=0)
     items_detected = models.ManyToManyField("DetectedItem", blank=True, related_name="orders")
     status = models.CharField(max_length=20, default="Pending")
-
-    def save(self, *args, **kwargs):
-        logger.info(f"Saving order #{self.id} by {self.customer.user.email}")
-        super().save(*args, **kwargs)
-        logger.info(f"Order #{self.id} saved successfully")
+    created_at = models.DateTimeField(auto_now_add=True)  
 
     def __str__(self):
         return f"Order #{self.id} by {self.customer.user.email}"
@@ -137,7 +124,7 @@ class DetectedItem(models.Model):
 
 # Photos Model
 class Photo(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="photos")
     image = models.ImageField(upload_to="photos/")
 
     def __str__(self):
