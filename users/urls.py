@@ -18,6 +18,7 @@ urlpatterns = [
     path('dashboard/mover/', views.mover_dashboard, name='mover_dashboard'),
 
     # Order Related URLs
+    path('remove_detected_item/<int:item_id>/', views.remove_detected_item, name='remove_detected_item'),
     path('create_order/', views.create_order, name='create_order'),
     path('create_order_step2/', views.create_order_step2, name='create_order_step2'), 
     path('order_details/<int:order_id>/', views.order_details, name='order_details'),

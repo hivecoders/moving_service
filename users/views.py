@@ -10,6 +10,8 @@ from geopy.distance import geodesic
 import cv2
 import json
 import numpy as np
+import django
+from django.core.files import File
 from ultralytics import YOLO
 import stripe
 from .models import Customer, Mover, Order, DetectedItem, Photo, CustomUser
@@ -70,39 +72,34 @@ def create_order_step2(request):
     item_list = {item: data for item, data in VOLUME_WEIGHT_ESTIMATES.items()}
     vehicle_choices = [(v, v) for v in Mover.objects.values_list('vehicle_type', flat=True).distinct()]
 
-    photos = Photo.objects.filter(order=order)
-    detected_items = DetectedItem.objects.filter(order=order)
+    if request.method == 'POST' and 'image' in request.FILES:
+        image = request.FILES['image']
+        photo = Photo(order=order, image=image)
+        photo.save()
 
-    if request.method == 'POST':
-        if 'image' in request.FILES:
-            image = request.FILES['image']
-            photo = Photo.objects.create(order=order, image=image)
+        detected_objects, processed_image_path = detect_objects(photo.image.path, order)
 
-            detected_objects, processed_image_path = detect_objects(photo.image.path, order)
-
-            photo.processed_image = f"photos/processed/{os.path.basename(processed_image_path)}"
+        # Save processed image to the model
+        with open(processed_image_path, 'rb') as img_file:
+            django_file = File(img_file := open(processed_image_path, 'rb'))
+            photo.processed_image.save(os.path.basename(processed_image_path), django.core.files.File(open(processed_image_path, 'rb')))
             photo.save()
 
-            for obj in detected_objects:
-              DetectedItem.objects.create(
-                 order=order,
-                 item_class=obj["item_class"],
-                 confidence=obj["confidence"],
-                 volume=obj["volume"],
-                 weight=obj["weight"],
-                 bbox=json.dumps(obj["bbox"])
-)
+        # ذخیره آیتم‌های شناسایی‌شده
+        for obj in detected_objects:
+            DetectedItem.objects.create(
+                order=order,
+                item_class=obj["item_class"],
+                confidence=obj["confidence"],
+                volume=obj["volume"],
+                weight=obj["weight"],
+                bbox=json.dumps(obj["bbox"])
+            )
 
-            messages.success(request, "Image processed successfully!")
+        messages.success(request, "Image processed successfully!")
 
-            return redirect('create_order_step2')
-
-        vehicle_type = request.POST.get('vehicle_type')
-        if vehicle_type:
-            order.vehicle_type = vehicle_type
-            order.save()
-            messages.success(request, "Vehicle type selected, continue to next step.")
-            return redirect('customer_dashboard')
+    photos = Photo.objects.filter(order=order)
+    detected_items = DetectedItem.objects.filter(order=order)
 
     context = {
         'photos': photos,
@@ -112,7 +109,6 @@ def create_order_step2(request):
     }
 
     return render(request, 'users/create_order_step2.html', context)
-
 
 # detect_objects
 def detect_objects(image_path, order):
@@ -474,3 +470,10 @@ def edit_profile(request):
         'profile_form': profile_form,
         'user_type': user_type
     })
+@login_required
+def remove_detected_item(request, item_id):
+    if request.method == 'POST':
+        item = get_object_or_404(DetectedItem, id=item_id, order__customer=request.user.customer)
+        item.delete()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
