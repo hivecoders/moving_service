@@ -1,7 +1,7 @@
 import logging
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-
+from django.utils.timezone import now
 logger = logging.getLogger(__name__)
 
 # Custom User Manager
@@ -98,7 +98,7 @@ class Mover(models.Model):
 
 # Order Model
 class Order(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="customer_orders")
     origin = models.CharField(max_length=100)
     destination = models.CharField(max_length=100)
     origin_floor = models.IntegerField(null=True, blank=True)
@@ -106,10 +106,14 @@ class Order(models.Model):
     has_elevator = models.BooleanField(default=False)
     need_pro_mover = models.BooleanField(default=False)
     need_box_packer = models.BooleanField(default=False)
-    move_date = models.DateTimeField()
+    move_date = models.DateField()
     move_time = models.TimeField(null=True, blank=True) 
     origin_location = models.CharField(max_length=100)
     destination_location = models.CharField(max_length=100)
+    origin_lat = models.FloatField(null=True, blank=True) 
+    origin_lng = models.FloatField(null=True, blank=True)  
+    destination_lat = models.FloatField(null=True, blank=True) 
+    destination_lng = models.FloatField(null=True, blank=True)
     total_volume = models.FloatField(default=0)
     total_weight = models.FloatField(default=0)
     items_detected = models.ManyToManyField("DetectedItem", blank=True, related_name="orders")
@@ -119,7 +123,8 @@ class Order(models.Model):
         logger.info(f"Saving order #{self.id} by {self.customer.user.email}")
         super().save(*args, **kwargs)
         logger.info(f"Order #{self.id} saved successfully")
-
+    created_at = models.DateTimeField(default=now)
+ 
     def __str__(self):
         return f"Order #{self.id} by {self.customer.user.email}"
 
@@ -137,7 +142,7 @@ class DetectedItem(models.Model):
 
 # Photos Model
 class Photo(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="photos")
     image = models.ImageField(upload_to="photos/")
 
     def __str__(self):

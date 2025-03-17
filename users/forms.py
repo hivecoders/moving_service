@@ -60,12 +60,12 @@ class MoverRegistrationForm(UserCreationForm):
 
 # Custom User Login Form
 class CustomUserLoginForm(AuthenticationForm):
-    username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your email', 'required': 'required'}))
+    email  = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your email', 'required': 'required'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter your password', 'required': 'required'}))
 
     def clean(self):
         cleaned_data = super().clean()
-        email = cleaned_data.get("username")
+        email = cleaned_data.get("email")
         password = cleaned_data.get("password")
         if email and password:
             self.user_cache = authenticate(email=email, password=password)
