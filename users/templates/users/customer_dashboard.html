@@ -64,7 +64,7 @@
 
                                     <!-- Photo Gallery -->
                                     <div class="photo-gallery d-flex flex-wrap gap-2 mt-3">
-                                        {% if order.photo_set.all %}
+                                        {% if order.photos.all %}
                                             {% for photo in order.photo_set.all %}
                                                 <img src="{{ photo.image.url }}" class="img-thumbnail" style="max-height: 120px; width: auto;" alt="Order Photo">
                                             {% endfor %}

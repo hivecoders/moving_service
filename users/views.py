@@ -8,6 +8,7 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from geopy.distance import geodesic
 import cv2
+import json
 import numpy as np
 from ultralytics import YOLO
 import stripe
@@ -61,141 +62,101 @@ def create_order(request):
 def create_order_step2(request):
     order_id = request.session.get('order_id')
     if not order_id:
-        messages.error(request, "No order found. Please create an order first.")
+        messages.error(request, "No order found.")
         return redirect('create_order')
 
     order = get_object_or_404(Order, id=order_id)
 
-    item_list = {item: {"volume": data["volume"], "weight": data["weight"]} for item, data in VOLUME_WEIGHT_ESTIMATES.items()}
-    
-    vehicle_choices = Mover.objects.values_list('vehicle_type', flat=True).distinct()
+    item_list = {item: data for item, data in VOLUME_WEIGHT_ESTIMATES.items()}
+    vehicle_choices = [(v, v) for v in Mover.objects.values_list('vehicle_type', flat=True).distinct()]
+
+    photos = Photo.objects.filter(order=order)
+    detected_items = DetectedItem.objects.filter(order=order)
 
     if request.method == 'POST':
-        selected_items = request.POST.getlist('selected_items')
-        manual_items = request.POST.getlist('manual_items')
-        vehicle_type = request.POST.get('vehicle_type')
-        images = request.FILES.getlist('images')
-
-        total_volume, total_weight = 0.0, 0.0
-
-        for image in images:
+        if 'image' in request.FILES:
+            image = request.FILES['image']
             photo = Photo.objects.create(order=order, image=image)
+
             detected_objects, processed_image_path = detect_objects(photo.image.path, order)
 
+            photo.processed_image = f"photos/processed/{os.path.basename(processed_image_path)}"
+            photo.save()
+
             for obj in detected_objects:
-                DetectedItem.objects.create(
-                    order=order,
-                    item_class=obj["item"],
-                    volume=obj["volume"],
-                    weight=obj["weight"],
-                    confidence=obj["confidence"],
-                    bbox=obj.get("bbox", {})
-                )
-                total_volume += obj["volume"]
-                total_weight += obj["weight"]
+              DetectedItem.objects.create(
+                 order=order,
+                 item_class=obj["item_class"],
+                 confidence=obj["confidence"],
+                 volume=obj["volume"],
+                 weight=obj["weight"],
+                 bbox=json.dumps(obj["bbox"])
+)
 
-        for item in selected_items:
-            if item in VOLUME_WEIGHT_ESTIMATES:
-                item_data = VOLUME_WEIGHT_ESTIMATES[item]
-                DetectedItem.objects.create(
-                    order=order,
-                    item_class=item,
-                    volume=item_data["volume"],
-                    weight=item_data["weight"],
-                    confidence=1.0
-                )
-                total_volume += item_data["volume"]
-                total_weight += item_data["weight"]
+            messages.success(request, "Image processed successfully!")
 
-        for item in manual_items:
-            DetectedItem.objects.create(
-                order=order,
-                item_class=item,
-                volume=0,
-                weight=0,
-                confidence=1.0
-            )
+            return redirect('create_order_step2')
 
-        order.total_volume = total_volume
-        order.total_weight = total_weight
-        order.vehicle_type = vehicle_type
-        order.save()
+        vehicle_type = request.POST.get('vehicle_type')
+        if vehicle_type:
+            order.vehicle_type = vehicle_type
+            order.save()
+            messages.success(request, "Vehicle type selected, continue to next step.")
+            return redirect('customer_dashboard')
 
-        messages.success(request, "Order items added successfully!")
-        return redirect('customer_dashboard')
-
-    detected_items = DetectedItem.objects.filter(order=order)
-    photos = Photo.objects.filter(order=order)
-
-    return render(request, 'users/create_order_step2.html', {
+    context = {
+        'photos': photos,
         'detected_items': detected_items,
         'item_list': item_list,
-        'photos': photos,
         'vehicle_choices': vehicle_choices
-    })
+    }
+
+    return render(request, 'users/create_order_step2.html', context)
 
 
-
+# detect_objects
 def detect_objects(image_path, order):
-    """ پردازش تصویر برای شناسایی اشیاء با استفاده از YOLO """
-    logger.info(f"🔍 پردازش تصویر برای سفارش {order.id}")
+    logger.info(f"Processing image for order {order.id}")
 
-    
     image = cv2.imread(image_path)
     if image is None:
-        logger.error(f"❌ تصویر پیدا نشد: {image_path}")
+        logger.error(f"Image not found: {image_path}")
         return [], image_path
 
-    # اجرای YOLO
-    results = yolo_model(image_path)
+    results = yolo_model.predict(image_path, conf=0.4)
 
     detected_items = []
     for result in results:
-        for box in result.boxes.data:
-            if len(box) < 6:
-                logger.warning("⚠️ باکس شناسایی نامعتبر، رد شد.")
-                continue  
+        boxes = result.boxes.xyxy.cpu().numpy()
+        confidences = result.boxes.conf.cpu().numpy()
+        classes = result.boxes.cls.cpu().numpy()
 
-            try:
-               
-                x1, y1, x2, y2, confidence, class_id = box[:6]
-                class_id = int(class_id.item())
-                item_name = result.names[class_id]
-                confidence = float(confidence.item())
+        for box, confidence, class_id in zip(boxes, confidences, classes):
+            x1, y1, x2, y2 = map(int, box)
+            item_name = yolo_model.names[int(class_id)]
 
-                item_data = VOLUME_WEIGHT_ESTIMATES.get(item_name, {"volume": 0.5, "weight": 10.0})
-                volume = item_data["volume"]
-                weight = item_data["weight"]
+            item_data = VOLUME_WEIGHT_ESTIMATES.get(item_name, {"volume": 0.5, "weight": 10.0})
+            volume = item_data["volume"]
+            weight = item_data["weight"]
 
-                DetectedItem.objects.create(
-                    order=order,
-                    item_class=item_name,
-                    confidence=confidence,
-                    bbox={'x1': int(x1), 'y1': int(y1), 'x2': int(x2), 'y2': int(y2)},
-                    volume=volume,
-                    weight=weight
-                )
+            detected_items.append({
+                "item_class": item_name,
+                "confidence": float(confidence) * 100,
+                "volume": volume,
+                "weight": weight,
+                "bbox": {"x1": x1, "y1": y1, "x2": x2, "y2": y2}
+            })
 
-                detected_items.append({
-                    "item": item_name, 
-                    "confidence": confidence,
-                    "volume": volume, 
-                    "weight": weight
-                })
-
-                cv2.rectangle(image, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
-                cv2.putText(image, f"{item_name} ({confidence:.2f})", 
-                            (int(x1), int(y1) - 10), 
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, 
-                            (0, 255, 0), 2)
-
-            except Exception as e:
-                logger.error(f"❌ خطا در پردازش شیء: {e}")
+            # رسم کادر و نام اشیاء روی تصویر
+            cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            cv2.putText(image, f"{item_name} ({volume}m³, {weight}kg)", 
+                        (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, 
+                        (0, 255, 0), 2)
 
     processed_image_path = image_path.replace(".jpg", "_processed.jpg")
     cv2.imwrite(processed_image_path, image)
 
-    logger.info(f"✅ پردازش انجام شد. تصویر ذخیره شد: {processed_image_path}")
+    logger.info(f"Processed image saved: {processed_image_path}")
     return detected_items, processed_image_path
 
 

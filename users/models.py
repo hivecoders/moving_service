@@ -126,6 +126,7 @@ class DetectedItem(models.Model):
 class Photo(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="photos")
     image = models.ImageField(upload_to="photos/")
+    processed_image = models.ImageField(upload_to="photos/processed/", null=True, blank=True)
 
     def __str__(self):
         return f"Photo for Order #{self.order.id}"

@@ -11,22 +11,34 @@
                 <div class="card-header bg-primary text-white text-center">
                     <h4><i class="fas fa-camera"></i> Upload & Select Items</h4>
                 </div>
+
                 <div class="card-body">
                     <form method="POST" enctype="multipart/form-data" id="itemForm">
                         {% csrf_token %}
 
-                        <!-- Upload Image -->
+                        <!-- Single Image Upload -->
                         <div class="mb-4">
-                            <h5>Upload Image:</h5>
-                            <input type="file" name="images" id="imageUpload" class="form-control" multiple>
+                            <label class="form-label"><i class="fas fa-upload"></i> Choose File:</label>
+                            <input type="file" name="image" id="imageUpload" class="form-control" required>
+                            <button type="submit" class="btn btn-primary w-100 mt-3">
+                                <i class="fas fa-cogs"></i> Process Image
+                            </button>
                         </div>
+                        
 
-                        <!-- Display Processed Image -->
-                        {% if processed_image_path %}
-                        <div class="text-center mb-3">
-                            <h5>Processed Image:</h5>
-                            <img src="{{ processed_image_path }}" class="img-fluid rounded shadow" style="max-width: 100%;">
-                        </div>
+                        <!-- Display Processed Images Gallery -->
+                        {% if photos %}
+                        <div class="mb-4">
+                            <h5>Processed Images:</h5>
+                            <div class="row">
+                                {% for photo in photos %}
+                                    {% if photo.processed_image %}
+                                    <div class="col-md-4 mb-3">
+                                        <img src="{{ photo.processed_image.url }}" class="img-fluid rounded shadow">
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
                         {% endif %}
 
                         <!-- Detected Items -->
@@ -35,9 +47,9 @@
                             {% if detected_items %}
                                 {% for item in detected_items %}
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="selected_items" value="{{ item.item }}" checked>
+                                        <input class="form-check-input" type="checkbox" name="selected_items" value="{{ item.item_class }}" checked>
                                         <label class="form-check-label">
-                                            {{ item.item }} ({{ item.volume }} m³, {{ item.weight }} kg)
+                                            {{ item.item_class }} ({{ item.volume }} m³, {{ item.weight }} kg)
                                         </label>
                                     </div>
                                 {% endfor %}
@@ -46,7 +58,7 @@
                             {% endif %}
                         </div>
 
-                        <!-- Add Item from List (Multiple Selection) -->
+                        <!-- Add Item from Preset List -->
                         <div class="mb-4">
                             <h5>Add Item from List:</h5>
                             <select id="presetItems" class="form-select">
@@ -55,10 +67,10 @@
                                     <option value="{{ item }}">{{ item }}</option>
                                 {% endfor %}
                             </select>
-                            <button type="button" class="btn btn-secondary mt-2" onclick="addFromList()">Add Item</button>
+                            <button type="button" class="btn btn-secondary w-100 mt-2" onclick="addFromList()">Add Selected Item</button>
                         </div>
 
-                        <!-- Add Manual Item with Weight & Volume -->
+                        <!-- Add Manual Item -->
                         <div class="mb-4">
                             <h5>Add Manual Item:</h5>
                             <input type="text" id="manualItem" class="form-control mb-2" placeholder="Enter item name">
@@ -77,56 +89,56 @@
                         <div class="mb-4">
                             <h5>Select Vehicle:</h5>
                             <select name="vehicle_type" class="form-select">
-                                {% for value, label in vehicle_choices %}
-                                    <option value="{{ value }}">{{ label }}</option>
+                                {% for vehicle in vehicle_choices %}
+                                    <option value="{{ vehicle.0 }}">{{ vehicle.1 }}</option>
                                 {% endfor %}
-                            </select>
-                        </div>
+                        </select>
+                    </div>
 
-                        <button type="submit" class="btn btn-success w-100">
-                            <i class="fas fa-check-circle"></i> Confirm & Continue
-                        </button>
-                    </form>
-                </div>
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="fas fa-check-circle"></i> Confirm & Continue
+                    </button>
+                </form>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    let selectedItems = [];
+let selectedItems = [];
 
-    function addFromList() {
-        let item = document.getElementById("presetItems").value;
-        if (item && !selectedItems.includes(item)) {
-            selectedItems.push(item);
-            updateItemList();
-        }
-    }
-
-    function addManualItem() {
-        let item = document.getElementById("manualItem").value;
-        let weight = document.getElementById("manualWeight").value;
-        let volume = document.getElementById("manualVolume").value;
-        if (item && weight && volume) {
-            selectedItems.push(`${item} (${volume} m³, ${weight} kg)`);
-            updateItemList();
-        }
-    }
-
-    function updateItemList() {
-        let list = document.getElementById("selectedItemsList");
-        list.innerHTML = "";
-        selectedItems.forEach((item, index) => {
-            list.innerHTML += `<li class='list-group-item d-flex justify-content-between'>${item} 
-                <button class='btn btn-danger btn-sm' onclick='removeItem(${index})'>Remove</button>
-            </li>`;
-        });
-    }
-
-    function removeItem(index) {
-        selectedItems.splice(index, 1);
+function addFromList() {
+    let item = document.getElementById("presetItems").value;
+    if (item && !selectedItems.includes(item)) {
+        selectedItems.push(item);
         updateItemList();
     }
+}
+
+function addManualItem() {
+    let item = document.getElementById("manualItem").value;
+    let weight = document.getElementById("manualWeight").value;
+    let volume = document.getElementById("manualVolume").value;
+    if (item && weight && volume) {
+        selectedItems.push(`${item} (${volume} m³, ${weight} kg)`);
+        updateItemList();
+    }
+}
+
+function updateItemList() {
+    let list = document.getElementById("selectedItemsList");
+    list.innerHTML = "";
+    selectedItems.forEach((item, index) => {
+        list.innerHTML += `<li class='list-group-item d-flex justify-content-between'>${item} 
+            <button class='btn btn-danger btn-sm' onclick='removeItem(${index})'>Remove</button>
+        </li>`;
+    });
+}
+
+function removeItem(index) {
+    selectedItems.splice(index, 1);
+    updateItemList();
+}
+
 </script>
 {% endblock %}
