@@ -70,65 +70,9 @@ def create_order_step2(request):
     order = get_object_or_404(Order, id=order_id)
 
     item_list = {item: data for item, data in VOLUME_WEIGHT_ESTIMATES.items()}
-    vehicle_choices = [
-    ("Car", "Car"),
-    ("Small Van", "Small Van"),
-    ("Large Van", "Large Van")
-]
+    vehicle_choices = [('Car', 'Car'), ('Small Van', 'Small Van'), ('Large Van', 'Large Van')]
 
-
-    if request.method == 'POST':
-
-        # Handle image uploads and processing
-        if 'images' in request.FILES:
-            for image in request.FILES.getlist('images'):
-                photo = Photo(order=order, image=image)
-                photo.save()
-
-                detected_objects, processed_image_path = detect_objects(photo.image.path, order)
-
-                with open(processed_image_path, 'rb') as img_file:
-                    photo.processed_image.save(os.path.basename(processed_image_path), File(img_file), save=True)
-
-                for obj in detected_objects:
-                    DetectedItem.objects.create(
-                        order=order,
-                        item_class=obj["item_class"],
-                        confidence=obj["confidence"],
-                        volume=obj["volume"],
-                        weight=obj["weight"],
-                        bbox=json.dumps(obj["bbox"])
-                    )
-
-            messages.success(request, "Images processed successfully!")
-            return redirect('create_order_step2')
-
-        # Handle vehicle type selection and items confirmation
-        elif 'vehicle_type' in request.POST:
-            vehicle_type = request.POST.get('vehicle_type')
-            selected_items = request.POST.getlist('selected_items[]')  # از JS بفرستی
-
-            order.vehicle_type = vehicle_type
-            order.save()
-
-            # Clear previous selected items
-            order.selected_items.clear()
-
-            # Add selected items to order
-            for item_json in selected_items:
-                item = json.loads(item_json)
-                DetectedItem.objects.create(
-                    order=order,
-                    item_class=item['item'],
-                    volume=item['volume'],
-                    weight=item['weight'],
-                    confidence=100,  
-                    bbox=json.dumps({})  
-                )
-            messages.success(request, "Order updated successfully!")
-            return redirect('customer_dashboard')
-
-    photos = Photo.objects.filter(order=order, processed_image__isnull=False)
+    photos = Photo.objects.filter(order=order)
     detected_items = DetectedItem.objects.filter(order=order)
 
     context = {
@@ -136,11 +80,61 @@ def create_order_step2(request):
         'detected_items': detected_items,
         'item_list': item_list,
         'vehicle_choices': vehicle_choices,
-        'volume_weight_estimates_json': json.dumps(VOLUME_WEIGHT_ESTIMATES),
-        'default_location_json': json.dumps({"lat": 45.5017, "lng": -73.5673})
+        'volume_weight_estimates_json': json.dumps(VOLUME_WEIGHT_ESTIMATES)
     }
 
+    if request.method == 'POST':
+        if 'images' in request.FILES:
+            image = request.FILES['images']
+            photo = Photo(order=order, image=image)
+            photo.save()
+
+            detected_objects, processed_image_path = detect_objects(photo.image.path, order)
+
+            with open(processed_image_path, 'rb') as img_file:
+                photo.processed_image.save(os.path.basename(processed_image_path), File(img_file))
+                photo.save()
+
+            for obj in detected_objects:
+                DetectedItem.objects.create(
+                    order=order,
+                    item_class=obj["item_class"],
+                    confidence=obj["confidence"],
+                    volume=obj["volume"],
+                    weight=obj["weight"],
+                    bbox=json.dumps(obj["bbox"])
+                )
+
+            messages.success(request, "Image processed successfully!")
+            return redirect('create_order_step2')
+
+        elif 'vehicle_type' in request.POST:
+            vehicle_type = request.POST.get('vehicle_type')
+            selected_items = request.POST.getlist('selected_items[]')
+
+            order.vehicle_type = vehicle_type
+            order.save()
+
+            DetectedItem.objects.filter(order=order).delete()
+
+            selected_items = selected_items if selected_items else []
+
+            for item_json in selected_items:
+                item = json.loads(item_json)
+                DetectedItem.objects.create(
+                    order=order,
+                    item_class=item['item'],
+                    volume=item['volume'],
+                    weight=item['weight'],
+                    confidence=100,
+                    bbox=json.dumps({})
+                )
+
+            messages.success(request, "Order updated successfully!")
+            return redirect('customer_dashboard')
+
     return render(request, 'users/create_order_step2.html', context)
+
 
 # detect_objects
 def detect_objects(image_path, order):
@@ -175,7 +169,7 @@ def detect_objects(image_path, order):
                 "bbox": {"x1": x1, "y1": y1, "x2": x2, "y2": y2}
             })
 
-            # رسم کادر و نام اشیاء روی تصویر
+
             cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
             cv2.putText(image, f"{item_name} ({volume}m³, {weight}kg)", 
                         (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, 
