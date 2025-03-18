@@ -13,111 +13,97 @@
                 </div>
 
                 <div class="card-body">
-                    <form method="POST" enctype="multipart/form-data" id="itemForm">
-                        {% csrf_token %}
 
-                        <!-- Single Image Upload -->
+                    <!-- Image Upload and Processing Form -->
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
                         <div class="mb-4">
                             <label class="form-label"><i class="fas fa-upload"></i> Choose File:</label>
-                            <input type="file" name="image" id="imageUpload" class="form-control" required>
+                            <input type="file" name="images" class="form-control" multiple>
                             <button type="submit" class="btn btn-primary w-100 mt-3">
                                 <i class="fas fa-cogs"></i> Process Image
                             </button>
                         </div>
-                        
+                    </form>
 
-                        <!-- Display Processed Images Gallery -->
-                        {% if photos %}
-                        <div class="mb-4">
-                            <h5>Processed Images:</h5>
-                            <div class="row">
-                                {% for photo in photos %}
-                                    {% if photo.processed_image %}
-                                    <div class="col-md-4 mb-3">
-                                        <img src="{{ photo.processed_image.url }}" class="img-fluid rounded shadow">
-                                    </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
+                    <!-- Display Processed Images Gallery -->
+                    {% if photos %}
+                    <div class="mb-4">
+                        <h5>Processed Images:</h5>
+                        <div class="row">
+                            {% for photo in photos %}
+                                {% if photo.processed_image %}
+                                <div class="col-md-4 mb-3">
+                                    <img src="{{ photo.processed_image.url }}" class="img-fluid rounded shadow">
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Detected Items -->
+                    <div class="mb-4">
+                        <h5>Detected Items:</h5>
+                        {% if detected_items %}
+                        <ul id="detectedItemsList" class="list-group">
+                            {% for item in detected_items %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ item.item_class }} ({{ item.volume }} m³, {{ item.weight }} kg)
+                                <button class="btn btn-danger btn-sm" onclick="removeDetectedItem({{ item.id }})">Remove</button>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="text-muted">No items detected. You can add manually.</p>
                         {% endif %}
+                    </div>
 
-                        <!-- Detected Items -->
-                        <div class="mb-4">
-                            <h5>Detected Items:</h5>
-                            {% if detected_items %}
-                             <ul id="detectedItemsList" class="list-group">
-                                {% for item in detected_items %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>{{ item.item_class }} ({{ item.volume }} m³, {{ item.weight }} kg)</span>
-                                    <button class="btn btn-danger btn-sm" onclick="removeDetectedItem({{ item.id }})">Remove</button>
-                                </li>
-                                {% endfor %}
-                             </ul>
-                            {% else %}
-                                <p class="text-muted">No items detected. You can add manually.</p>
-                            {% endif %}
-                        </div>
+                    <!-- Add Item from Preset List -->
+                    <div class="mb-4">
+                        <h5>Add Item from List:</h5>
+                        <select id="presetItems" class="form-select">
+                            <option value="" disabled selected>Select an item</option>
+                            {% for item in item_list %}
+                                <option value="{{ item }}">{{ item }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="button" class="btn btn-secondary w-100 mt-2" onclick="addFromList()">Add Selected Item</button>
+                    </div>
 
-                        <script>
-                            function removeDetectedItem(itemId) {
-                                fetch(`/users/remove_detected_item/${itemId}/`, {
-                                    method: "POST",
-                                    headers: {
-                                        "X-CSRFToken": '{{ csrf_token }}',
-                                        "Content-Type": "application/json",
-                                    },
-                                })
-                                .then(response => {
-                                    if (response.ok) {
-                                        location.reload();
-                                    } else {
-                                        alert("Error removing item.");
-                                    }
-                                })
-                            }
-                            </script>
+                    <!-- Add Manual Item -->
+                    <div class="mb-4">
+                        <h5>Add Manual Item:</h5>
+                        <input type="text" id="manualItem" class="form-control mb-2" placeholder="Enter item name">
+                        <input type="number" id="manualWeight" class="form-control mb-2" placeholder="Enter weight (kg)" step="0.1">
+                        <input type="number" id="manualVolume" class="form-control mb-2" placeholder="Enter volume (m³)" step="0.01">
+                        <button type="button" class="btn btn-secondary" onclick="addManualItem()">Add Manual Item</button>
+                    </div>
 
-                        <!-- Add Item from Preset List -->
-                        <div class="mb-4">
-                            <h5>Add Item from List:</h5>
-                            <select id="presetItems" class="form-select">
-                                <option value="" disabled selected>Select an item</option>
-                                {% for item in item_list %}
-                                    <option value="{{ item }}">{{ item }}</option>
-                                {% endfor %}
-                            </select>
-                            <button type="button" class="btn btn-secondary w-100 mt-2" onclick="addFromList()">Add Selected Item</button>
-                        </div>
+                    <!-- Selected Items List -->
+                    <div class="mb-4">
+                        <h5>Selected Items:</h5>
+                        <ul id="selectedItemsList" class="list-group"></ul>
+                    </div>
 
-                        <!-- Add Manual Item -->
-                        <div class="mb-4">
-                            <h5>Add Manual Item:</h5>
-                            <input type="text" id="manualItem" class="form-control mb-2" placeholder="Enter item name">
-                            <input type="number" id="manualWeight" class="form-control mb-2" placeholder="Enter weight (kg)" step="0.1">
-                            <input type="number" id="manualVolume" class="form-control mb-2" placeholder="Enter volume (m³)" step="0.01">
-                            <button type="button" class="btn btn-secondary" onclick="addManualItem()">Add Manual Item</button>
-                        </div>
-
-                        <!-- Selected Items List -->
-                        <div class="mb-4">
-                            <h5>Selected Items:</h5>
-                            <ul id="selectedItemsList" class="list-group"></ul>
-                        </div>
-
-                        <!-- Select Vehicle -->
+                    <!-- Vehicle Selection and Final Submission -->
+                    <form method="POST" id="finalForm">
+                        {% csrf_token %}
                         <div class="mb-4">
                             <h5>Select Vehicle:</h5>
                             <select name="vehicle_type" class="form-select">
                                 {% for vehicle in vehicle_choices %}
-                                    <option value="{{ vehicle.0 }}">{{ vehicle.1 }}</option>
+                                    <option value="{{ vehicle.0 }}">{{ vehicle.0 }}</option>
                                 {% endfor %}
-                        </select>
-                    </div>
+                            </select>
+                        </div>
 
-                    <button type="submit" class="btn btn-success w-100">
-                        <i class="fas fa-check-circle"></i> Confirm & Continue
-                    </button>
-                </form>
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-check-circle"></i> Confirm & Continue
+                        </button>
+                    </form>
+
+                </div>
             </div>
         </div>
     </div>
@@ -125,11 +111,13 @@
 
 <script>
 let selectedItems = [];
+const volumeWeightEstimates = {{ volume_weight_estimates_json|safe }};
 
 function addFromList() {
     let item = document.getElementById("presetItems").value;
-    if (item && !selectedItems.includes(item)) {
-        selectedItems.push(item);
+    if (item && !selectedItems.some(i => i.item === item)) {
+        let details = volumeWeightEstimates[item];
+        selectedItems.push({item, volume: details.volume, weight: details.weight});
         updateItemList();
     }
 }
@@ -139,7 +127,7 @@ function addManualItem() {
     let weight = document.getElementById("manualWeight").value;
     let volume = document.getElementById("manualVolume").value;
     if (item && weight && volume) {
-        selectedItems.push(`${item} (${volume} m³, ${weight} kg)`);
+        selectedItems.push({item, volume, weight});
         updateItemList();
     }
 }
@@ -148,7 +136,7 @@ function updateItemList() {
     let list = document.getElementById("selectedItemsList");
     list.innerHTML = "";
     selectedItems.forEach((item, index) => {
-        list.innerHTML += `<li class='list-group-item d-flex justify-content-between'>${item} 
+        list.innerHTML += `<li class='list-group-item d-flex justify-content-between'>${item.item} (${item.volume} m³, ${item.weight} kg)
             <button class='btn btn-danger btn-sm' onclick='removeItem(${index})'>Remove</button>
         </li>`;
     });
@@ -159,5 +147,14 @@ function removeItem(index) {
     updateItemList();
 }
 
+document.getElementById("finalForm").addEventListener("submit", function(e){
+    selectedItems.forEach(item => {
+        let input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'selected_items[]';
+        input.value = JSON.stringify(item);
+        this.appendChild(input);
+    });
+});
 </script>
 {% endblock %}

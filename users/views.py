@@ -70,42 +70,68 @@ def create_order_step2(request):
     order = get_object_or_404(Order, id=order_id)
 
     item_list = {item: data for item, data in VOLUME_WEIGHT_ESTIMATES.items()}
-    vehicle_choices = [(v, v) for v in Mover.objects.values_list('vehicle_type', flat=True).distinct()]
+    vehicle_choices = Mover.objects.values_list('vehicle_type', flat=True).distinct()
+    vehicle_choices = [(vehicle, vehicle) for vehicle in vehicle_choices if vehicle]
 
-    if request.method == 'POST' and 'image' in request.FILES:
-        image = request.FILES['image']
-        photo = Photo(order=order, image=image)
-        photo.save()
+    if request.method == 'POST':
 
-        detected_objects, processed_image_path = detect_objects(photo.image.path, order)
+        # Handle image uploads and processing
+        if 'images' in request.FILES:
+            for image in request.FILES.getlist('images'):
+                photo = Photo(order=order, image=image)
+                photo.save()
 
-        # Save processed image to the model
-        with open(processed_image_path, 'rb') as img_file:
-            django_file = File(img_file := open(processed_image_path, 'rb'))
-            photo.processed_image.save(os.path.basename(processed_image_path), django.core.files.File(open(processed_image_path, 'rb')))
-            photo.save()
+                detected_objects, processed_image_path = detect_objects(photo.image.path, order)
 
-        # ذخیره آیتم‌های شناسایی‌شده
-        for obj in detected_objects:
-            DetectedItem.objects.create(
-                order=order,
-                item_class=obj["item_class"],
-                confidence=obj["confidence"],
-                volume=obj["volume"],
-                weight=obj["weight"],
-                bbox=json.dumps(obj["bbox"])
-            )
+                with open(processed_image_path, 'rb') as img_file:
+                    photo.processed_image.save(os.path.basename(processed_image_path), File(img_file), save=True)
 
-        messages.success(request, "Image processed successfully!")
+                for obj in detected_objects:
+                    DetectedItem.objects.create(
+                        order=order,
+                        item_class=obj["item_class"],
+                        confidence=obj["confidence"],
+                        volume=obj["volume"],
+                        weight=obj["weight"],
+                        bbox=json.dumps(obj["bbox"])
+                    )
 
-    photos = Photo.objects.filter(order=order)
+            messages.success(request, "Images processed successfully!")
+            return redirect('create_order_step2')
+
+        # Handle vehicle type selection and items confirmation
+        elif 'vehicle_type' in request.POST:
+            vehicle_type = request.POST.get('vehicle_type')
+            selected_items = request.POST.getlist('selected_items[]')  # از JS بفرستی
+
+            order.vehicle_type = vehicle_type
+            order.save()
+
+            # Clear previous selected items
+            order.selected_items.clear()
+
+            # Add selected items to order
+            for item_json in selected_items:
+                item = json.loads(item_json)
+                order.selected_items.create(
+                    item_class=item['item'],
+                    volume=item['volume'],
+                    weight=item['weight']
+                )
+
+            messages.success(request, "Order updated successfully!")
+            return redirect('customer_dashboard')
+
+    photos = Photo.objects.filter(order=order, processed_image__isnull=False)
     detected_items = DetectedItem.objects.filter(order=order)
 
     context = {
         'photos': photos,
         'detected_items': detected_items,
         'item_list': item_list,
-        'vehicle_choices': vehicle_choices
+        'vehicle_choices': vehicle_choices,
+        'volume_weight_estimates_json': json.dumps(VOLUME_WEIGHT_ESTIMATES),
+        'default_location_json': json.dumps({"lat": 45.5017, "lng": -73.5673})
     }
 
     return render(request, 'users/create_order_step2.html', context)
@@ -477,3 +503,4 @@ def remove_detected_item(request, item_id):
         item.delete()
         return JsonResponse({'status': 'success'})
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
