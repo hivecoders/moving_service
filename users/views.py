@@ -70,8 +70,12 @@ def create_order_step2(request):
     order = get_object_or_404(Order, id=order_id)
 
     item_list = {item: data for item, data in VOLUME_WEIGHT_ESTIMATES.items()}
-    vehicle_choices = Mover.objects.values_list('vehicle_type', flat=True).distinct()
-    vehicle_choices = [(vehicle, vehicle) for vehicle in vehicle_choices if vehicle]
+    vehicle_choices = [
+    ("Car", "Car"),
+    ("Small Van", "Small Van"),
+    ("Large Van", "Large Van")
+]
+
 
     if request.method == 'POST':
 
@@ -113,12 +117,14 @@ def create_order_step2(request):
             # Add selected items to order
             for item_json in selected_items:
                 item = json.loads(item_json)
-                order.selected_items.create(
+                DetectedItem.objects.create(
+                    order=order,
                     item_class=item['item'],
                     volume=item['volume'],
-                    weight=item['weight']
+                    weight=item['weight'],
+                    confidence=100,  
+                    bbox=json.dumps({})  
                 )
-
             messages.success(request, "Order updated successfully!")
             return redirect('customer_dashboard')
 
