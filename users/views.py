@@ -434,13 +434,21 @@ def reject_order(request, order_id):
 def order_details(request, order_id):
     order = get_object_or_404(Order, id=order_id)
 
-    processed_images = ProcessedImage.objects.filter(order=order)  # عکس‌های پردازش‌شده
-    detected_items = DetectedItem.objects.filter(order=order)  # آیتم‌های شناسایی‌شده
+    processed_images = ProcessedImage.objects.filter(order=order)
+    detected_items = DetectedItem.objects.filter(order=order)
+
+    # اطمینان از اینکه اشیا پردازش‌شده و اطلاعات وزن و حجم ارسال بشه
+    total_volume = sum(item.volume for item in detected_items)
+    total_weight = sum(item.weight for item in detected_items)
+    total_items = detected_items.count()
 
     return render(request, 'users/order_details.html', {
         'order': order,
         'processed_images': processed_images,
         'detected_items': detected_items,
+        'total_volume': total_volume,
+        'total_weight': total_weight,
+        'total_items': total_items,
         'origin_lat': order.origin_lat,
         'origin_lng': order.origin_lng,
         'destination_lat': order.destination_lat,
