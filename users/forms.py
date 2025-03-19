@@ -44,13 +44,12 @@ class MoverRegistrationForm(UserCreationForm):
     ], widget=forms.Select(attrs={'class': 'form-select', 'onchange': 'toggleCertificationField(this.value)'}))
     payment_info = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Bank account details', 'required': 'required'}))
     driving_license = forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
-    carrying_capacity = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Carrying Capacity (kg)'}), required=False)
     has_mover_certification = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
     mover_certification_document = forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
 
     class Meta:
         model = CustomUser
-        fields = ['email', 'password1', 'password2', 'full_name', 'phone', 'profile_photo', 'identification_id', 'has_vehicle', 'vehicle_type', 'mover_type', 'payment_info', 'driving_license', 'carrying_capacity', 'has_mover_certification', 'mover_certification_document']
+        fields = ['email', 'password1', 'password2', 'full_name', 'phone', 'profile_photo', 'identification_id', 'has_vehicle', 'vehicle_type', 'mover_type', 'payment_info', 'driving_license', 'has_mover_certification', 'mover_certification_document']
 
     def clean_email(self):
         email = self.cleaned_data.get('email').lower()
@@ -67,7 +66,6 @@ class MoverRegistrationForm(UserCreationForm):
         if has_vehicle == "No":
             cleaned_data["vehicle_type"] = None
             cleaned_data["driving_license"] = None
-            cleaned_data["carrying_capacity"] = None
 
         if mover_type == "Pro Mover" and not mover_certification_document:
             self.add_error("mover_certification_document", "Pro Movers must upload a certification document.")

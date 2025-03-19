@@ -26,27 +26,18 @@
                     <div class="mb-3">
                         <label for="id_email" class="form-label">Email</label>
                         {{ form.email }}
-                        {% for error in form.email.errors %}
-                            <div class="text-danger">{{ error }}</div>
-                        {% endfor %}
                     </div>
 
                     <!-- Full Name -->
                     <div class="mb-3">
                         <label for="id_full_name" class="form-label">Full Name</label>
                         {{ form.full_name }}
-                        {% for error in form.full_name.errors %}
-                            <div class="text-danger">{{ error }}</div>
-                        {% endfor %}
                     </div>
 
                     <!-- Phone -->
                     <div class="mb-3">
                         <label for="id_phone" class="form-label">Phone</label>
                         {{ form.phone }}
-                        {% for error in form.phone.errors %}
-                            <div class="text-danger">{{ error }}</div>
-                        {% endfor %}
                     </div>
 
                     <div class="mb-3">
@@ -63,62 +54,36 @@
                     <div class="mb-3">
                         <label for="id_profile_photo" class="form-label">Profile Photo</label>
                         {{ form.profile_photo }}
-                        {% for error in form.profile_photo.errors %}
-                            <div class="text-danger">{{ error }}</div>
-                        {% endfor %}
                     </div>
 
                     <!-- Identification ID -->
                     <div class="mb-3">
                         <label for="id_identification_id" class="form-label">Identification ID</label>
                         {{ form.identification_id }}
-                        {% for error in form.identification_id.errors %}
-                            <div class="text-danger">{{ error }}</div>
-                        {% endfor %}
                     </div>
 
                     <!-- Payment Info -->
                     <div class="mb-3">
                         <label for="id_payment_info" class="form-label">Payment Info</label>
                         {{ form.payment_info }}
-                        {% for error in form.payment_info.errors %}
-                            <div class="text-danger">{{ error }}</div>
-                        {% endfor %}
                     </div>
 
                     <!-- Do you have a vehicle? -->
                     <div class="mb-3">
                         <label for="id_has_vehicle" class="form-label">Do you have a vehicle?</label>
                         {{ form.has_vehicle }}
-                        {% for error in form.has_vehicle.errors %}
-                            <div class="text-danger">{{ error }}</div>
-                        {% endfor %}
                     </div>
 
                     <!-- Vehicle Fields (conditionally displayed) -->
-                    <div id="certificationField" style="display: none;">
+                    <div id="vehicle_fields" style="display: none;">
                         <div class="mb-3">
                             <label for="id_vehicle_type" class="form-label">Vehicle Type</label>
                             {{ form.vehicle_type }}
-                            {% for error in form.vehicle_type.errors %}
-                                <div class="text-danger">{{ error }}</div>
-                            {% endfor %}
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="id_carrying_capacity" class="form-label">Carrying Capacity (kg)</label>
-                            {{ form.carrying_capacity }}
-                            {% for error in form.carrying_capacity.errors %}
-                                <div class="text-danger">{{ error }}</div>
-                            {% endfor %}
                         </div>
 
                         <div class="mb-3">
                             <label for="id_driving_license" class="form-label">Upload Driving License</label>
                             {{ form.driving_license }}
-                            {% for error in form.driving_license.errors %}
-                                <div class="text-danger">{{ error }}</div>
-                            {% endfor %}
                         </div>
                     </div>
 
@@ -126,28 +91,58 @@
                     <div class="mb-3">
                         <label for="id_mover_type" class="form-label">Mover Type</label>
                         {{ form.mover_type }}
-                        {% for error in form.mover_type.errors %}
-                            <div class="text-danger">{{ error }}</div>
-                        {% endfor %}
                     </div>
 
                     <!-- Mover Certification Field -->
-                    <div id="certificationField" style="display: none;">
+                    <div id="certification_field" style="display: none;">
                         <div class="mb-3">
                             <label for="id_mover_certification_document" class="form-label">Upload Certification Document</label>
                             {{ form.mover_certification_document }}
-                            {% for error in form.mover_certification_document.errors %}
-                                <div class="text-danger">{{ error }}</div>
-                            {% endfor %}
                         </div>
                     </div>
 
                     <!-- Select Location (Map) -->
                     <div class="mb-3">
-                        <label for="location_map_canvas" class="form-label">Select your location</label>
+                        <label class="form-label">Select your location</label>
                         <div id="location_map_canvas" style="height: 400px;"></div>
                         <input type="hidden" id="location_map" name="location_map">
+                    
+                        <script>
+                            document.addEventListener("DOMContentLoaded", function () {
+                                var mapElement = document.getElementById("location_map_canvas");
+                                if (mapElement) {  
+                                    var default_location = [45.5017, -73.5673]; // مونترال
+                    
+                                    // چک کردن اینکه آیا نقشه قبلاً مقداردهی شده یا نه
+                                    if (typeof map === 'undefined') {
+                                        var map = L.map('location_map_canvas').setView(default_location, 13);
+                    
+                                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                            attribution: '&copy; OpenStreetMap contributors'
+                                        }).addTo(map);
+                    
+                                        var marker = L.marker(default_location, { draggable: true }).addTo(map);
+                    
+                                        marker.on('dragend', function(event) {
+                                            var position = marker.getLatLng();
+                                            document.getElementById("location_map").value = position.lat + "," + position.lng;
+                                        });
+                    
+                                        // اضافه کردن قابلیت جستجوی مکان
+                                        var geocoder = L.Control.geocoder({
+                                            defaultMarkGeocode: true
+                                        }).on('markgeocode', function(e) {
+                                            var latlng = e.geocode.center;
+                                            map.setView(latlng, 13);
+                                            marker.setLatLng(latlng);
+                                            document.getElementById("location_map").value = latlng.lat + "," + latlng.lng;
+                                        }).addTo(map);
+                                    }
+                                }
+                            });
+                        </script>
                     </div>
+                    
 
                     <button type="submit" class="btn btn-success w-100">
                         <i class="fas fa-check-circle"></i> Submit
@@ -180,7 +175,6 @@
             }
             marker = L.marker(latlng).addTo(map);
             document.getElementById('location_map').value = latlng.lat + ', ' + latlng.lng;
-
         }
 
         map.on('click', function(e) {
@@ -193,7 +187,7 @@
     // Toggle vehicle fields based on selection
     document.addEventListener('DOMContentLoaded', function() {
         var hasVehicleField = document.getElementById('id_has_vehicle');
-        var vehicleFields = document.getElementById('vehicleFields');
+        var vehicleFields = document.getElementById('vehicle_fields');
 
         function toggleVehicleFields() {
             vehicleFields.style.display = hasVehicleField.value === 'Yes' ? 'block' : 'none';
@@ -206,7 +200,7 @@
     // Toggle Pro Mover certification field
     document.addEventListener('DOMContentLoaded', function () {
         var moverTypeField = document.getElementById('id_mover_type');
-        var certificationField = document.getElementById('certificationField');
+        var certificationField = document.getElementById('certification_field');
 
         function toggleCertificationField() {
             certificationField.style.display = moverTypeField.value === 'Pro Mover' ? 'block' : 'none';
