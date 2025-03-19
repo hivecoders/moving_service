@@ -37,11 +37,11 @@ class MoverRegistrationForm(UserCreationForm):
     email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter your email', 'required': 'required'}))
     profile_photo = forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
     identification_id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Passport, Work/Study Permit, SIN', 'required': 'required'}))
-    has_vehicle = forms.ChoiceField(choices=[('Yes', 'Yes'), ('No', 'No')], widget=forms.Select(attrs={'class': 'form-select'}))
+    has_vehicle = forms.ChoiceField(choices=[('Yes', 'Yes'), ('No', 'No')], widget=forms.Select(attrs={'class': 'form-select', 'onchange': 'toggleVehicleFields(this.value)'}))
     vehicle_type = forms.ChoiceField(choices=[('Car', 'Car'), ('Small Van', 'Small Van'), ('Large Van', 'Large Van')], required=False, widget=forms.Select(attrs={'class': 'form-select'}))
     mover_type = forms.ChoiceField(choices=[
         ('Pro Mover', 'Professional Mover'), ('Mover', 'Simple Mover'), ('Box Packer', 'Box Packer'), ('Driver with Help', 'Driver with Help'), ('Driver without Help', 'Driver without Help')
-    ], widget=forms.Select(attrs={'class': 'form-select'}))
+    ], widget=forms.Select(attrs={'class': 'form-select', 'onchange': 'toggleCertificationField(this.value)'}))
     payment_info = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Bank account details', 'required': 'required'}))
     driving_license = forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
     carrying_capacity = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Carrying Capacity (kg)'}), required=False)
@@ -58,17 +58,46 @@ class MoverRegistrationForm(UserCreationForm):
             raise forms.ValidationError("This email is already taken.")
         return email
 
-# Custom User Login Form
+    def clean(self):
+        cleaned_data = super().clean()
+        has_vehicle = cleaned_data.get("has_vehicle")
+        mover_type = cleaned_data.get("mover_type")
+        mover_certification_document = cleaned_data.get("mover_certification_document")
+
+        if has_vehicle == "No":
+            cleaned_data["vehicle_type"] = None
+            cleaned_data["driving_license"] = None
+            cleaned_data["carrying_capacity"] = None
+
+        if mover_type == "Pro Mover" and not mover_certification_document:
+            self.add_error("mover_certification_document", "Pro Movers must upload a certification document.")
+
+        return cleaned_data
+
+
+
+# CustomUserLoginForm
 class CustomUserLoginForm(AuthenticationForm):
-    email = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your email', 'required': 'required'}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter your password', 'required': 'required'}))
+    username = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control', 'placeholder': 'Enter your email', 'required': 'required'
+    }))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={
+        'class': 'form-control', 'placeholder': 'Enter your password', 'required': 'required'
+    }))
 
     def clean(self):
         cleaned_data = super().clean()
-        email = cleaned_data.get("email")
+        email = cleaned_data.get("username")
+
+        # اگر مقدار ایمیل `None` بود، خطا نده، فقط مقدار خالی قرار بده
+        if not email:
+            raise forms.ValidationError("Email field cannot be empty.")
+
+        email = email.strip().lower()  # حالا مقدار رو کوچک می‌کنیم و فاصله‌های اضافی حذف می‌کنیم
         password = cleaned_data.get("password")
+
         if email and password:
-            self.user_cache = authenticate(email=email, password=password)
+            self.user_cache = authenticate(username=email, password=password)  # مقدار username=email باشد
             if self.user_cache is None:
                 raise forms.ValidationError("Invalid email or password.")
         return cleaned_data

@@ -89,9 +89,7 @@
             
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-
                     {% if user.is_authenticated %}
-                        
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'customer_dashboard' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
                         </li>
@@ -112,7 +110,6 @@
                             <a class="nav-link" href="{% url 'register_mover' %}"><i class="fas fa-truck"></i> Register as Mover</a>
                         </li>
                     {% endif %}
-                    
                 </ul>
             </div>
         </div>
@@ -151,32 +148,38 @@
                 time_24hr: true
             });
 
-          
             $('.form-select').each(function() {
                 $(this).val($(this).find("option[selected]").val());
             });
         });
-
-        function initMap() {
-            default_location = {"lat": 45.5017, "lng": -73.5673} 
-            context["default_location"] = default_location
-            
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map);
-
-            var marker = L.marker([defaultLocation.lat, defaultLocation.lng], { draggable: true }).addTo(map);
-
-            marker.on('dragend', function(event) {
-                var position = marker.getLatLng();
-                document.getElementById("latitude").value = position.lat;
-                document.getElementById("longitude").value = position.lng;
-            });
-        }
-        window.onload = initMap;
     </script>
+    {% block extra_scripts %}
+    {% if "map" in request.path %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var mapElement = document.getElementById("map");
+            if (mapElement) {  // فقط اگر المان #map در صفحه بود اجرا می‌شود
+                var default_location = {"lat": 45.5017, "lng": -73.5673}; // مقداردهی درست
 
-    {% block extra_scripts %}{% endblock %}
+                var map = L.map('map').setView([default_location.lat, default_location.lng], 13);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
+
+                var marker = L.marker([default_location.lat, default_location.lng], { draggable: true }).addTo(map);
+
+                marker.on('dragend', function(event) {
+                    var position = marker.getLatLng();
+                    document.getElementById("latitude").value = position.lat;
+                    document.getElementById("longitude").value = position.lng;
+                });
+            }
+        });
+    </script>
+    {% endif %}
+{% endblock %}
+
+    
 </body>
 </html>

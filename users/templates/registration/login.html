@@ -27,21 +27,23 @@
                     <!-- Email Field -->
                     <div class="mb-3">
                         <label for="id_username" class="form-label">Email</label>
-                        <input type="email" name="username" id="id_username" class="form-control" placeholder="Enter your email" required>
+                        <input type="text" name="username" id="id_username" class="form-control" 
+                               placeholder="Enter your email" required autocomplete="email">
+
                         {% if form.username.errors %}
-                            <div class="text-danger mt-1">
-                                {% for error in form.username.errors %}
-                                    <p class="mb-0">{{ error }}</p>
-                                {% endfor %}
-                            </div>
+                        <div class="text-danger mt-1">
+                            {% for error in form.username.errors %}
+                                <p class="mb-0">{{ error }}</p>
+                            {% endfor %}
+                        </div>
                         {% endif %}
                     </div>
-                    
 
                     <!-- Password Field -->
                     <div class="mb-3">
                         <label for="id_password" class="form-label">Password</label>
-                        <input type="password" name="password" id="id_password" class="form-control" placeholder="Enter your password" required>
+                        <input type="password" name="password" id="id_password" class="form-control" 
+                               placeholder="Enter your password" required>
                         {% if form.password.errors %}
                             <div class="text-danger mt-1">
                                 {% for error in form.password.errors %}

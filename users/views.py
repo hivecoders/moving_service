@@ -190,20 +190,20 @@ def login_view(request):
     logger.info("Login attempt")
 
     next_url = request.GET.get('next', '')
-    
+
     if request.method == 'POST':
         form = CustomUserLoginForm(request, data=request.POST)
 
-
         if form.is_valid():
-            email = form.cleaned_data.get('username')
+            email = form.cleaned_data.get('username', "").strip().lower()  # جلوگیری از NoneType
             password = form.cleaned_data.get('password')
 
-            if email:
-                email = email.lower()  # to lower letter
-                logger.debug(f"Authenticating user: {email}")
+            if not email:
+                messages.error(request, "Email field cannot be empty.")
+                return render(request, 'registration/login.html', {'form': form, 'next': next_url})
 
-            # `username` to `email` change
+            logger.debug(f"Authenticating user: {email}")
+
             user = authenticate(request, username=email, password=password)
 
             if user is not None:
@@ -211,12 +211,7 @@ def login_view(request):
                 request.session.save()
                 logger.info(f"User {email} logged in successfully")
 
-                if hasattr(user, 'customer'):
-                    return redirect('customer_dashboard')
-                elif hasattr(user, 'mover'):
-                    return redirect('mover_dashboard')
-                else:
-                    return redirect('home')
+                return redirect('customer_dashboard' if hasattr(user, 'customer') else 'mover_dashboard')
             else:
                 logger.warning(f"Invalid login attempt for {email}")
                 messages.error(request, "Invalid email or password.")
@@ -228,7 +223,6 @@ def login_view(request):
         form = CustomUserLoginForm()
 
     return render(request, 'registration/login.html', {'form': form, 'next': next_url})
-
 
 # Customer Registration
 def register_customer(request):
