@@ -43,20 +43,19 @@
 
                     <ul class="nav nav-tabs" id="orderTabs">
                         <li class="nav-item">
-                            <a class="nav-link active" id="pending-tab" data-bs-toggle="tab" href="#pending" style="color:rgb(84, 91, 99);">Pending</a>
+                            <a class="nav-link active" id="pending-tab" data-bs-toggle="tab" href="#pending" style="color:gray;">Pending</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="ongoing-tab" data-bs-toggle="tab" href="#ongoing" style="color:rgb(232, 238, 244);">Ongoing</a>
+                            <a class="nav-link" id="ongoing-tab" data-bs-toggle="tab" href="#ongoing" style="color:gray;">Ongoing</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="completed-tab" data-bs-toggle="tab" href="#completed" style="color:rgb(228, 232, 236);">Completed</a>
+                            <a class="nav-link" id="completed-tab" data-bs-toggle="tab" href="#completed" style="color:gray;">Completed</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="canceled-tab" data-bs-toggle="tab" href="#canceled" style="color:rgb(245, 247, 249);">Canceled</a>
+                            <a class="nav-link" id="canceled-tab" data-bs-toggle="tab" href="#canceled" style="color:gray;">Canceled</a>
                         </li>
                     </ul>
                     
-
                     <div class="tab-content mt-3">
                         {% for status, orders in order_groups.items %}
                             <div class="tab-pane fade {% if status == 'pending' %}show active{% endif %}" id="{{ status }}">

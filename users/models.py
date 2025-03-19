@@ -116,17 +116,18 @@ class Order(models.Model):
     items_detected = models.ManyToManyField("DetectedItem", blank=True, related_name="orders")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Pending")
     created_at = models.DateTimeField(default=now)
-    
+    bids = models.ManyToManyField('Bid', related_name="order_bids", blank=True) 
     def __str__(self):
         return f"Order #{self.id} by {self.customer.user.email}"
 
 # Bid
 class Bid(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="bids")
+    order = models.ForeignKey(Order, related_name="bids_list", on_delete=models.CASCADE)  # اصلاح related_name
     mover = models.ForeignKey("Mover", on_delete=models.CASCADE, related_name="mover_bids")
     price = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=[("Pending", "Pending"), ("Accepted", "Accepted"), ("Rejected", "Rejected")], default="Pending")
     created_at = models.DateTimeField(auto_now_add=True)
+
 
     def __str__(self):
         return f"Bid by {self.mover} for Order #{self.order.id} - ${self.price}"

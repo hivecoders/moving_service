@@ -1,5 +1,8 @@
 from django.urls import path
 from . import views
+from .views import (
+    accept_order, reject_order, mark_order_as_done, confirm_mission_complete
+)
 
 urlpatterns = [
     # Home Page
@@ -38,4 +41,9 @@ urlpatterns = [
     # Order Management for Movers
     path('accept_order/<int:order_id>/', views.accept_order, name='accept_order'),
     path('reject_order/<int:order_id>/', views.reject_order, name='reject_order'),
+    path('order/<int:order_id>/accept/', accept_order, name='accept_order'),
+    path('order/<int:order_id>/reject/', reject_order, name='reject_order'),
+    path('order/<int:order_id>/confirm_complete/', confirm_mission_complete, name='confirm_mission_complete'),
+    path('order/<int:order_id>/mark_done/', mark_order_as_done, name='mark_order_as_done'),
+
 ]

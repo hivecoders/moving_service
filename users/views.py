@@ -349,53 +349,95 @@ def customer_dashboard(request):
 @login_required
 def mover_dashboard(request):
     logger.info("Accessing mover dashboard for user: %s", request.user)
-    if hasattr(request.user, 'mover'):
-        orders = Order.objects.filter(items_detected__isnull=False).distinct()
-        return render(request, 'users/mover_dashboard.html', {'orders': orders})
-    else:
+
+    if not hasattr(request.user, 'mover'):
         messages.error(request, "Access denied.")
         return redirect('home')
+
+    orders = Order.objects.filter(items_detected__isnull=False, status="Pending").distinct()
+    sent_bids = Bid.objects.filter(mover=request.user.mover)
+    accepted_orders = Order.objects.filter(bids__mover=request.user.mover, bids__status="Accepted").distinct()
+
+    # بررسی درآمد فقط برای سفارش‌های پذیرفته‌شده
+    earnings = Payment.objects.filter(customer__selected_movers__mover=request.user.mover)
+
+    total_earnings = sum(earning.amount for earning in earnings) if earnings else 0
+
+    return render(request, 'users/mover_dashboard.html', {
+        'orders': orders,
+        'sent_bids': sent_bids,
+        'accepted_orders': accepted_orders,
+        'earnings': earnings,
+        'total_earnings': total_earnings
+    })
 
 # Accept or Reject Orders
 @login_required
 def accept_order(request, order_id):
     logger.info("Accepting order: %s", order_id)
     order = get_object_or_404(Order, id=order_id)
-    order.status = 'Accepted'
+
+    if not hasattr(request.user, 'mover'):
+        messages.error(request, "Access denied.")
+        return redirect('home')
+
+    # بررسی اینکه سفارش در وضعیت Pending باشد
+    if order.status != 'Pending':
+        messages.error(request, "This order is no longer available.")
+        return redirect('mover_dashboard')
+
+    # تغییر وضعیت سفارش و ذخیره پیشنهاد
+    order.status = 'Ongoing'
     order.save()
+
+    bid, created = Bid.objects.get_or_create(order=order, mover=request.user.mover)
+    bid.status = 'Accepted'
+    bid.save()
+
     messages.success(request, "Order accepted successfully!")
     return redirect('mover_dashboard')
+
 
 @login_required
 def reject_order(request, order_id):
     logger.info("Rejecting order: %s", order_id)
     order = get_object_or_404(Order, id=order_id)
-    order.status = 'Rejected'
-    order.save()
-    messages.success(request, "Order rejected successfully!")
+
+    if not hasattr(request.user, 'mover'):
+        messages.error(request, "Access denied.")
+        return redirect('home')
+
+    bid = Bid.objects.filter(order=order, mover=request.user.mover).first()
+    
+    if bid:
+        bid.status = 'Rejected'
+        bid.save()
+        messages.success(request, "Order rejected successfully!")
+    else:
+        messages.error(request, "You haven't placed a bid for this order.")
+
     return redirect('mover_dashboard')
 
-# Order Details View
 
+
+# Order Details View
 @login_required
 def order_details(request, order_id):
     order = get_object_or_404(Order, id=order_id)
-    
-    # دریافت تصاویر پردازش‌شده (عکس‌هایی که اشیا در آن‌ها تشخیص داده شده)
-    processed_images = ProcessedImage.objects.filter(order=order)
 
-    # دریافت لیست اشیای شناسایی‌شده از تصویر
-    detected_items = DetectedItem.objects.filter(order=order)
+    processed_images = ProcessedImage.objects.filter(order=order)  # عکس‌های پردازش‌شده
+    detected_items = DetectedItem.objects.filter(order=order)  # آیتم‌های شناسایی‌شده
 
     return render(request, 'users/order_details.html', {
         'order': order,
-        'processed_images': processed_images,  # تصاویر پردازش‌شده
-        'detected_items': detected_items,  # اشیای تشخیص داده‌شده
+        'processed_images': processed_images,
+        'detected_items': detected_items,
         'origin_lat': order.origin_lat,
         'origin_lng': order.origin_lng,
         'destination_lat': order.destination_lat,
         'destination_lng': order.destination_lng
     })
+
 
 # Movers & Proximity Logic
 def nearest_movers(request, order_id):
@@ -425,6 +467,7 @@ def calculate_total_price(order):
 def process_payment(request, order_id):
     logger.info("Processing payment for order: %s", order_id)
     order = get_object_or_404(Order, id=order_id)
+
     amount = calculate_total_price(order)
 
     session = stripe.checkout.Session.create(
@@ -441,6 +484,17 @@ def process_payment(request, order_id):
         success_url=request.build_absolute_uri('/payment_success/'),
         cancel_url=request.build_absolute_uri('/payment_cancel/'),
     )
+
+    # ذخیره پرداخت در دیتابیس
+    payment = Payment.objects.create(
+        customer=order.customer,
+        amount=amount,
+        status="Pending",
+    )
+    payment.save()
+
+    return redirect(session.url)
+
 
 @csrf_exempt
 def stripe_webhook(request):
@@ -540,11 +594,109 @@ def edit_profile(request):
         'profile_form': profile_form,
         'user_type': user_type
     })
+#remove_detected_item
 @login_required
 def remove_detected_item(request, item_id):
     if request.method == 'POST':
-        item = get_object_or_404(DetectedItem, id=item_id, order__customer=request.user.customer)
+        item = get_object_or_404(DetectedItem, id=item_id)
+
+        if item.order.customer != request.user.customer:
+            return JsonResponse({'error': 'Unauthorized action'}, status=403)
+
         item.delete()
         return JsonResponse({'status': 'success'})
+    
     return JsonResponse({'error': 'Invalid request'}, status=400)
+#confirm_mission_complete
+@login_required
+def confirm_mission_complete(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    if not hasattr(request.user, 'customer') or order.customer != request.user.customer:
+        messages.error(request, "Access denied.")
+        return redirect('home')
 
+    order.status = "Completed"
+    order.save()
+
+    # بروزرسانی وضعیت پرداخت
+    payment = Payment.objects.filter(order=order).first()
+    if payment:
+        payment.status = "Completed"
+        payment.save()
+
+    messages.success(request, "Order has been marked as completed and payment has been processed.")
+    return redirect('customer_dashboard')
+#mark_order_as_done
+@login_required
+def mark_order_as_done(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    if not hasattr(request.user, 'mover'):
+        messages.error(request, "Access denied.")
+        return redirect('home')
+
+    order.status = "Awaiting Confirmation"
+    order.save()
+    messages.success(request, "Order marked as completed. Awaiting customer confirmation.")
+    return redirect('mover_dashboard')
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import Order, Payment
+
+# accept_order
+@login_required
+def accept_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    if order.status == 'Pending':  # فقط اگه در انتظار باشه
+        order.status = 'Ongoing'
+        order.save()
+        messages.success(request, "Order accepted successfully!")
+    else:
+        messages.error(request, "This order is not available for acceptance.")
+    return redirect('mover_dashboard')
+
+# reject_order
+@login_required
+def reject_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    if order.status == 'Pending':
+        order.status = 'Rejected'
+        order.save()
+        messages.success(request, "Order rejected successfully!")
+    else:
+        messages.error(request, "This order cannot be rejected.")
+    return redirect('mover_dashboard')
+
+# mark_order_as_done
+@login_required
+def mark_order_as_done(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    if order.status == 'Ongoing':
+        order.status = 'Awaiting Confirmation'  # وضعیت جدید قبل از تایید مشتری
+        order.save()
+        messages.success(request, "Order marked as completed. Waiting for customer confirmation.")
+    else:
+        messages.error(request, "This order cannot be marked as completed.")
+    return redirect('mover_dashboard')
+
+# confirm_mission_complete
+@login_required
+def confirm_mission_complete(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    if order.status == 'Awaiting Confirmation':
+        order.status = 'Completed'
+        order.save()
+        
+        # پرداخت به موور انجام بشه
+        payment = Payment.objects.create(
+            customer=order.customer,
+            mover=order.mover,
+            order=order,
+            amount=order.total_price * 0.8  # ۸۰٪ مبلغ به موور داده میشه
+        )
+        payment.save()
+
+        messages.success(request, "Order confirmed and payment processed!")
+    else:
+        messages.error(request, "This order cannot be confirmed as completed.")
+    return redirect('customer_dashboard')
