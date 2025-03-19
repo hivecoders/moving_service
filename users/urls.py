@@ -45,5 +45,7 @@ urlpatterns = [
     path('order/<int:order_id>/reject/', reject_order, name='reject_order'),
     path('order/<int:order_id>/confirm_complete/', confirm_mission_complete, name='confirm_mission_complete'),
     path('order/<int:order_id>/mark_done/', mark_order_as_done, name='mark_order_as_done'),
-
+    path('order/<int:order_id>/bid/', views.place_bid, name='place_bid'),
+    path('order/<int:order_id>/confirm_complete/', confirm_mission_complete, name='confirm_mission_complete'),
+    path('order/<int:order_id>/mark_done/', mark_order_as_done, name='mark_order_as_done'),
 ]

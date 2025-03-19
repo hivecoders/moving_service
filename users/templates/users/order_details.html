@@ -53,22 +53,21 @@
             <hr>
 
             <!-- نمایش تصاویر پردازش‌شده -->
-            <h4 class="mt-4">🖼 Processed Images (Detected Objects)</h4>
-            <div class="row">
-                {% if processed_images %}
-                    {% for image in processed_images %}
-                        <div class="col-md-4 mb-3">
-                            <img src="{{ image.processed_image.url }}" class="img-fluid rounded shadow" alt="Processed Image">
+            <h3>📸 Processed Images (Detected Objects)</h3>
+
+            {% if processed_images %}
+                <div class="row">
+                    {% for img in processed_images %}
+                        <div class="col-md-4">
+                            <img src="{{ img.processed_image.url }}" class="img-fluid rounded shadow" alt="Processed Image">
                         </div>
                     {% endfor %}
-                {% else %}
-                    <p class="text-muted">No processed images available.</p>
-                {% endif %}
-            </div>
-
-            <hr>
-
-            <!-- نمایش آیتم‌های شناسایی‌شده -->
+                </div>
+            {% else %}
+                <p class="text-danger">⚠ No processed images available.</p>
+            {% endif %}
+            
+            
             <h4 class="mt-4">🔍 Detected Items</h4>
             {% if detected_items %}
                 <table class="table table-bordered">
@@ -94,6 +93,12 @@
             {% else %}
                 <p class="text-muted">No detected items available.</p>
             {% endif %}
+            
+            </div>
+
+            <hr>
+
+            
 
             <h4 class="mt-4">📦 Total Volume & Weight</h4>
             <p class="fw-bold">Total Volume: {{ order.total_volume|default:"0" }} m³</p>
@@ -128,3 +133,13 @@
 </script>
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 {% endblock %}
+
+{% if processed_images %}
+    <div>
+        {% for image in processed_images %}
+            <img src="{{ image.processed_image.url }}" alt="Processed Image" style="width: 100%; max-width: 500px;">
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No processed images available.</p>
+{% endif %}

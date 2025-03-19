@@ -139,8 +139,8 @@ def create_order_step2(request):
 
     return render(request, 'users/create_order_step2.html', context)
 
+ # اضافه کردن مدل مربوط به ذخیره تصویر پردازش‌شده
 
-# detect_objects
 def detect_objects(image_path, order):
     logger.info(f"Processing image for order {order.id}")
 
@@ -173,17 +173,26 @@ def detect_objects(image_path, order):
                 "bbox": {"x1": x1, "y1": y1, "x2": x2, "y2": y2}
             })
 
-
+            # رسم مربع دور اشیای شناسایی‌شده
             cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
             cv2.putText(image, f"{item_name} ({volume}m³, {weight}kg)", 
                         (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, 
                         (0, 255, 0), 2)
 
+    # ذخیره تصویر پردازش‌شده در سیستم فایل
     processed_image_path = image_path.replace(".jpg", "_processed.jpg")
     cv2.imwrite(processed_image_path, image)
 
+    # **🚀 ذخیره تصویر پردازش‌شده در پایگاه داده**
+    with open(processed_image_path, 'rb') as img_file:
+        processed_image = ProcessedImage(order=order)  # اتصال به سفارش
+        processed_image.processed_image.save(os.path.basename(processed_image_path), File(img_file))
+        processed_image.save()
+
     logger.info(f"Processed image saved: {processed_image_path}")
+
     return detected_items, processed_image_path
+
 
 
 # Stripe Configuration
@@ -607,41 +616,76 @@ def remove_detected_item(request, item_id):
         return JsonResponse({'status': 'success'})
     
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
 #confirm_mission_complete
+
 @login_required
 def confirm_mission_complete(request, order_id):
+    """
+    این تابع به مشتری اجازه می‌دهد که سفارش را تأیید کند و وضعیت آن را به "Completed" تغییر دهد.
+    همچنین پرداخت به موورهای انتخاب‌شده انجام می‌شود.
+    """
     order = get_object_or_404(Order, id=order_id)
+
+    # بررسی اینکه فقط مشتری مرتبط بتواند سفارش را تایید کند
     if not hasattr(request.user, 'customer') or order.customer != request.user.customer:
-        messages.error(request, "Access denied.")
+        messages.error(request, "Access denied. Only the order's customer can confirm completion.")
         return redirect('home')
 
+    # بررسی اینکه سفارش در وضعیت "Awaiting Confirmation" باشد
+    if order.status != "Awaiting Confirmation":
+        messages.error(request, "This order is not awaiting confirmation.")
+        return redirect('customer_dashboard')
+
+    # تغییر وضعیت سفارش به "Completed"
     order.status = "Completed"
     order.save()
 
-    # بروزرسانی وضعیت پرداخت
-    payment = Payment.objects.filter(order=order).first()
-    if payment:
-        payment.status = "Completed"
-        payment.save()
+    # پردازش پرداخت به موورها
+    selected_movers = SelectedMover.objects.filter(order=order)
 
-    messages.success(request, "Order has been marked as completed and payment has been processed.")
+    if selected_movers.exists():
+        for mover in selected_movers:
+            Payment.objects.create(
+                customer=order.customer,
+                mover=mover.mover,
+                order=order,
+                amount=mover.price * 0.8  # ۸۰٪ مبلغ به موور داده می‌شود
+            )
+
+        messages.success(request, "Order confirmed and payments processed to movers.")
+    else:
+        messages.warning(request, "No selected movers found. Payment was not processed.")
+
     return redirect('customer_dashboard')
-#mark_order_as_done
+
+
 @login_required
 def mark_order_as_done(request, order_id):
+    """
+    این تابع به موور اجازه می‌دهد تا وضعیت سفارش را به "در انتظار تایید مشتری" تغییر دهد.
+    """
     order = get_object_or_404(Order, id=order_id)
+
+    # بررسی اینکه فقط موورها می‌توانند این عملیات را انجام دهند
     if not hasattr(request.user, 'mover'):
-        messages.error(request, "Access denied.")
+        messages.error(request, "Access denied. Only movers can mark an order as completed.")
         return redirect('home')
 
+    # بررسی اینکه سفارش در حال انجام باشد
+    if order.status != "Ongoing":
+        messages.error(request, "This order cannot be marked as completed.")
+        return redirect('mover_dashboard')
+
+    # تغییر وضعیت سفارش
     order.status = "Awaiting Confirmation"
     order.save()
+
     messages.success(request, "Order marked as completed. Awaiting customer confirmation.")
     return redirect('mover_dashboard')
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from .models import Order, Payment
+
+
 
 # accept_order
 @login_required
@@ -667,36 +711,13 @@ def reject_order(request, order_id):
         messages.error(request, "This order cannot be rejected.")
     return redirect('mover_dashboard')
 
-# mark_order_as_done
+#place bid
 @login_required
-def mark_order_as_done(request, order_id):
+def place_bid(request, order_id):
     order = get_object_or_404(Order, id=order_id)
-    if order.status == 'Ongoing':
-        order.status = 'Awaiting Confirmation'  # وضعیت جدید قبل از تایید مشتری
-        order.save()
-        messages.success(request, "Order marked as completed. Waiting for customer confirmation.")
-    else:
-        messages.error(request, "This order cannot be marked as completed.")
-    return redirect('mover_dashboard')
-
-# confirm_mission_complete
-@login_required
-def confirm_mission_complete(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    if order.status == 'Awaiting Confirmation':
-        order.status = 'Completed'
-        order.save()
-        
-        # پرداخت به موور انجام بشه
-        payment = Payment.objects.create(
-            customer=order.customer,
-            mover=order.mover,
-            order=order,
-            amount=order.total_price * 0.8  # ۸۰٪ مبلغ به موور داده میشه
-        )
-        payment.save()
-
-        messages.success(request, "Order confirmed and payment processed!")
-    else:
-        messages.error(request, "This order cannot be confirmed as completed.")
-    return redirect('customer_dashboard')
+    if request.method == "POST":
+        price = request.POST.get("bid_price")
+        if price:
+            Bid.objects.create(order=order, mover=request.user.mover, price=price, status="Pending")
+            messages.success(request, "Your bid has been placed successfully!")
+    return redirect("mover_dashboard")
