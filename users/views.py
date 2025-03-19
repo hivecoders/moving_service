@@ -7,6 +7,8 @@ from django.http import JsonResponse, HttpResponse
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from geopy.distance import geodesic
+from .models import Order, Bid, Payment, SelectedMover
+from .models import Order, ProcessedImage, DetectedItem, Photo
 import cv2
 import json
 import numpy as np
@@ -21,6 +23,8 @@ from .forms import (
     MoverRegistrationForm, CustomerRegistrationForm, CustomUserLoginForm, 
     OrderForm, PhotoFormSet, MoverProfileForm, CustomerProfileForm, UserProfileForm , PhotoUploadForm
 )
+
+
 
 
 logger = logging.getLogger(__name__)
@@ -286,15 +290,60 @@ def logout_view(request):
 
 
 # Customer Dashboard
+
+logger = logging.getLogger(__name__)  # برای لاگ گرفتن
+
 @login_required
 def customer_dashboard(request):
     logger.info("Accessing customer dashboard for user: %s", request.user)
+
+    # بررسی اینکه کاربر نقش مشتری داره یا نه
     if hasattr(request.user, 'customer'):
-        orders = Order.objects.filter(customer=request.user.customer)
-        return render(request, 'users/customer_dashboard.html', {'orders': orders})
+        customer = request.user.customer
+
+        # دریافت همه سفارشات مشتری
+        orders = Order.objects.filter(customer=customer)
+
+        # دسته‌بندی سفارشات بر اساس وضعیت
+        pending_orders = orders.filter(status="Pending")
+        ongoing_orders = orders.filter(status="Ongoing")
+        completed_orders = orders.filter(status="Completed")
+        canceled_orders = orders.filter(status="Canceled")
+
+        order_groups = {
+            'pending': pending_orders,
+            'ongoing': ongoing_orders,
+            'completed': completed_orders,
+            'canceled': canceled_orders
+        }
+
+        # دریافت پیشنهادهای موورها برای سفارشات مشتری
+        received_bids = Bid.objects.filter(order__customer=customer, status="Pending")
+
+        # دریافت لیست موورهای انتخاب‌شده در سبد خرید
+        selected_movers = SelectedMover.objects.filter(customer=customer)
+
+        # محاسبه مجموع قیمت + ۱۰٪ سهم سایت
+        total_price = sum(mover.price for mover in selected_movers) * 1.10
+
+        # دریافت تاریخچه پرداخت‌ها
+        payment_history = Payment.objects.filter(customer=customer).order_by('-date')
+
+        context = {
+            'orders': orders,  # نگه داشتن لیست کلی سفارشات (برای اطمینان از حذف نشدن چیزی از کد قبلی)
+            'order_groups': order_groups,  # گروه‌بندی سفارشات
+            'received_bids': received_bids,  # پیشنهادهای دریافتی از موورها
+            'selected_movers': selected_movers,  # لیست موورهای انتخاب‌شده در سبد خرید
+            'total_price': total_price,  # جمع کل مبلغ پرداختی
+            'payment_history': payment_history,  # نمایش تاریخچه پرداخت‌ها
+        }
+
+        return render(request, 'users/customer_dashboard.html', context)
+
     else:
         messages.error(request, "Access denied.")
         return redirect('home')
+
 
 # Mover Dashboard
 @login_required
@@ -327,25 +376,26 @@ def reject_order(request, order_id):
     return redirect('mover_dashboard')
 
 # Order Details View
+
 @login_required
 def order_details(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     
-    photos = Photo.objects.filter(order=order)
-    
+    # دریافت تصاویر پردازش‌شده (عکس‌هایی که اشیا در آن‌ها تشخیص داده شده)
+    processed_images = ProcessedImage.objects.filter(order=order)
+
+    # دریافت لیست اشیای شناسایی‌شده از تصویر
     detected_items = DetectedItem.objects.filter(order=order)
 
     return render(request, 'users/order_details.html', {
         'order': order,
-        'photos': photos,
-        'detected_items': detected_items,
+        'processed_images': processed_images,  # تصاویر پردازش‌شده
+        'detected_items': detected_items,  # اشیای تشخیص داده‌شده
         'origin_lat': order.origin_lat,
         'origin_lng': order.origin_lng,
         'destination_lat': order.destination_lat,
         'destination_lng': order.destination_lng
     })
-
-
 
 # Movers & Proximity Logic
 def nearest_movers(request, order_id):

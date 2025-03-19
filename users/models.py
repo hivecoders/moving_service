@@ -83,9 +83,19 @@ class Mover(models.Model):
     def __str__(self):
         return f"Mover: {self.user.full_name} - {self.user.email}"
 
-# Order Model
+from django.db import models
+from django.utils.timezone import now
+
+#Order
 class Order(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="customer_orders")
+    STATUS_CHOICES = [
+        ("Pending", "Pending"),
+        ("Ongoing", "Ongoing"),
+        ("Completed", "Completed"),
+        ("Canceled", "Canceled"),
+    ]
+
+    customer = models.ForeignKey("Customer", on_delete=models.CASCADE, related_name="customer_orders")
     origin = models.CharField(max_length=100)
     destination = models.CharField(max_length=100)
     origin_floor = models.IntegerField(null=True, blank=True)
@@ -104,11 +114,43 @@ class Order(models.Model):
     total_volume = models.FloatField(default=0)
     total_weight = models.FloatField(default=0)
     items_detected = models.ManyToManyField("DetectedItem", blank=True, related_name="orders")
-    status = models.CharField(max_length=20, default="Pending")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Pending")
     created_at = models.DateTimeField(default=now)
     
     def __str__(self):
         return f"Order #{self.id} by {self.customer.user.email}"
+
+# Bid
+class Bid(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="bids")
+    mover = models.ForeignKey("Mover", on_delete=models.CASCADE, related_name="mover_bids")
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20, choices=[("Pending", "Pending"), ("Accepted", "Accepted"), ("Rejected", "Rejected")], default="Pending")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Bid by {self.mover} for Order #{self.order.id} - ${self.price}"
+
+#SelectedMover
+class SelectedMover(models.Model):
+    customer = models.ForeignKey("Customer", on_delete=models.CASCADE, related_name="selected_movers")
+    mover = models.ForeignKey("Mover", on_delete=models.CASCADE, related_name="selected_movers")
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="selected_movers")
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Selected {self.mover} for Order #{self.order.id} - ${self.price}"
+
+# Payment
+class Payment(models.Model):
+    customer = models.ForeignKey("Customer", on_delete=models.CASCADE, related_name="payments")
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    date = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=[("Pending", "Pending"), ("Completed", "Completed"), ("Failed", "Failed")], default="Completed")
+
+    def __str__(self):
+        return f"Payment of ${self.amount} by {self.customer} on {self.date}"
 
 # Detected Items Model
 class DetectedItem(models.Model):
@@ -130,3 +172,13 @@ class Photo(models.Model):
 
     def __str__(self):
         return f"Photo for Order #{self.order.id}"
+    
+#ProcessedImage
+
+class ProcessedImage(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="processed_images")
+    processed_image = models.ImageField(upload_to='processed_images/')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Processed Image for Order #{self.order.id}"
