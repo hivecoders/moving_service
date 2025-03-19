@@ -69,9 +69,10 @@
             
             
             <h4 class="mt-4">🔍 Detected Items</h4>
+            <h3>Detected Items</h3>
             {% if detected_items %}
-                <table class="table table-bordered">
-                    <thead class="bg-light">
+                <table class="table">
+                    <thead>
                         <tr>
                             <th>Item</th>
                             <th>Confidence</th>
@@ -81,29 +82,27 @@
                     </thead>
                     <tbody>
                         {% for item in detected_items %}
-                        <tr>
-                            <td>{{ item.item_class }}</td>
-                            <td>{{ item.confidence|floatformat:2 }}%</td>
-                            <td>{{ item.volume }} m³</td>
-                            <td>{{ item.weight }} kg</td>
-                        </tr>
+                            <tr>
+                                <td>{{ item.item_class }}</td>
+                                <td>{{ item.confidence }}%</td>
+                                <td>{{ item.volume }} m³</td>
+                                <td>{{ item.weight }} kg</td>
+                            </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+                <h4 class="mt-4">📦 Total Volume & Weight</h4>               
+                <h4>Total Volume: {{ total_volume }} m³</h4>
+                <h4>Total Weight: {{ total_weight }} kg</h4>
+                <h4>Total Items: {{ total_items }}</h4>
             {% else %}
-                <p class="text-muted">No detected items available.</p>
+                <p>No detected items found.</p>
             {% endif %}
+            
             
             </div>
 
             <hr>
-
-            
-
-            <h4 class="mt-4">📦 Total Volume & Weight</h4>
-            <p class="fw-bold">Total Volume: {{ order.total_volume|default:"0" }} m³</p>
-            <p class="fw-bold">Total Weight: {{ order.total_weight|default:"0" }} kg</p>
-            
         </div>
         <div class="card-footer text-end">
             <a href="{% url 'customer_dashboard' %}" class="btn btn-secondary">

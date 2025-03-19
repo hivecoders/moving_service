@@ -353,7 +353,6 @@ def customer_dashboard(request):
         messages.error(request, "Access denied.")
         return redirect('home')
 
-
 # Mover Dashboard
 @login_required
 def mover_dashboard(request):
@@ -363,13 +362,27 @@ def mover_dashboard(request):
         messages.error(request, "Access denied.")
         return redirect('home')
 
-    orders = Order.objects.filter(items_detected__isnull=False, status="Pending").distinct()
-    sent_bids = Bid.objects.filter(mover=request.user.mover)
-    accepted_orders = Order.objects.filter(bids__mover=request.user.mover, bids__status="Accepted").distinct()
+    mover = request.user.mover
+
+    # دریافت تمام سفارش‌های "Pending"
+    orders = Order.objects.filter(status="Pending").distinct()
+
+    # فیلتر سفارش‌ها بر اساس نوع موور
+    if mover.mover_type == "Professional Mover":
+        orders = orders.filter(need_pro_mover=True)
+    elif mover.mover_type in ["Driver with Help", "Driver without Help"]:
+        orders = orders.filter(vehicle_type__isnull=False)
+    elif mover.mover_type == "Box Packer":
+        orders = orders.filter(need_box_packer=True)
+
+    # پیشنهادات ارسال‌شده توسط موور
+    sent_bids = Bid.objects.filter(mover=mover)
+
+    # سفارش‌های پذیرفته‌شده توسط موور
+    accepted_orders = Order.objects.filter(bids__mover=mover, bids__status="Accepted").distinct()
 
     # بررسی درآمد فقط برای سفارش‌های پذیرفته‌شده
-    earnings = Payment.objects.filter(customer__selected_movers__mover=request.user.mover)
-
+    earnings = Payment.objects.filter(customer__selected_movers__mover=mover)
     total_earnings = sum(earning.amount for earning in earnings) if earnings else 0
 
     return render(request, 'users/mover_dashboard.html', {
@@ -379,6 +392,7 @@ def mover_dashboard(request):
         'earnings': earnings,
         'total_earnings': total_earnings
     })
+
 
 # Accept or Reject Orders
 @login_required
@@ -435,9 +449,11 @@ def order_details(request, order_id):
     order = get_object_or_404(Order, id=order_id)
 
     processed_images = ProcessedImage.objects.filter(order=order)
+
+    # دریافت اشیای شناسایی‌شده از تصویر + اشیای اضافه شده دستی
     detected_items = DetectedItem.objects.filter(order=order)
 
-    # اطمینان از اینکه اشیا پردازش‌شده و اطلاعات وزن و حجم ارسال بشه
+    # محاسبه مجموع حجم، وزن و تعداد اشیا
     total_volume = sum(item.volume for item in detected_items)
     total_weight = sum(item.weight for item in detected_items)
     total_items = detected_items.count()
@@ -445,7 +461,7 @@ def order_details(request, order_id):
     return render(request, 'users/order_details.html', {
         'order': order,
         'processed_images': processed_images,
-        'detected_items': detected_items,
+        'detected_items': detected_items,  # این شامل اشیای پردازش‌شده + دستی است
         'total_volume': total_volume,
         'total_weight': total_weight,
         'total_items': total_items,
@@ -454,6 +470,7 @@ def order_details(request, order_id):
         'destination_lat': order.destination_lat,
         'destination_lng': order.destination_lng
     })
+
 
 
 # Movers & Proximity Logic
