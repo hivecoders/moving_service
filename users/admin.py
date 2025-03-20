@@ -2,8 +2,8 @@ from django.contrib import admin
 from .models import Customer, Mover, Order, DetectedItem, Photo
 
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ('user', 'phone')  # یا 'user.name' بسته به نیاز
-    search_fields = ['user__username', 'phone']  # اگر از 'user' برای نام استفاده می‌کنید
+    list_display = ('user', 'phone') 
+    search_fields = ['user__username', 'phone']  
 
 class MoverAdmin(admin.ModelAdmin):
     list_display = ('user', 'phone', 'vehicle_type', 'mover_type', 'location')
@@ -11,7 +11,7 @@ class MoverAdmin(admin.ModelAdmin):
 
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('customer', 'origin', 'destination', 'move_date', 'need_pro_mover', 'need_box_packer')
-    search_fields = ['origin', 'destination', 'customer__user__username']  # اگر به دنبال جستجو در نام کاربر هستید
+    search_fields = ['origin', 'destination', 'customer__user__username'] 
     list_filter = ('move_date', 'need_pro_mover', 'need_box_packer')
 
 class DetectedItemAdmin(admin.ModelAdmin):

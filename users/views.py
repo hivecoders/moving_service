@@ -27,7 +27,7 @@ from .forms import (
 from utils.volume_weight_estimates import VOLUME_WEIGHT_ESTIMATES
 
 
-print("🔥 views.py is loaded!")  # اینو به `views.py` اضافه کن
+print("🔥 views.py is loaded!")  
 
 
 
@@ -143,7 +143,6 @@ def create_order_step2(request):
 
     return render(request, 'users/create_order_step2.html', context)
 
- # اضافه کردن مدل مربوط به ذخیره تصویر پردازش‌شده
 
 def detect_objects(image_path, order):
     logger.info(f"Processing image for order {order.id}")
@@ -177,19 +176,16 @@ def detect_objects(image_path, order):
                 "bbox": {"x1": x1, "y1": y1, "x2": x2, "y2": y2}
             })
 
-            # رسم مربع دور اشیای شناسایی‌شده
             cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
             cv2.putText(image, f"{item_name} ({volume}m³, {weight}kg)", 
                         (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, 
                         (0, 255, 0), 2)
 
-    # ذخیره تصویر پردازش‌شده در سیستم فایل
     processed_image_path = image_path.replace(".jpg", "_processed.jpg")
     cv2.imwrite(processed_image_path, image)
 
-    # **🚀 ذخیره تصویر پردازش‌شده در پایگاه داده**
     with open(processed_image_path, 'rb') as img_file:
-        processed_image = ProcessedImage(order=order)  # اتصال به سفارش
+        processed_image = ProcessedImage(order=order) 
         processed_image.processed_image.save(os.path.basename(processed_image_path), File(img_file))
         processed_image.save()
 
@@ -212,7 +208,7 @@ def login_view(request):
         form = CustomUserLoginForm(request, data=request.POST)
 
         if form.is_valid():
-            email = form.cleaned_data.get('username', "").strip().lower()  # جلوگیری از NoneType
+            email = form.cleaned_data.get('username', "").strip().lower()  
             password = form.cleaned_data.get('password')
 
             if not email:
@@ -327,7 +323,7 @@ def confirm_mission_complete(request, order_id):
     if order.status != "Ongoing":
         return JsonResponse({"status": "error", "message": "Order is not in progress!"}, status=400)
 
-    # تغییر وضعیت به "Awaiting Confirmation"
+    # Awaiting Confirmation"
     order.status = "Awaiting Confirmation"
     order.save()
 
@@ -336,7 +332,7 @@ def confirm_mission_complete(request, order_id):
 
 # Customer Dashboard
 
-logger = logging.getLogger(__name__)  # برای لاگ گرفتن
+logger = logging.getLogger(__name__) 
 
 @login_required
 def customer_dashboard(request):
@@ -393,12 +389,10 @@ def accept_order(request, order_id):
         messages.error(request, "Access denied.")
         return redirect('home')
 
-    # بررسی اینکه سفارش در وضعیت Pending باشد
     if order.status != 'Pending':
         messages.error(request, "This order is no longer available.")
         return redirect('mover_dashboard')
 
-    # تغییر وضعیت سفارش و ذخیره پیشنهاد
     order.status = 'Ongoing'
     order.save()
 
@@ -439,10 +433,8 @@ def order_details(request, order_id):
 
     processed_images = ProcessedImage.objects.filter(order=order)
 
-    # دریافت اشیای شناسایی‌شده از تصویر + اشیای اضافه شده دستی
     detected_items = DetectedItem.objects.filter(order=order)
 
-    # محاسبه مجموع حجم، وزن و تعداد اشیا
     total_volume = sum(item.volume for item in detected_items)
     total_weight = sum(item.weight for item in detected_items)
     total_items = detected_items.count()
@@ -450,7 +442,7 @@ def order_details(request, order_id):
     return render(request, 'users/order_details.html', {
         'order': order,
         'processed_images': processed_images,
-        'detected_items': detected_items,  # این شامل اشیای پردازش‌شده + دستی است
+        'detected_items': detected_items, 
         'total_volume': total_volume,
         'total_weight': total_weight,
         'total_items': total_items,
@@ -492,11 +484,9 @@ def process_payment(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     amount = sum(m.price for m in SelectedMover.objects.filter(order=order))
 
-    # تغییر وضعیت سفارش به "Ongoing"
     order.status = "Ongoing"
     order.save()
 
-    # ایجاد پرداخت جدید (پرداخت نمایشیه)
     Payment.objects.create(
         customer=order.customer,
         amount=amount,
@@ -508,7 +498,6 @@ def process_payment(request, order_id):
         "message": f"Payment of ${amount} completed successfully! Order is now in progress."
     })
 
-    # ذخیره پرداخت در دیتابیس
     payment = Payment.objects.create(
         customer=order.customer,
         amount=amount,
@@ -635,22 +624,17 @@ def remove_detected_item(request, item_id):
 
 @login_required
 def mark_order_as_done(request, order_id):
-    """
-    این تابع به موور اجازه می‌دهد تا وضعیت سفارش را به "در انتظار تایید مشتری" تغییر دهد.
-    """
+   
     order = get_object_or_404(Order, id=order_id)
 
-    # بررسی اینکه فقط موورها می‌توانند این عملیات را انجام دهند
     if not hasattr(request.user, 'mover'):
         messages.error(request, "Access denied. Only movers can mark an order as completed.")
         return redirect('home')
 
-    # بررسی اینکه سفارش در حال انجام باشد
     if order.status != "Ongoing":
         messages.error(request, "This order cannot be marked as completed.")
         return redirect('mover_dashboard')
 
-    # تغییر وضعیت سفارش
     order.status = "Awaiting Confirmation"
     order.save()
 
@@ -663,7 +647,7 @@ def mark_order_as_done(request, order_id):
 @login_required
 def accept_order(request, order_id):
     order = get_object_or_404(Order, id=order_id)
-    if order.status == 'Pending':  # فقط اگه در انتظار باشه
+    if order.status == 'Pending': 
         order.status = 'Ongoing'
         order.save()
         messages.success(request, "Order accepted successfully!")
@@ -703,10 +687,8 @@ def accept_bid(request, bid_id):
     if request.user.customer != bid.order.customer:
         return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
 
-    # حذف تمام بیدهای دیگر این سفارش
     Bid.objects.filter(order=bid.order).delete()
 
-    # افزودن به لیست چک‌اوت
     selected_mover = SelectedMover.objects.create(
         customer=request.user.customer,
         order=bid.order,
@@ -743,11 +725,10 @@ def finalize_payment(request, order_id):
     if order.status != "Awaiting Confirmation":
         return JsonResponse({"status": "error", "message": "Order is not ready for finalization!"}, status=400)
 
-    # پرداخت به موور
     for mover in SelectedMover.objects.filter(order=order):
         Payment.objects.create(
             customer=order.customer,
-            amount=mover.price * 0.8,  # 80% به موور داده می‌شود
+            amount=mover.price * 0.8,  
             status="Completed"
         )
 

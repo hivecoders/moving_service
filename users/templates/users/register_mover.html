@@ -111,9 +111,8 @@
                             document.addEventListener("DOMContentLoaded", function () {
                                 var mapElement = document.getElementById("location_map_canvas");
                                 if (mapElement) {  
-                                    var default_location = [45.5017, -73.5673]; // مونترال
+                                    var default_location = [45.5017, -73.5673];
                     
-                                    // چک کردن اینکه آیا نقشه قبلاً مقداردهی شده یا نه
                                     if (typeof map === 'undefined') {
                                         var map = L.map('location_map_canvas').setView(default_location, 13);
                     
@@ -128,7 +127,6 @@
                                             document.getElementById("location_map").value = position.lat + "," + position.lng;
                                         });
                     
-                                        // اضافه کردن قابلیت جستجوی مکان
                                         var geocoder = L.Control.geocoder({
                                             defaultMarkGeocode: true
                                         }).on('markgeocode', function(e) {
@@ -184,7 +182,6 @@
 
     document.addEventListener('DOMContentLoaded', initMap);
 
-    // Toggle vehicle fields based on selection
     document.addEventListener('DOMContentLoaded', function() {
         var hasVehicleField = document.getElementById('id_has_vehicle');
         var vehicleFields = document.getElementById('vehicle_fields');
@@ -197,7 +194,6 @@
         toggleVehicleFields(); 
     });
 
-    // Toggle Pro Mover certification field
     document.addEventListener('DOMContentLoaded', function () {
         var moverTypeField = document.getElementById('id_mover_type');
         var certificationField = document.getElementById('certification_field');

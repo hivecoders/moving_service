@@ -87,15 +87,15 @@ class CustomUserLoginForm(AuthenticationForm):
         cleaned_data = super().clean()
         email = cleaned_data.get("username")
 
-        # اگر مقدار ایمیل `None` بود، خطا نده، فقط مقدار خالی قرار بده
+        
         if not email:
             raise forms.ValidationError("Email field cannot be empty.")
 
-        email = email.strip().lower()  # حالا مقدار رو کوچک می‌کنیم و فاصله‌های اضافی حذف می‌کنیم
+        email = email.strip().lower() 
         password = cleaned_data.get("password")
 
         if email and password:
-            self.user_cache = authenticate(username=email, password=password)  # مقدار username=email باشد
+            self.user_cache = authenticate(username=email, password=password)  
             if self.user_cache is None:
                 raise forms.ValidationError("Invalid email or password.")
         return cleaned_data
@@ -220,7 +220,7 @@ class UserProfileForm(forms.ModelForm):
 
     class Meta:
         model = CustomUser
-        fields = ['profile_photo']  # این خط رو اضافه کردم
+        fields = ['profile_photo'] 
 
     def clean(self):
         cleaned_data = super().clean()
