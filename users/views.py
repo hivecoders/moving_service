@@ -742,23 +742,32 @@ def place_bid(request, order_id):
 def accept_bid(request, bid_id):
     bid = get_object_or_404(Bid, id=bid_id)
 
+    # بررسی دسترسی مشتری
     if request.user.customer != bid.order.customer:
-        messages.error(request, "Unauthorized access")
-        return redirect("customer_dashboard")
+        return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
 
-    selected_mover, created = SelectedMover.objects.get_or_create(
+    # حذف بیدهای قبلی از همین سفارش در چک‌اوت
+    SelectedMover.objects.filter(order=bid.order, customer=request.user.customer).delete()
+
+    # افزودن موور اکسپت‌شده به چک‌اوت
+    selected_mover = SelectedMover.objects.create(
         customer=request.user.customer,
         order=bid.order,
         mover=bid.mover,
-        defaults={'price': bid.price}
+        price=bid.price
     )
 
-    if created:
-        messages.success(request, "Bid accepted! Proceed to checkout.")
-    else:
-        messages.warning(request, "This mover is already in your cart.")
+    # حذف بید اکسپت‌شده از لیست بیدها
+    bid.delete()
 
-    return redirect("customer_dashboard")  # اینو اضافه کنیم تا مشتری بره داشبورد
+    return JsonResponse({
+        "status": "success",
+        "message": "Bid accepted! Moved to checkout.",
+        "mover_name": selected_mover.mover.full_name,
+        "order_name": f"From {bid.order.origin} → To {bid.order.destination}",
+        "price": selected_mover.price,
+        "mover_id": selected_mover.mover.id
+    })
 
 # mover profile
 
