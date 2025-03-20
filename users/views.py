@@ -1,29 +1,32 @@
 import os
 import logging
+import json
+import cv2
+import numpy as np
+import stripe
+from decimal import Decimal
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 from geopy.distance import geodesic
-from .models import Order, Bid, Payment, SelectedMover
-from .models import Order, ProcessedImage, DetectedItem, Photo
-import cv2
-import json
-import numpy as np
-import django
-from decimal import Decimal
 from django.core.files import File
 from ultralytics import YOLO
-import stripe
-from .models import Customer, Mover, Order, DetectedItem, Photo, CustomUser
-from utils.volume_weight_estimates import VOLUME_WEIGHT_ESTIMATES
-from django.contrib.auth.decorators import login_required
+from .models import (
+    Order, Bid, Payment, SelectedMover, ProcessedImage, DetectedItem, Photo,
+    Customer, Mover, CustomUser
+)
 from .forms import (
     MoverRegistrationForm, CustomerRegistrationForm, CustomUserLoginForm, 
-    OrderForm, PhotoFormSet, MoverProfileForm, CustomerProfileForm, UserProfileForm , PhotoUploadForm
+    OrderForm, PhotoFormSet, MoverProfileForm, CustomerProfileForm, 
+    UserProfileForm, PhotoUploadForm
 )
+from utils.volume_weight_estimates import VOLUME_WEIGHT_ESTIMATES
+
+
 print("🔥 views.py is loaded!")  # اینو به `views.py` اضافه کن
 
 
@@ -295,8 +298,85 @@ def logout_view(request):
     logout(request)
     messages.success(request, "You have been logged out.")
     return redirect('login')
+    # Checkout and Process Payment
 
+@login_required
+def process_payment(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    selected_movers = SelectedMover.objects.filter(order=order, customer=request.user.customer)
 
+    if not selected_movers.exists():
+        messages.error(request, "No movers selected for this order.")
+        return redirect('customer_dashboard')
+
+    total_amount = sum(mover.price for mover in selected_movers) * Decimal(1.10)  # ۱۰٪ سهم سایت
+
+    # ایجاد پرداخت (نمایشی)
+    Payment.objects.create(
+        customer=order.customer,
+        order=order,
+        amount=total_amount,
+        status="Completed"
+    )
+
+    # تغییر وضعیت سفارش و انتقال به لیست مأموریت‌ها
+    order.status = "Ongoing"
+    order.save()
+
+    messages.success(request, f"Payment of ${total_amount:.3f} successful! Movers are on their way.")
+    return redirect('customer_dashboard')
+# Mark Mission as Done (Mover)
+@login_required
+def mark_order_as_done(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+
+    if not hasattr(request.user, 'mover'):
+        messages.error(request, "Access denied. Only movers can mark an order as completed.")
+        return redirect('home')
+
+    if order.status != "Ongoing":
+        messages.error(request, "This order cannot be marked as completed.")
+        return redirect('mover_dashboard')
+
+    order.status = "Awaiting Confirmation"
+    order.save()
+
+    messages.success(request, "Order marked as completed. Awaiting customer confirmation.")
+    return redirect('mover_dashboard')
+
+# Confirm Mission Complete (Customer)
+@login_required
+def confirm_mission_complete(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+
+    if not hasattr(request.user, 'customer') or order.customer != request.user.customer:
+        messages.error(request, "Access denied. Only the order's customer can confirm completion.")
+        return redirect('home')
+
+    if order.status != "Awaiting Confirmation":
+        messages.error(request, "This order is not awaiting confirmation.")
+        return redirect('customer_dashboard')
+
+    order.status = "Completed"
+    order.save()
+
+    # واریز مبلغ به حساب موور
+    selected_movers = SelectedMover.objects.filter(order=order)
+
+    if selected_movers.exists():
+        for mover in selected_movers:
+            Payment.objects.create(
+                customer=order.customer,
+                mover=mover.mover,
+                order=order,
+                amount=mover.price * Decimal(0.80)  # ۸۰٪ مبلغ برای موور
+            )
+
+        messages.success(request, "Order confirmed! Payment sent to movers.")
+    else:
+        messages.warning(request, "No selected movers found. Payment was not processed.")
+
+    return redirect('customer_dashboard')
 
 
 # Customer Dashboard
@@ -305,80 +385,46 @@ logger = logging.getLogger(__name__)  # برای لاگ گرفتن
 
 @login_required
 def customer_dashboard(request):
-    logger.info("Accessing customer dashboard for user: %s", request.user)
-
-    if not hasattr(request.user, 'customer'):
-        messages.error(request, "Access denied.")
-        return redirect('home')
-
     customer = request.user.customer
 
-    # دریافت همه سفارشات مشتری
     orders = Order.objects.filter(customer=customer)
-
-    # دسته‌بندی سفارشات بر اساس وضعیت
-    pending_orders = orders.filter(status="Pending")
-    ongoing_orders = orders.filter(status="Ongoing")
-    completed_orders = orders.filter(status="Completed")
-    canceled_orders = orders.filter(status="Canceled")
-
-    order_groups = {
-        'pending': pending_orders,
-        'ongoing': ongoing_orders,
-        'completed': completed_orders,
-        'canceled': canceled_orders
-    }
-
-    # دریافت پیشنهادهای ارسال‌شده توسط موورها (با مشخصات کامل موور)
     received_bids = Bid.objects.filter(order__customer=customer, status="Pending").select_related('mover')
-
-    # دریافت لیست موورهای انتخاب‌شده در سبد خرید
     selected_movers = SelectedMover.objects.filter(customer=customer).select_related('mover')
-
-    total_price = sum(float(mover.price) for mover in selected_movers) * 1.10
-
-
-    # دریافت تاریخچه پرداخت‌ها
     payment_history = Payment.objects.filter(customer=customer).order_by('-date')
 
-    context = {
-        'orders': orders,  # نگه داشتن لیست کلی سفارشات (برای اطمینان از حذف نشدن چیزی از کد قبلی)
-        'order_groups': order_groups,  # گروه‌بندی سفارشات
-        'received_bids': received_bids,  # پیشنهادهای دریافتی از موورها (با جزئیات کامل)
-        'selected_movers': selected_movers,  # لیست موورهای انتخاب‌شده در سبد خرید
-        'total_price': total_price,  # جمع کل مبلغ پرداختی
-        'payment_history': payment_history,  # نمایش تاریخچه پرداخت‌ها
-    }
+    total_price = sum(mover.price for mover in selected_movers) * Decimal(1.10)
 
-    return render(request, 'users/customer_dashboard.html', context)
+    return render(request, 'users/customer_dashboard.html', {
+        'orders': orders,
+        'received_bids': received_bids,
+        'selected_movers': selected_movers,
+        'total_price': total_price,
+        'payment_history': payment_history
+    })
 
   
 
 # Mover Dashboard
 @login_required
 def mover_dashboard(request):
-    if not hasattr(request.user, 'mover'):
-        messages.error(request, "Access denied.")
-        return redirect('home')
+    mover = request.user.mover
 
-    # نمایش تمام سفارش‌هایی که در وضعیت `Pending` هستند
     orders = Order.objects.filter(status="Pending").distinct()
+    sent_bids = Bid.objects.filter(mover=mover)
+    accepted_orders = Order.objects.filter(bids__mover=mover, bids__status="Accepted").distinct()
+    missions = SelectedMover.objects.filter(mover=mover, order__status="Ongoing")
 
-    sent_bids = Bid.objects.filter(mover=request.user.mover)
-    accepted_orders = Order.objects.filter(bids__mover=request.user.mover, bids__status="Accepted").distinct()
-
-    # بررسی درآمد فقط برای سفارش‌های پذیرفته‌شده
-    earnings = Payment.objects.filter(customer__selected_movers__mover=request.user.mover)
-    total_earnings = sum(earning.amount for earning in earnings) if earnings else 0
+    earnings = Payment.objects.filter(mover=mover)
+    total_earnings = sum(payment.amount for payment in earnings) if earnings else 0
 
     return render(request, 'users/mover_dashboard.html', {
         'orders': orders,
         'sent_bids': sent_bids,
         'accepted_orders': accepted_orders,
+        'missions': missions,
         'earnings': earnings,
         'total_earnings': total_earnings
     })
-
 
 
 
@@ -736,20 +782,18 @@ def place_bid(request, order_id):
     return redirect("mover_dashboard")
 
 
-# Accept Bid
-
+# Accept Bid and Move to Checkout
 @login_required
 def accept_bid(request, bid_id):
     bid = get_object_or_404(Bid, id=bid_id)
 
-    # بررسی دسترسی مشتری
     if request.user.customer != bid.order.customer:
         return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
 
-    # حذف بیدهای قبلی از همین سفارش در چک‌اوت
+    # حذف بیدهای قبلی همین سفارش در چک‌اوت
     SelectedMover.objects.filter(order=bid.order, customer=request.user.customer).delete()
 
-    # افزودن موور اکسپت‌شده به چک‌اوت
+    # اضافه کردن موور جدید به چک‌اوت
     selected_mover = SelectedMover.objects.create(
         customer=request.user.customer,
         order=bid.order,
@@ -757,7 +801,7 @@ def accept_bid(request, bid_id):
         price=bid.price
     )
 
-    # حذف بید اکسپت‌شده از لیست بیدها
+    # حذف بید از لیست
     bid.delete()
 
     return JsonResponse({
