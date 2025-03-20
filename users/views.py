@@ -13,6 +13,7 @@ import cv2
 import json
 import numpy as np
 import django
+from decimal import Decimal
 from django.core.files import File
 from ultralytics import YOLO
 import stripe
@@ -334,7 +335,7 @@ def customer_dashboard(request):
     # دریافت لیست موورهای انتخاب‌شده در سبد خرید
     selected_movers = SelectedMover.objects.filter(customer=customer).select_related('mover')
 
-    total_price = sum(mover.price for mover in selected_movers) * 1.10
+    total_price = sum(float(mover.price) for mover in selected_movers) * 1.10
 
 
     # دریافت تاریخچه پرداخت‌ها
