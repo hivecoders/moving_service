@@ -14,8 +14,8 @@
                          class="img-thumbnail rounded-circle mb-3" 
                          alt="Profile Photo" 
                          style="width: 150px; height: 150px;">
-                    <h4 class="text-gray-700">{{ user.customer.full_name }}</h4>
-                    <p class="text-gray-600">{{ user.email }}</p>
+                    <h4 class="text-dark">{{ user.customer.full_name }}</h4>
+                    <p class="text-dark">{{ user.email }}</p>
                     <a href="{% url 'edit_profile' %}" class="btn btn-primary w-100 mb-2">
                         <i class="fas fa-user-edit"></i> Edit Profile
                     </a>
@@ -33,7 +33,7 @@
         <!-- سفارشات مشتری -->
         <div class="col-md-9">
             <div class="card shadow-sm">
-                <div class="card-header bg-dark text-gray-300 text-center">
+                <div class="card-header bg-dark text-dark text-center">
                     <h2><i class="fas fa-box-open"></i> Your Orders</h2>
                 </div>
                 <div class="card-body">
@@ -42,27 +42,23 @@
                     </a>
 
                     <ul class="nav nav-tabs" id="orderTabs">
-                        <li class="nav-item">
-                            <a class="nav-link active" id="pending-tab" data-bs-toggle="tab" href="#pending" style="color:gray;">Pending</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="ongoing-tab" data-bs-toggle="tab" href="#ongoing" style="color:gray;">Ongoing</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="completed-tab" data-bs-toggle="tab" href="#completed" style="color:gray;">Completed</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="canceled-tab" data-bs-toggle="tab" href="#canceled" style="color:gray;">Canceled</a>
-                        </li>
+                        {% for status, orders in order_groups.items %}
+                            <li class="nav-item">
+                                <a class="nav-link {% if forloop.first %}active{% endif %}" 
+                                   data-bs-toggle="tab" href="#{{ status }}" style="color:black;">
+                                    {{ status|title }}
+                                </a>
+                            </li>
+                        {% endfor %}
                     </ul>
                     
                     <div class="tab-content mt-3">
                         {% for status, orders in order_groups.items %}
-                            <div class="tab-pane fade {% if status == 'pending' %}show active{% endif %}" id="{{ status }}">
+                            <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="{{ status }}">
                                 <ul class="list-group">
                                     {% for order in orders %}
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            <div class="text-gray-700">
+                                            <div>
                                                 <strong>📍 From:</strong> {{ order.origin }} → <strong>To:</strong> {{ order.destination }}<br>
                                                 <small>🕒 {{ order.move_date }} | Status: 
                                                     <span class="badge {% if order.status == 'Pending' %}bg-warning{% elif order.status == 'Ongoing' %}bg-info{% elif order.status == 'Completed' %}bg-success{% elif order.status == 'Canceled' %}bg-danger{% endif %}">
@@ -82,28 +78,34 @@
                 </div>
             </div>
 
-            <!-- پیشنهادهای دریافتی -->
+            <!--bid-->
             <div class="card shadow-sm mt-4">
-                <div class="card-header bg-info text-gray-300">
+                <div class="card-header bg-info text-dark">
                     <h4><i class="fas fa-gavel"></i> Received Bids</h4>
                 </div>
-                <div class="card-body">
-                    <ul class="list-group">
-                        {% for bid in received_bids %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <div class="text-gray-700">
-                                    <strong>{{ bid.mover.full_name }}</strong> - ${{ bid.price }}
-                                </div>
-                                <button class="btn btn-success btn-sm">Accept</button>
-                            </li>
-                        {% empty %}
-                            <li class="list-group-item text-muted">No bids received yet.</li>
-                        {% endfor %}
-                    </ul>
-                </div>
+                <ul class="list-group">
+                    {% for bid in received_bids %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="text-dark">
+                                <strong>
+                                    <a href="{% url 'mover_profile' bid.mover.id %}" class="text-primary">
+                                        {{ bid.mover.full_name }}
+                                    </a>
+                                </strong> 
+                                ({{ bid.mover.get_mover_type_display }}) - ${{ bid.price }}
+                                {% if forloop.first %}
+                                    <span class="badge bg-warning">Nearest</span>
+                                {% endif %}
+                            </div>
+                            <button class="btn btn-success btn-sm accept-bid" data-bid-id="{{ bid.id }}">Accept</button>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-muted">No bids received yet.</li>
+                    {% endfor %}
+                </ul>
             </div>
 
-            <!-- سبد خرید و پرداخت -->
+            <!-- Checkout-->
             <div class="card shadow-sm mt-4">
                 <div class="card-header bg-warning text-dark">
                     <h4><i class="fas fa-shopping-cart"></i> Checkout</h4>
@@ -111,30 +113,30 @@
                 <div class="card-body">
                     <ul class="list-group">
                         {% for selected_mover in selected_movers %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <div class="text-gray-700">
-                                    <strong>{{ selected_mover.mover.full_name }}</strong> - ${{ selected_mover.price }}
-                                </div>
+                            <li class="list-group-item">
+                                <a href="{% url 'mover_profile' selected_mover.mover.id %}" class="text-primary">
+                                    {{ selected_mover.mover.full_name }}
+                                </a> - ${{ selected_mover.price }}
                             </li>
                         {% empty %}
                             <li class="list-group-item text-muted">No movers selected.</li>
                         {% endfor %}
                     </ul>
-                    <h5 class="mt-3 text-gray-700">Total: ${{ total_price }}</h5>
+                    <h5 class="mt-3 text-dark">Total: ${{ total_price }}</h5>
                     <button class="btn btn-primary w-100 mt-2">Proceed to Payment</button>
                 </div>
             </div>
 
             <!-- تاریخچه پرداخت‌ها -->
             <div class="card shadow-sm mt-4">
-                <div class="card-header bg-secondary text-gray-300">
+                <div class="card-header bg-secondary text-dark">
                     <h4><i class="fas fa-credit-card"></i> Payment History</h4>
                 </div>
                 <div class="card-body">
                     <ul class="list-group">
                         {% for payment in payment_history %}
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <div class="text-gray-700">
+                                <div class="text-dark">
                                     <strong>${{ payment.amount }}</strong> - {{ payment.date }}
                                 </div>
                             </li>
@@ -144,8 +146,32 @@
                     </ul>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
+
+<script>
+    document.querySelectorAll('.accept-bid').forEach(button => {
+        button.addEventListener('click', function() {
+            let bidId = this.getAttribute('data-bid-id');
+            fetch(`/users/accept_bid/${bidId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    alert("Bid accepted! Proceed to checkout.");
+                    location.reload();
+                } else {
+                    alert("Error: " + data.message);
+                }
+            });
+        });
+    });
+</script>
+
 {% endblock %}

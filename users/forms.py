@@ -149,17 +149,6 @@ PhotoFormSet = modelformset_factory(
     can_delete=True
 )
 
-# Mover Profile Form
-class MoverProfileForm(forms.ModelForm):
-    class Meta:
-        model = Mover
-        fields = ['full_name', 'phone', 'identification_id', 'has_vehicle', 'vehicle_type', 'mover_type', 'payment_info', 'driving_license', 'carrying_capacity', 'has_mover_certification', 'mover_certification_document']
-
-# Customer Profile Form
-class CustomerProfileForm(forms.ModelForm):
-    class Meta:
-        model = Customer
-        fields = ['full_name', 'phone', 'profile_photo']
 
  # Customer Profile Form (For Editing)
 class CustomerProfileForm(forms.ModelForm):
@@ -174,7 +163,7 @@ class CustomerProfileForm(forms.ModelForm):
 
     class Meta:
         model = Customer
-        fields = ['phone', 'profile_photo']
+        fields = ['phone', 'full_name','profile_photo']
 
     def clean(self):
         cleaned_data = super().clean()
@@ -186,8 +175,8 @@ class CustomerProfileForm(forms.ModelForm):
                 raise forms.ValidationError("Passwords do not match. Please try again.")
 
         return cleaned_data
+ #Mover Profile Form
 
- # Mover Profile Form (For Editing)
 class MoverProfileForm(forms.ModelForm):
     new_password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter new password'}),
@@ -203,7 +192,7 @@ class MoverProfileForm(forms.ModelForm):
         fields = [
             'phone', 'identification_id', 'has_vehicle',
             'vehicle_type', 'mover_type', 'payment_info', 'driving_license',
-            'carrying_capacity', 'has_mover_certification', 'mover_certification_document'
+            'has_mover_certification', 'mover_certification_document',  # 'full_name' رو از اینجا حذف کن و جداگانه بنویس
         ]
 
     def clean(self):
@@ -216,6 +205,7 @@ class MoverProfileForm(forms.ModelForm):
                 raise forms.ValidationError("Passwords do not match. Please try again.")
 
         return cleaned_data
+
       # edit form
 class UserProfileForm(forms.ModelForm):
     profile_photo = forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
@@ -230,7 +220,7 @@ class UserProfileForm(forms.ModelForm):
 
     class Meta:
         model = CustomUser
-        fields = ['profile_photo']
+        fields = ['profile_photo']  # این خط رو اضافه کردم
 
     def clean(self):
         cleaned_data = super().clean()
@@ -242,3 +232,4 @@ class UserProfileForm(forms.ModelForm):
                 raise forms.ValidationError("Passwords do not match. Please try again.")
 
         return cleaned_data
+

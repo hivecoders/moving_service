@@ -20,14 +20,18 @@ urlpatterns = [
     path('dashboard/customer/', views.customer_dashboard, name='customer_dashboard'),
     path('dashboard/mover/', views.mover_dashboard, name='mover_dashboard'),
 
+    # Customer & Mover Profiles
+    path('customer/<int:customer_id>/', views.customer_profile, name='customer_profile'),
+    path('mover/<int:mover_id>/', views.mover_profile, name='mover_profile'),
+
     # Order Related URLs
     path('remove_detected_item/<int:item_id>/', views.remove_detected_item, name='remove_detected_item'),
     path('create_order/', views.create_order, name='create_order'),
-    path('create_order_step2/', views.create_order_step2, name='create_order_step2'), 
+    path('create_order_step2/', views.create_order_step2, name='create_order_step2'),
     path('order_details/<int:order_id>/', views.order_details, name='order_details'),
     path('nearest_movers/<int:order_id>/', views.nearest_movers, name='nearest_movers'),
 
-    #  edit profile
+    # Edit Profile
     path('edit_profile/', views.edit_profile, name='edit_profile'),
 
     # Payment Processing
@@ -41,11 +45,11 @@ urlpatterns = [
     # Order Management for Movers
     path('accept_order/<int:order_id>/', views.accept_order, name='accept_order'),
     path('reject_order/<int:order_id>/', views.reject_order, name='reject_order'),
-    path('order/<int:order_id>/accept/', accept_order, name='accept_order'),
-    path('order/<int:order_id>/reject/', reject_order, name='reject_order'),
-    path('order/<int:order_id>/confirm_complete/', confirm_mission_complete, name='confirm_mission_complete'),
-    path('order/<int:order_id>/mark_done/', mark_order_as_done, name='mark_order_as_done'),
+    path('order/<int:order_id>/confirm_complete/', views.confirm_mission_complete, name='confirm_mission_complete'),
+    path('order/<int:order_id>/mark_done/', views.mark_order_as_done, name='mark_order_as_done'),
     path('order/<int:order_id>/bid/', views.place_bid, name='place_bid'),
-    path('order/<int:order_id>/confirm_complete/', confirm_mission_complete, name='confirm_mission_complete'),
-    path('order/<int:order_id>/mark_done/', mark_order_as_done, name='mark_order_as_done'),
+
+    # Bids
+    path("accept_bid/<int:bid_id>/", views.accept_bid, name="accept_bid"),
+    
 ]
