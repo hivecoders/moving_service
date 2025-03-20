@@ -300,31 +300,6 @@ def logout_view(request):
     return redirect('login')
     # Checkout and Process Payment
 
-@login_required
-def process_payment(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    selected_movers = SelectedMover.objects.filter(order=order, customer=request.user.customer)
-
-    if not selected_movers.exists():
-        messages.error(request, "No movers selected for this order.")
-        return redirect('customer_dashboard')
-
-    total_amount = sum(mover.price for mover in selected_movers) * Decimal(1.10)  # ۱۰٪ سهم سایت
-
-    # ایجاد پرداخت (نمایشی)
-    Payment.objects.create(
-        customer=order.customer,
-        order=order,
-        amount=total_amount,
-        status="Completed"
-    )
-
-    # تغییر وضعیت سفارش و انتقال به لیست مأموریت‌ها
-    order.status = "Ongoing"
-    order.save()
-
-    messages.success(request, f"Payment of ${total_amount:.3f} successful! Movers are on their way.")
-    return redirect('customer_dashboard')
 # Mark Mission as Done (Mover)
 @login_required
 def mark_order_as_done(request, order_id):
@@ -349,34 +324,14 @@ def mark_order_as_done(request, order_id):
 def confirm_mission_complete(request, order_id):
     order = get_object_or_404(Order, id=order_id)
 
-    if not hasattr(request.user, 'customer') or order.customer != request.user.customer:
-        messages.error(request, "Access denied. Only the order's customer can confirm completion.")
-        return redirect('home')
+    if order.status != "Ongoing":
+        return JsonResponse({"status": "error", "message": "Order is not in progress!"}, status=400)
 
-    if order.status != "Awaiting Confirmation":
-        messages.error(request, "This order is not awaiting confirmation.")
-        return redirect('customer_dashboard')
-
-    order.status = "Completed"
+    # تغییر وضعیت به "Awaiting Confirmation"
+    order.status = "Awaiting Confirmation"
     order.save()
 
-    # واریز مبلغ به حساب موور
-    selected_movers = SelectedMover.objects.filter(order=order)
-
-    if selected_movers.exists():
-        for mover in selected_movers:
-            Payment.objects.create(
-                customer=order.customer,
-                mover=mover.mover,
-                order=order,
-                amount=mover.price * Decimal(0.80)  # ۸۰٪ مبلغ برای موور
-            )
-
-        messages.success(request, "Order confirmed! Payment sent to movers.")
-    else:
-        messages.warning(request, "No selected movers found. Payment was not processed.")
-
-    return redirect('customer_dashboard')
+    return JsonResponse({"status": "success", "message": "Order marked as awaiting confirmation!"})
 
 
 # Customer Dashboard
@@ -532,26 +487,26 @@ def calculate_total_price(order):
     total_price = base_price + pro_mover_fee + box_packer_fee
     return total_price * 1.20
 
+@login_required
 def process_payment(request, order_id):
-    logger.info("Processing payment for order: %s", order_id)
     order = get_object_or_404(Order, id=order_id)
+    amount = sum(m.price for m in SelectedMover.objects.filter(order=order))
 
-    amount = calculate_total_price(order)
+    # تغییر وضعیت سفارش به "Ongoing"
+    order.status = "Ongoing"
+    order.save()
 
-    session = stripe.checkout.Session.create(
-        payment_method_types=['card'],
-        line_items=[{
-            'price_data': {
-                'currency': 'usd',
-                'product_data': {'name': f'Moving Order #{order.id}'},
-                'unit_amount': int(amount * 100),
-            },
-            'quantity': 1,
-        }],
-        mode='payment',
-        success_url=request.build_absolute_uri('/payment_success/'),
-        cancel_url=request.build_absolute_uri('/payment_cancel/'),
+    # ایجاد پرداخت جدید (پرداخت نمایشیه)
+    Payment.objects.create(
+        customer=order.customer,
+        amount=amount,
+        status="Completed"
     )
+
+    return JsonResponse({
+        "status": "success",
+        "message": f"Payment of ${amount} completed successfully! Order is now in progress."
+    })
 
     # ذخیره پرداخت در دیتابیس
     payment = Payment.objects.create(
@@ -677,48 +632,6 @@ def remove_detected_item(request, item_id):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
-#confirm_mission_complete
-
-@login_required
-def confirm_mission_complete(request, order_id):
-    """
-    این تابع به مشتری اجازه می‌دهد که سفارش را تأیید کند و وضعیت آن را به "Completed" تغییر دهد.
-    همچنین پرداخت به موورهای انتخاب‌شده انجام می‌شود.
-    """
-    order = get_object_or_404(Order, id=order_id)
-
-    # بررسی اینکه فقط مشتری مرتبط بتواند سفارش را تایید کند
-    if not hasattr(request.user, 'customer') or order.customer != request.user.customer:
-        messages.error(request, "Access denied. Only the order's customer can confirm completion.")
-        return redirect('home')
-
-    # بررسی اینکه سفارش در وضعیت "Awaiting Confirmation" باشد
-    if order.status != "Awaiting Confirmation":
-        messages.error(request, "This order is not awaiting confirmation.")
-        return redirect('customer_dashboard')
-
-    # تغییر وضعیت سفارش به "Completed"
-    order.status = "Completed"
-    order.save()
-
-    # پردازش پرداخت به موورها
-    selected_movers = SelectedMover.objects.filter(order=order)
-
-    if selected_movers.exists():
-        for mover in selected_movers:
-            Payment.objects.create(
-                customer=order.customer,
-                mover=mover.mover,
-                order=order,
-                amount=mover.price * 0.8  # ۸۰٪ مبلغ به موور داده می‌شود
-            )
-
-        messages.success(request, "Order confirmed and payments processed to movers.")
-    else:
-        messages.warning(request, "No selected movers found. Payment was not processed.")
-
-    return redirect('customer_dashboard')
-
 
 @login_required
 def mark_order_as_done(request, order_id):
@@ -790,10 +703,10 @@ def accept_bid(request, bid_id):
     if request.user.customer != bid.order.customer:
         return JsonResponse({"status": "error", "message": "Unauthorized access"}, status=403)
 
-    # حذف بیدهای قبلی همین سفارش در چک‌اوت
-    SelectedMover.objects.filter(order=bid.order, customer=request.user.customer).delete()
+    # حذف تمام بیدهای دیگر این سفارش
+    Bid.objects.filter(order=bid.order).delete()
 
-    # اضافه کردن موور جدید به چک‌اوت
+    # افزودن به لیست چک‌اوت
     selected_mover = SelectedMover.objects.create(
         customer=request.user.customer,
         order=bid.order,
@@ -801,16 +714,12 @@ def accept_bid(request, bid_id):
         price=bid.price
     )
 
-    # حذف بید از لیست
-    bid.delete()
-
     return JsonResponse({
         "status": "success",
         "message": "Bid accepted! Moved to checkout.",
         "mover_name": selected_mover.mover.full_name,
-        "order_name": f"From {bid.order.origin} → To {bid.order.destination}",
-        "price": selected_mover.price,
-        "mover_id": selected_mover.mover.id
+        "order_name": f"{bid.order.origin} → {bid.order.destination}",
+        "price": selected_mover.price
     })
 
 # mover profile
@@ -824,3 +733,25 @@ def mover_profile(request, mover_id):
 def customer_profile(request, customer_id):
     customer = get_object_or_404(Customer, id=customer_id)
     return render(request, 'users/customer_profile.html', {'customer': customer})
+
+
+
+@login_required
+def finalize_payment(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+
+    if order.status != "Awaiting Confirmation":
+        return JsonResponse({"status": "error", "message": "Order is not ready for finalization!"}, status=400)
+
+    # پرداخت به موور
+    for mover in SelectedMover.objects.filter(order=order):
+        Payment.objects.create(
+            customer=order.customer,
+            amount=mover.price * 0.8,  # 80% به موور داده می‌شود
+            status="Completed"
+        )
+
+    order.status = "Completed"
+    order.save()
+
+    return JsonResponse({"status": "success", "message": "Order completed and payments processed!"})
